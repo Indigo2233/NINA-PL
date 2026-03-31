@@ -563,10 +563,7 @@
                 </DockPanel>
 
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
-                              Padding="0,0,4,0"
-                              AllowDrop="True"
-                              DragOver="OnSequenceAreaDragOver"
-                              Drop="OnSequenceAreaDrop">
+                              Padding="0,0,4,0">
                     <StackPanel>
                         <!-- Sequence Start -->
                         <Border Background="{StaticResource Brush.InputBg}" CornerRadius="4" Margin="0,0,0,6" Padding="8,6"
