@@ -193,7 +193,7 @@ public partial class SequencerView
         e.Handled = true;
     }
 
-    private void OnSectionPreviewDragOver(object sender, DragEventArgs e)
+    private void OnSectionDragOver(object sender, DragEventArgs e)
     {
         if (e.Data.GetDataPresent(typeof(InstructionTemplate)) ||
             e.Data.GetDataPresent(typeof(ConditionTemplate)))
@@ -210,7 +210,7 @@ public partial class SequencerView
         }
     }
 
-    private void OnSectionPreviewDrop(object sender, DragEventArgs e)
+    private void OnSectionDrop(object sender, DragEventArgs e)
     {
         if (DataContext is not SequencerPanelViewModel panel)
         {

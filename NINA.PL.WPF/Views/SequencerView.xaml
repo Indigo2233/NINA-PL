@@ -290,7 +290,7 @@
                 <Border x:Name="InstructionCard" Padding="0" Margin="0,0,0,2"
                         CornerRadius="3" Height="Auto" MinHeight="32"
                         AllowDrop="True"
-                        PreviewDragOver="OnNodeDragOver"
+                        DragOver="OnNodeDragOver"
                         DragLeave="OnNodeDragLeave"
                         Drop="OnNodeDrop"
                         PreviewMouseLeftButtonDown="OnNodeMouseDown"
@@ -568,7 +568,7 @@
                         <!-- Sequence Start -->
                         <Border Background="{StaticResource Brush.InputBg}" CornerRadius="4" Margin="0,0,0,6" Padding="8,6"
                                 AllowDrop="True" Tag="Start"
-                                PreviewDragOver="OnSectionPreviewDragOver" PreviewDrop="OnSectionPreviewDrop">
+                                DragOver="OnSectionDragOver" Drop="OnSectionDrop">
                             <StackPanel>
                                 <DockPanel Margin="0,0,0,4">
                                     <TextBlock Text="▶ SEQUENCE START" FontWeight="Bold" FontSize="11"
@@ -596,7 +596,7 @@
                         <!-- Targets (main area) -->
                         <Border Background="{StaticResource Brush.InputBg}" CornerRadius="4" Margin="0,0,0,6" Padding="8,6"
                                 MinHeight="120" AllowDrop="True" Tag="Target"
-                                PreviewDragOver="OnSectionPreviewDragOver" PreviewDrop="OnSectionPreviewDrop">
+                                DragOver="OnSectionDragOver" Drop="OnSectionDrop">
                             <StackPanel>
                                 <DockPanel Margin="0,0,0,4">
                                     <TextBlock Text="🎯 TARGETS" FontWeight="Bold" FontSize="11"
@@ -627,7 +627,7 @@
                         <!-- Sequence End -->
                         <Border Background="{StaticResource Brush.InputBg}" CornerRadius="4" Margin="0,0,0,6" Padding="8,6"
                                 AllowDrop="True" Tag="End"
-                                PreviewDragOver="OnSectionPreviewDragOver" PreviewDrop="OnSectionPreviewDrop">
+                                DragOver="OnSectionDragOver" Drop="OnSectionDrop">
                             <StackPanel>
                                 <DockPanel Margin="0,0,0,4">
                                     <TextBlock Text="⏹ SEQUENCE END" FontWeight="Bold" FontSize="11"
