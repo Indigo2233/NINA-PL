@@ -585,6 +585,121 @@ public static class SequenceItemViewModelFactory
                 icon = "💾";
                 category = "Utility";
                 return true;
+            case DewHeaterInstruction:
+                displayName = "Dew Heater";
+                icon = "💧";
+                category = "Camera";
+                return true;
+            case TakeManyExposuresInstruction:
+                displayName = "Take Many Exposures";
+                icon = "📸";
+                category = "Capture";
+                return true;
+            case TakeSubframeExposureInstruction:
+                displayName = "Take Subframe";
+                icon = "🔲";
+                category = "Capture";
+                return true;
+            case SmartExposureInstruction:
+                displayName = "Smart Exposure";
+                icon = "🧠";
+                category = "Capture";
+                return true;
+            case OpenDomeShutterInstruction:
+                displayName = "Open Dome Shutter";
+                icon = "🏠";
+                category = "Dome";
+                return true;
+            case CloseDomeShutterInstruction:
+                displayName = "Close Dome Shutter";
+                icon = "🏠";
+                category = "Dome";
+                return true;
+            case ParkDomeInstruction:
+                displayName = "Park Dome";
+                icon = "🅿";
+                category = "Dome";
+                return true;
+            case SlewDomeAzimuthInstruction:
+                displayName = "Slew Dome Azimuth";
+                icon = "🧭";
+                category = "Dome";
+                return true;
+            case SynchronizeDomeInstruction:
+                displayName = "Synchronize Dome";
+                icon = "🔄";
+                category = "Dome";
+                return true;
+            case EnableDomeSyncInstruction:
+                displayName = "Enable Dome Sync";
+                icon = "🔗";
+                category = "Dome";
+                return true;
+            case TrainedFlatExposureInstruction:
+                displayName = "Trained Flat Exposure";
+                icon = "🔆";
+                category = "Flat Panel";
+                return true;
+            case TrainedDarkExposureInstruction:
+                displayName = "Trained Dark Exposure";
+                icon = "🌑";
+                category = "Flat Panel";
+                return true;
+            case FindHomeInstruction:
+                displayName = "Find Home";
+                icon = "🏠";
+                category = "Mount";
+                return true;
+            case SlewAndCenterInstruction:
+                displayName = "Slew And Center";
+                icon = "🎯";
+                category = "Mount";
+                return true;
+            case SlewCenterRotateInstruction:
+                displayName = "Slew Center Rotate";
+                icon = "🔄";
+                category = "Mount";
+                return true;
+            case SolveAndSyncInstruction:
+                displayName = "Solve And Sync";
+                icon = "📡";
+                category = "Mount";
+                return true;
+            case MoveFocuserByTempInstruction:
+                displayName = "Move Focuser By Temp";
+                icon = "🌡";
+                category = "Focuser";
+                return true;
+            case SolveAndRotateInstruction:
+                displayName = "Solve And Rotate";
+                icon = "🔃";
+                category = "Rotator";
+                return true;
+            case WaitUntilSafeInstruction:
+                displayName = "Wait Until Safe";
+                icon = "🛡";
+                category = "Safety";
+                return true;
+            case WaitIfMoonAltitudeInstruction:
+                displayName = "Wait If Moon Alt";
+                icon = "🌙";
+                category = "Utility";
+                return true;
+            case WaitIfSunAltitudeInstruction:
+                displayName = "Wait If Sun Alt";
+                icon = "☀";
+                category = "Utility";
+                return true;
+            case WaitUntilAboveHorizonInstruction:
+                displayName = "Wait Until Above Horizon";
+                icon = "⛰";
+                category = "Utility";
+                return true;
+            case RestoreGuidingInstruction:
+                displayName = "Restore Guiding";
+                icon = "▶";
+                category = "Guiding";
+                return true;
             case DeepSkyObjectContainer:
                 displayName = "DSO Target";
                 icon = "🌟";
@@ -610,6 +725,26 @@ public static class SequenceItemViewModelFactory
                         break;
                     case MeridianFlipTrigger:
                         icon = "🔀";
+                        category = "Trigger";
+                        break;
+                    case AutofocusAfterHFRTrigger:
+                        icon = "📈";
+                        category = "Trigger";
+                        break;
+                    case AutofocusAfterTemperatureChangeTrigger:
+                        icon = "🌡";
+                        category = "Trigger";
+                        break;
+                    case RestoreGuidingTrigger:
+                        icon = "▶";
+                        category = "Trigger";
+                        break;
+                    case CenterAfterDriftTrigger:
+                        icon = "🎯";
+                        category = "Trigger";
+                        break;
+                    case SynchronizeDomeTrigger:
+                        icon = "🏠";
                         category = "Trigger";
                         break;
                 }
@@ -655,6 +790,30 @@ public static class SequenceItemViewModelFactory
                     case MeridianFlipCondition:
                         icon = "🔀";
                         category = "Sky";
+                        break;
+                    case TimeSpanCondition:
+                        icon = "⏱";
+                        category = "Flow";
+                        break;
+                    case LoopUntilTimeCondition:
+                        icon = "🕐";
+                        category = "Flow";
+                        break;
+                    case LoopUntilAltitudeBelowCondition:
+                        icon = "📐";
+                        category = "Sky";
+                        break;
+                    case LoopWhileAboveHorizonCondition:
+                        icon = "⛰";
+                        category = "Sky";
+                        break;
+                    case LoopWhileSafeCondition:
+                        icon = "🛡";
+                        category = "Safety";
+                        break;
+                    case LoopWhileUnsafeCondition:
+                        icon = "⚠";
+                        category = "Safety";
                         break;
                 }
                 return true;
@@ -702,6 +861,22 @@ public static class SequenceItemViewModelFactory
             {
                 SeqProp(nameof(MeridianFlipTrigger.MinutesAfterMeridian), x.MinutesAfterMeridian, typeof(double)),
             },
+            AutofocusAfterHFRTrigger hfr => new[]
+            {
+                SeqProp(nameof(AutofocusAfterHFRTrigger.HFRIncreasePercent), hfr.HFRIncreasePercent, typeof(double)),
+                SeqProp(nameof(AutofocusAfterHFRTrigger.SampleSize), hfr.SampleSize, typeof(int)),
+            },
+            AutofocusAfterTemperatureChangeTrigger atc => new[]
+            {
+                SeqProp(nameof(AutofocusAfterTemperatureChangeTrigger.TemperatureChangeThreshold), atc.TemperatureChangeThreshold, typeof(double)),
+            },
+            RestoreGuidingTrigger => Array.Empty<SequenceItemPropertyViewModel>(),
+            CenterAfterDriftTrigger cad => new[]
+            {
+                SeqProp(nameof(CenterAfterDriftTrigger.AfterExposures), cad.AfterExposures, typeof(int)),
+                SeqProp(nameof(CenterAfterDriftTrigger.ThresholdArcminutes), cad.ThresholdArcminutes, typeof(double)),
+            },
+            SynchronizeDomeTrigger => Array.Empty<SequenceItemPropertyViewModel>(),
             _ => Array.Empty<SequenceItemPropertyViewModel>(),
         };
 
@@ -908,6 +1083,115 @@ public static class SequenceItemViewModelFactory
                 SeqProp(nameof(MessageBoxInstruction.Text), m.Text, typeof(string)),
             }),
             SaveSequenceInstruction s => WithInstructionMeta(s, Array.Empty<SequenceItemPropertyViewModel>()),
+            DewHeaterInstruction dh => WithInstructionMeta(dh, new[] { SeqProp(nameof(DewHeaterInstruction.TurnOn), dh.TurnOn, typeof(bool)) }),
+            TakeManyExposuresInstruction tm => WithInstructionMeta(tm, new[]
+            {
+                SeqProp(nameof(TakeManyExposuresInstruction.ExposureSeconds), tm.ExposureSeconds, typeof(double)),
+                SeqProp(nameof(TakeManyExposuresInstruction.Gain), tm.Gain, typeof(int)),
+                SeqProp(nameof(TakeManyExposuresInstruction.Offset), tm.Offset, typeof(int)),
+                SeqProp(nameof(TakeManyExposuresInstruction.BinningX), tm.BinningX, typeof(int)),
+                SeqProp(nameof(TakeManyExposuresInstruction.BinningY), tm.BinningY, typeof(int)),
+                SeqProp(nameof(TakeManyExposuresInstruction.ImageType), tm.ImageType, typeof(string)),
+                SeqProp(nameof(TakeManyExposuresInstruction.FilterName), tm.FilterName ?? "", typeof(string)),
+                SeqProp(nameof(TakeManyExposuresInstruction.ExposureCount), tm.ExposureCount, typeof(int)),
+                SeqProp(nameof(TakeManyExposuresInstruction.FilePrefix), tm.FilePrefix, typeof(string)),
+            }),
+            TakeSubframeExposureInstruction ts => WithInstructionMeta(ts, new[]
+            {
+                SeqProp(nameof(TakeSubframeExposureInstruction.ExposureSeconds), ts.ExposureSeconds, typeof(double)),
+                SeqProp(nameof(TakeSubframeExposureInstruction.Gain), ts.Gain, typeof(int)),
+                SeqProp(nameof(TakeSubframeExposureInstruction.Offset), ts.Offset, typeof(int)),
+                SeqProp(nameof(TakeSubframeExposureInstruction.BinningX), ts.BinningX, typeof(int)),
+                SeqProp(nameof(TakeSubframeExposureInstruction.BinningY), ts.BinningY, typeof(int)),
+                SeqProp(nameof(TakeSubframeExposureInstruction.ImageType), ts.ImageType, typeof(string)),
+                SeqProp(nameof(TakeSubframeExposureInstruction.FilterName), ts.FilterName ?? "", typeof(string)),
+                SeqProp(nameof(TakeSubframeExposureInstruction.FilePrefix), ts.FilePrefix, typeof(string)),
+                SeqProp(nameof(TakeSubframeExposureInstruction.TotalExposureCount), ts.TotalExposureCount, typeof(int)),
+                SeqProp(nameof(TakeSubframeExposureInstruction.SubframePercentage), ts.SubframePercentage, typeof(int)),
+            }),
+            SmartExposureInstruction sm => WithInstructionMeta(sm, new[]
+            {
+                SeqProp(nameof(SmartExposureInstruction.ExposureSeconds), sm.ExposureSeconds, typeof(double)),
+                SeqProp(nameof(SmartExposureInstruction.Gain), sm.Gain, typeof(int)),
+                SeqProp(nameof(SmartExposureInstruction.Offset), sm.Offset, typeof(int)),
+                SeqProp(nameof(SmartExposureInstruction.BinningX), sm.BinningX, typeof(int)),
+                SeqProp(nameof(SmartExposureInstruction.BinningY), sm.BinningY, typeof(int)),
+                SeqProp(nameof(SmartExposureInstruction.FilterName), sm.FilterName ?? "", typeof(string)),
+                SeqProp(nameof(SmartExposureInstruction.ExposureCount), sm.ExposureCount, typeof(int)),
+                SeqProp(nameof(SmartExposureInstruction.DitherAfterExposures), sm.DitherAfterExposures, typeof(int)),
+                SeqProp(nameof(SmartExposureInstruction.FilePrefix), sm.FilePrefix, typeof(string)),
+            }),
+            OpenDomeShutterInstruction ods => WithInstructionMeta(ods, Array.Empty<SequenceItemPropertyViewModel>()),
+            CloseDomeShutterInstruction cds => WithInstructionMeta(cds, Array.Empty<SequenceItemPropertyViewModel>()),
+            ParkDomeInstruction pd => WithInstructionMeta(pd, Array.Empty<SequenceItemPropertyViewModel>()),
+            SlewDomeAzimuthInstruction sda => WithInstructionMeta(sda, new[] { SeqProp(nameof(SlewDomeAzimuthInstruction.Azimuth), sda.Azimuth, typeof(double)) }),
+            SynchronizeDomeInstruction sd => WithInstructionMeta(sd, Array.Empty<SequenceItemPropertyViewModel>()),
+            EnableDomeSyncInstruction eds => WithInstructionMeta(eds, new[] { SeqProp(nameof(EnableDomeSyncInstruction.Enable), eds.Enable, typeof(bool)) }),
+            TrainedFlatExposureInstruction tf => WithInstructionMeta(tf, new[]
+            {
+                SeqProp(nameof(TrainedFlatExposureInstruction.FilterName), tf.FilterName ?? "", typeof(string)),
+                SeqProp(nameof(TrainedFlatExposureInstruction.ExposureSeconds), tf.ExposureSeconds, typeof(double)),
+                SeqProp(nameof(TrainedFlatExposureInstruction.Gain), tf.Gain, typeof(int)),
+                SeqProp(nameof(TrainedFlatExposureInstruction.Offset), tf.Offset, typeof(int)),
+                SeqProp(nameof(TrainedFlatExposureInstruction.FlatCount), tf.FlatCount, typeof(int)),
+                SeqProp(nameof(TrainedFlatExposureInstruction.KeepClosed), tf.KeepClosed, typeof(bool)),
+            }),
+            TrainedDarkExposureInstruction td => WithInstructionMeta(td, new[]
+            {
+                SeqProp(nameof(TrainedDarkExposureInstruction.FilterName), td.FilterName ?? "", typeof(string)),
+                SeqProp(nameof(TrainedDarkExposureInstruction.ExposureSeconds), td.ExposureSeconds, typeof(double)),
+                SeqProp(nameof(TrainedDarkExposureInstruction.Gain), td.Gain, typeof(int)),
+                SeqProp(nameof(TrainedDarkExposureInstruction.Offset), td.Offset, typeof(int)),
+                SeqProp(nameof(TrainedDarkExposureInstruction.DarkCount), td.DarkCount, typeof(int)),
+                SeqProp(nameof(TrainedDarkExposureInstruction.KeepClosed), td.KeepClosed, typeof(bool)),
+            }),
+            FindHomeInstruction fh => WithInstructionMeta(fh, Array.Empty<SequenceItemPropertyViewModel>()),
+            SlewAndCenterInstruction sac => WithInstructionMeta(sac, new[]
+            {
+                SeqProp(nameof(SlewAndCenterInstruction.RA), sac.RA, typeof(double)),
+                SeqProp(nameof(SlewAndCenterInstruction.Dec), sac.Dec, typeof(double)),
+                SeqProp(nameof(SlewAndCenterInstruction.Iterations), sac.Iterations, typeof(int)),
+                SeqProp(nameof(SlewAndCenterInstruction.ThresholdArcsec), sac.ThresholdArcsec, typeof(double)),
+            }),
+            SlewCenterRotateInstruction scr => WithInstructionMeta(scr, new[]
+            {
+                SeqProp(nameof(SlewCenterRotateInstruction.RA), scr.RA, typeof(double)),
+                SeqProp(nameof(SlewCenterRotateInstruction.Dec), scr.Dec, typeof(double)),
+                SeqProp(nameof(SlewCenterRotateInstruction.PositionAngle), scr.PositionAngle, typeof(double)),
+                SeqProp(nameof(SlewCenterRotateInstruction.Iterations), scr.Iterations, typeof(int)),
+                SeqProp(nameof(SlewCenterRotateInstruction.ThresholdArcsec), scr.ThresholdArcsec, typeof(double)),
+            }),
+            SolveAndSyncInstruction sas => WithInstructionMeta(sas, Array.Empty<SequenceItemPropertyViewModel>()),
+            MoveFocuserByTempInstruction mft => WithInstructionMeta(mft, new[]
+            {
+                SeqProp(nameof(MoveFocuserByTempInstruction.Slope), mft.Slope, typeof(double)),
+                SeqProp(nameof(MoveFocuserByTempInstruction.Intercept), mft.Intercept, typeof(double)),
+                SeqProp(nameof(MoveFocuserByTempInstruction.AbsoluteMode), mft.AbsoluteMode, typeof(bool)),
+            }),
+            SolveAndRotateInstruction sar => WithInstructionMeta(sar, new[]
+            {
+                SeqProp(nameof(SolveAndRotateInstruction.TargetSkyAngle), sar.TargetSkyAngle, typeof(double)),
+                SeqProp(nameof(SolveAndRotateInstruction.Tolerance), sar.Tolerance, typeof(double)),
+            }),
+            WaitUntilSafeInstruction wus => WithInstructionMeta(wus, new[] { SeqProp(nameof(WaitUntilSafeInstruction.CheckIntervalSeconds), wus.CheckIntervalSeconds, typeof(double)) }),
+            WaitIfMoonAltitudeInstruction wim => WithInstructionMeta(wim, new[]
+            {
+                SeqProp(nameof(WaitIfMoonAltitudeInstruction.AltitudeThreshold), wim.AltitudeThreshold, typeof(double)),
+                SeqProp(nameof(WaitIfMoonAltitudeInstruction.Comparator), wim.Comparator, typeof(string)),
+            }),
+            WaitIfSunAltitudeInstruction wis => WithInstructionMeta(wis, new[]
+            {
+                SeqProp(nameof(WaitIfSunAltitudeInstruction.AltitudeThreshold), wis.AltitudeThreshold, typeof(double)),
+                SeqProp(nameof(WaitIfSunAltitudeInstruction.Comparator), wis.Comparator, typeof(string)),
+            }),
+            WaitUntilAboveHorizonInstruction wah => WithInstructionMeta(wah, new[]
+            {
+                SeqProp(nameof(WaitUntilAboveHorizonInstruction.RA), wah.RA, typeof(double)),
+                SeqProp(nameof(WaitUntilAboveHorizonInstruction.Dec), wah.Dec, typeof(double)),
+                SeqProp(nameof(WaitUntilAboveHorizonInstruction.AltitudeOffset), wah.AltitudeOffset, typeof(double)),
+                SeqProp(nameof(WaitUntilAboveHorizonInstruction.CheckIntervalSeconds), wah.CheckIntervalSeconds, typeof(double)),
+            }),
+            RestoreGuidingInstruction rg => WithInstructionMeta(rg, Array.Empty<SequenceItemPropertyViewModel>()),
             _ => Array.Empty<SequenceItemPropertyViewModel>(),
         };
 
@@ -953,6 +1237,37 @@ public static class SequenceItemViewModelFactory
                 MeridianFlipCondition mf => new[]
                 {
                     SeqProp(nameof(MeridianFlipCondition.HoursThreshold), mf.HoursThreshold, typeof(double)),
+                },
+                TimeSpanCondition ts => new[]
+                {
+                    SeqProp(nameof(TimeSpanCondition.Name), ts.Name, typeof(string)),
+                    SeqProp(nameof(TimeSpanCondition.MaxSeconds), ts.MaxSeconds, typeof(double)),
+                },
+                LoopUntilTimeCondition lut => new[]
+                {
+                    SeqProp(nameof(LoopUntilTimeCondition.Name), lut.Name, typeof(string)),
+                    SeqProp(nameof(LoopUntilTimeCondition.TimeSource), lut.TimeSource, typeof(string)),
+                    SeqProp(nameof(LoopUntilTimeCondition.Hours), lut.Hours, typeof(int)),
+                    SeqProp(nameof(LoopUntilTimeCondition.Minutes), lut.Minutes, typeof(int)),
+                    SeqProp(nameof(LoopUntilTimeCondition.OffsetMinutes), lut.OffsetMinutes, typeof(int)),
+                },
+                LoopUntilAltitudeBelowCondition lab => new[]
+                {
+                    SeqProp(nameof(LoopUntilAltitudeBelowCondition.Name), lab.Name, typeof(string)),
+                    SeqProp(nameof(LoopUntilAltitudeBelowCondition.TargetAltitude), lab.TargetAltitude, typeof(double)),
+                },
+                LoopWhileAboveHorizonCondition lwah => new[]
+                {
+                    SeqProp(nameof(LoopWhileAboveHorizonCondition.Name), lwah.Name, typeof(string)),
+                    SeqProp(nameof(LoopWhileAboveHorizonCondition.AltitudeOffset), lwah.AltitudeOffset, typeof(double)),
+                },
+                LoopWhileSafeCondition lws => new[]
+                {
+                    SeqProp(nameof(LoopWhileSafeCondition.Name), lws.Name, typeof(string)),
+                },
+                LoopWhileUnsafeCondition lwu => new[]
+                {
+                    SeqProp(nameof(LoopWhileUnsafeCondition.Name), lwu.Name, typeof(string)),
                 },
                 _ => Array.Empty<SequenceItemPropertyViewModel>(),
             };
@@ -1241,6 +1556,279 @@ public static class SequenceItemViewModelFactory
                 Attempts = c.Attempts,
                 IsEnabled = c.IsEnabled,
             },
+            DewHeaterInstruction c => new DewHeaterInstruction
+            {
+                Name = c.Name,
+                Description = c.Description,
+                Category = c.Category,
+                ErrorBehavior = c.ErrorBehavior,
+                Attempts = c.Attempts,
+                IsEnabled = c.IsEnabled,
+                TurnOn = c.TurnOn,
+            },
+            TakeManyExposuresInstruction c => new TakeManyExposuresInstruction
+            {
+                Name = c.Name,
+                Description = c.Description,
+                Category = c.Category,
+                ErrorBehavior = c.ErrorBehavior,
+                Attempts = c.Attempts,
+                IsEnabled = c.IsEnabled,
+                ExposureSeconds = c.ExposureSeconds,
+                Gain = c.Gain,
+                Offset = c.Offset,
+                BinningX = c.BinningX,
+                BinningY = c.BinningY,
+                ImageType = c.ImageType,
+                FilterName = c.FilterName,
+                ExposureCount = c.ExposureCount,
+                FilePrefix = c.FilePrefix,
+            },
+            TakeSubframeExposureInstruction c => new TakeSubframeExposureInstruction
+            {
+                Name = c.Name,
+                Description = c.Description,
+                Category = c.Category,
+                ErrorBehavior = c.ErrorBehavior,
+                Attempts = c.Attempts,
+                IsEnabled = c.IsEnabled,
+                ExposureSeconds = c.ExposureSeconds,
+                Gain = c.Gain,
+                Offset = c.Offset,
+                BinningX = c.BinningX,
+                BinningY = c.BinningY,
+                ImageType = c.ImageType,
+                FilterName = c.FilterName,
+                FilePrefix = c.FilePrefix,
+                TotalExposureCount = c.TotalExposureCount,
+                SubframePercentage = c.SubframePercentage,
+            },
+            SmartExposureInstruction c => new SmartExposureInstruction
+            {
+                Name = c.Name,
+                Description = c.Description,
+                Category = c.Category,
+                ErrorBehavior = c.ErrorBehavior,
+                Attempts = c.Attempts,
+                IsEnabled = c.IsEnabled,
+                ExposureSeconds = c.ExposureSeconds,
+                Gain = c.Gain,
+                Offset = c.Offset,
+                BinningX = c.BinningX,
+                BinningY = c.BinningY,
+                FilterName = c.FilterName,
+                ExposureCount = c.ExposureCount,
+                DitherAfterExposures = c.DitherAfterExposures,
+                FilePrefix = c.FilePrefix,
+            },
+            OpenDomeShutterInstruction c => new OpenDomeShutterInstruction
+            {
+                Name = c.Name,
+                Description = c.Description,
+                Category = c.Category,
+                ErrorBehavior = c.ErrorBehavior,
+                Attempts = c.Attempts,
+                IsEnabled = c.IsEnabled,
+            },
+            CloseDomeShutterInstruction c => new CloseDomeShutterInstruction
+            {
+                Name = c.Name,
+                Description = c.Description,
+                Category = c.Category,
+                ErrorBehavior = c.ErrorBehavior,
+                Attempts = c.Attempts,
+                IsEnabled = c.IsEnabled,
+            },
+            ParkDomeInstruction c => new ParkDomeInstruction
+            {
+                Name = c.Name,
+                Description = c.Description,
+                Category = c.Category,
+                ErrorBehavior = c.ErrorBehavior,
+                Attempts = c.Attempts,
+                IsEnabled = c.IsEnabled,
+            },
+            SlewDomeAzimuthInstruction c => new SlewDomeAzimuthInstruction
+            {
+                Name = c.Name,
+                Description = c.Description,
+                Category = c.Category,
+                ErrorBehavior = c.ErrorBehavior,
+                Attempts = c.Attempts,
+                IsEnabled = c.IsEnabled,
+                Azimuth = c.Azimuth,
+            },
+            SynchronizeDomeInstruction c => new SynchronizeDomeInstruction
+            {
+                Name = c.Name,
+                Description = c.Description,
+                Category = c.Category,
+                ErrorBehavior = c.ErrorBehavior,
+                Attempts = c.Attempts,
+                IsEnabled = c.IsEnabled,
+            },
+            EnableDomeSyncInstruction c => new EnableDomeSyncInstruction
+            {
+                Name = c.Name,
+                Description = c.Description,
+                Category = c.Category,
+                ErrorBehavior = c.ErrorBehavior,
+                Attempts = c.Attempts,
+                IsEnabled = c.IsEnabled,
+                Enable = c.Enable,
+            },
+            TrainedFlatExposureInstruction c => new TrainedFlatExposureInstruction
+            {
+                Name = c.Name,
+                Description = c.Description,
+                Category = c.Category,
+                ErrorBehavior = c.ErrorBehavior,
+                Attempts = c.Attempts,
+                IsEnabled = c.IsEnabled,
+                FilterName = c.FilterName,
+                ExposureSeconds = c.ExposureSeconds,
+                Gain = c.Gain,
+                Offset = c.Offset,
+                FlatCount = c.FlatCount,
+                KeepClosed = c.KeepClosed,
+            },
+            TrainedDarkExposureInstruction c => new TrainedDarkExposureInstruction
+            {
+                Name = c.Name,
+                Description = c.Description,
+                Category = c.Category,
+                ErrorBehavior = c.ErrorBehavior,
+                Attempts = c.Attempts,
+                IsEnabled = c.IsEnabled,
+                FilterName = c.FilterName,
+                ExposureSeconds = c.ExposureSeconds,
+                Gain = c.Gain,
+                Offset = c.Offset,
+                DarkCount = c.DarkCount,
+                KeepClosed = c.KeepClosed,
+            },
+            FindHomeInstruction c => new FindHomeInstruction
+            {
+                Name = c.Name,
+                Description = c.Description,
+                Category = c.Category,
+                ErrorBehavior = c.ErrorBehavior,
+                Attempts = c.Attempts,
+                IsEnabled = c.IsEnabled,
+            },
+            SlewAndCenterInstruction c => new SlewAndCenterInstruction
+            {
+                Name = c.Name,
+                Description = c.Description,
+                Category = c.Category,
+                ErrorBehavior = c.ErrorBehavior,
+                Attempts = c.Attempts,
+                IsEnabled = c.IsEnabled,
+                RA = c.RA,
+                Dec = c.Dec,
+                Iterations = c.Iterations,
+                ThresholdArcsec = c.ThresholdArcsec,
+            },
+            SlewCenterRotateInstruction c => new SlewCenterRotateInstruction
+            {
+                Name = c.Name,
+                Description = c.Description,
+                Category = c.Category,
+                ErrorBehavior = c.ErrorBehavior,
+                Attempts = c.Attempts,
+                IsEnabled = c.IsEnabled,
+                RA = c.RA,
+                Dec = c.Dec,
+                PositionAngle = c.PositionAngle,
+                Iterations = c.Iterations,
+                ThresholdArcsec = c.ThresholdArcsec,
+            },
+            SolveAndSyncInstruction c => new SolveAndSyncInstruction
+            {
+                Name = c.Name,
+                Description = c.Description,
+                Category = c.Category,
+                ErrorBehavior = c.ErrorBehavior,
+                Attempts = c.Attempts,
+                IsEnabled = c.IsEnabled,
+            },
+            MoveFocuserByTempInstruction c => new MoveFocuserByTempInstruction
+            {
+                Name = c.Name,
+                Description = c.Description,
+                Category = c.Category,
+                ErrorBehavior = c.ErrorBehavior,
+                Attempts = c.Attempts,
+                IsEnabled = c.IsEnabled,
+                Slope = c.Slope,
+                Intercept = c.Intercept,
+                AbsoluteMode = c.AbsoluteMode,
+            },
+            SolveAndRotateInstruction c => new SolveAndRotateInstruction
+            {
+                Name = c.Name,
+                Description = c.Description,
+                Category = c.Category,
+                ErrorBehavior = c.ErrorBehavior,
+                Attempts = c.Attempts,
+                IsEnabled = c.IsEnabled,
+                TargetSkyAngle = c.TargetSkyAngle,
+                Tolerance = c.Tolerance,
+            },
+            WaitUntilSafeInstruction c => new WaitUntilSafeInstruction
+            {
+                Name = c.Name,
+                Description = c.Description,
+                Category = c.Category,
+                ErrorBehavior = c.ErrorBehavior,
+                Attempts = c.Attempts,
+                IsEnabled = c.IsEnabled,
+                CheckIntervalSeconds = c.CheckIntervalSeconds,
+            },
+            WaitIfMoonAltitudeInstruction c => new WaitIfMoonAltitudeInstruction
+            {
+                Name = c.Name,
+                Description = c.Description,
+                Category = c.Category,
+                ErrorBehavior = c.ErrorBehavior,
+                Attempts = c.Attempts,
+                IsEnabled = c.IsEnabled,
+                AltitudeThreshold = c.AltitudeThreshold,
+                Comparator = c.Comparator,
+            },
+            WaitIfSunAltitudeInstruction c => new WaitIfSunAltitudeInstruction
+            {
+                Name = c.Name,
+                Description = c.Description,
+                Category = c.Category,
+                ErrorBehavior = c.ErrorBehavior,
+                Attempts = c.Attempts,
+                IsEnabled = c.IsEnabled,
+                AltitudeThreshold = c.AltitudeThreshold,
+                Comparator = c.Comparator,
+            },
+            WaitUntilAboveHorizonInstruction c => new WaitUntilAboveHorizonInstruction
+            {
+                Name = c.Name,
+                Description = c.Description,
+                Category = c.Category,
+                ErrorBehavior = c.ErrorBehavior,
+                Attempts = c.Attempts,
+                IsEnabled = c.IsEnabled,
+                RA = c.RA,
+                Dec = c.Dec,
+                AltitudeOffset = c.AltitudeOffset,
+                CheckIntervalSeconds = c.CheckIntervalSeconds,
+            },
+            RestoreGuidingInstruction c => new RestoreGuidingInstruction
+            {
+                Name = c.Name,
+                Description = c.Description,
+                Category = c.Category,
+                ErrorBehavior = c.ErrorBehavior,
+                Attempts = c.Attempts,
+                IsEnabled = c.IsEnabled,
+            },
             TriggerInstruction c => new TriggerInstruction
             {
                 Name = c.Name,
@@ -1339,6 +1927,25 @@ public static class SequenceItemViewModelFactory
                 MinutesAfterMeridian = x.MinutesAfterMeridian,
             },
             AutofocusOnFilterChangeTrigger x => new AutofocusOnFilterChangeTrigger { Name = x.Name },
+            AutofocusAfterHFRTrigger x => new AutofocusAfterHFRTrigger
+            {
+                Name = x.Name,
+                HFRIncreasePercent = x.HFRIncreasePercent,
+                SampleSize = x.SampleSize,
+            },
+            AutofocusAfterTemperatureChangeTrigger x => new AutofocusAfterTemperatureChangeTrigger
+            {
+                Name = x.Name,
+                TemperatureChangeThreshold = x.TemperatureChangeThreshold,
+            },
+            RestoreGuidingTrigger x => new RestoreGuidingTrigger { Name = x.Name },
+            CenterAfterDriftTrigger x => new CenterAfterDriftTrigger
+            {
+                Name = x.Name,
+                AfterExposures = x.AfterExposures,
+                ThresholdArcminutes = x.ThresholdArcminutes,
+            },
+            SynchronizeDomeTrigger x => new SynchronizeDomeTrigger { Name = x.Name },
             _ => throw new NotSupportedException($"Cannot duplicate trigger type {t.GetType().Name}"),
         };
 
@@ -1382,6 +1989,27 @@ public static class SequenceItemViewModelFactory
                 Name = mf.Name,
                 HoursThreshold = mf.HoursThreshold,
             },
+            TimeSpanCondition ts => new TimeSpanCondition { Name = ts.Name, MaxSeconds = ts.MaxSeconds },
+            LoopUntilTimeCondition lut => new LoopUntilTimeCondition
+            {
+                Name = lut.Name,
+                TimeSource = lut.TimeSource,
+                Hours = lut.Hours,
+                Minutes = lut.Minutes,
+                OffsetMinutes = lut.OffsetMinutes,
+            },
+            LoopUntilAltitudeBelowCondition lab => new LoopUntilAltitudeBelowCondition
+            {
+                Name = lab.Name,
+                TargetAltitude = lab.TargetAltitude,
+            },
+            LoopWhileAboveHorizonCondition lwah => new LoopWhileAboveHorizonCondition
+            {
+                Name = lwah.Name,
+                AltitudeOffset = lwah.AltitudeOffset,
+            },
+            LoopWhileSafeCondition lws => new LoopWhileSafeCondition { Name = lws.Name },
+            LoopWhileUnsafeCondition lwu => new LoopWhileUnsafeCondition { Name = lwu.Name },
             _ => throw new NotSupportedException($"Cannot duplicate condition type {c.GetType().Name}"),
         };
 }

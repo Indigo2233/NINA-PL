@@ -73,6 +73,9 @@ public sealed partial class SequencerPanelViewModel : ObservableObject, IDisposa
         _autoFocusEngine = autoFocusEngine;
         _guider = guider;
 
+        StartSectionNodes.CollectionChanged += OnRootNodesCollectionChanged;
+        TargetSectionNodes.CollectionChanged += OnRootNodesCollectionChanged;
+        EndSectionNodes.CollectionChanged += OnRootNodesCollectionChanged;
         RootNodes.CollectionChanged += OnRootNodesCollectionChanged;
 
         foreach (InstructionTemplate t in BuildInstructionTemplates())
@@ -117,6 +120,12 @@ public sealed partial class SequencerPanelViewModel : ObservableObject, IDisposa
             ElapsedTime = (DateTime.UtcNow - _runStartedUtc).ToString(@"hh\:mm\:ss", System.Globalization.CultureInfo.InvariantCulture);
         };
     }
+
+    public ObservableCollection<SequenceNodeViewModel> StartSectionNodes { get; } = new();
+
+    public ObservableCollection<SequenceNodeViewModel> TargetSectionNodes { get; } = new();
+
+    public ObservableCollection<SequenceNodeViewModel> EndSectionNodes { get; } = new();
 
     public ObservableCollection<SequenceNodeViewModel> RootNodes { get; } = new();
 
@@ -448,8 +457,25 @@ public sealed partial class SequencerPanelViewModel : ObservableObject, IDisposa
         if (SelectedNode?.IsContainer == true)
             SelectedNode.Children.Add(node);
         else
-            RootNodes.Add(node);
+            TargetSectionNodes.Add(node);
 
+        SelectedNode = node;
+    }
+
+    [RelayCommand]
+    private void AddInstructionToSection(string? section)
+    {
+        if (SelectedInstructionTemplate is null)
+            return;
+
+        SequenceNodeViewModel node = SequenceItemViewModelFactory.FromTemplate(SelectedInstructionTemplate);
+        var target = section switch
+        {
+            "Start" => StartSectionNodes,
+            "End" => EndSectionNodes,
+            _ => TargetSectionNodes,
+        };
+        target.Add(node);
         SelectedNode = node;
     }
 
@@ -470,7 +496,7 @@ public sealed partial class SequencerPanelViewModel : ObservableObject, IDisposa
         if (template is null)
             return;
         SequenceNodeViewModel node = SequenceItemViewModelFactory.FromContainerTemplate(template);
-        RootNodes.Add(node);
+        TargetSectionNodes.Add(node);
         SelectedNode = node;
     }
 
@@ -965,6 +991,21 @@ public sealed partial class SequencerPanelViewModel : ObservableObject, IDisposa
             Description = "User sequence",
         };
 
+        var startSection = new SequenceContainer { Name = "Sequence Start" };
+        foreach (SequenceNodeViewModel vm in StartSectionNodes)
+            startSection.Items.Add(BuildSequenceItem(vm));
+        if (startSection.Items.Count > 0)
+            root.Items.Add(startSection);
+
+        foreach (SequenceNodeViewModel vm in TargetSectionNodes)
+            root.Items.Add(BuildSequenceItem(vm));
+
+        var endSection = new SequenceContainer { Name = "Sequence End" };
+        foreach (SequenceNodeViewModel vm in EndSectionNodes)
+            endSection.Items.Add(BuildSequenceItem(vm));
+        if (endSection.Items.Count > 0)
+            root.Items.Add(endSection);
+
         foreach (SequenceNodeViewModel vm in RootNodes)
             root.Items.Add(BuildSequenceItem(vm));
 
@@ -1194,12 +1235,29 @@ public sealed partial class SequencerPanelViewModel : ObservableObject, IDisposa
                 Visit(c);
         }
 
+        foreach (SequenceNodeViewModel r in StartSectionNodes)
+            Visit(r);
+        foreach (SequenceNodeViewModel r in TargetSectionNodes)
+            Visit(r);
+        foreach (SequenceNodeViewModel r in EndSectionNodes)
+            Visit(r);
         foreach (SequenceNodeViewModel r in RootNodes)
             Visit(r);
     }
 
-    private ObservableCollection<SequenceNodeViewModel> GetParentCollection(SequenceNodeViewModel node) =>
-        node.Parent?.Children ?? RootNodes;
+    private ObservableCollection<SequenceNodeViewModel> GetParentCollection(SequenceNodeViewModel node)
+    {
+        if (node.Parent?.Children is not null)
+            return node.Parent.Children;
+
+        if (StartSectionNodes.Contains(node))
+            return StartSectionNodes;
+        if (EndSectionNodes.Contains(node))
+            return EndSectionNodes;
+        if (TargetSectionNodes.Contains(node))
+            return TargetSectionNodes;
+        return RootNodes;
+    }
 
     public ObservableCollection<SequenceNodeViewModel> GetCollectionForNode(SequenceNodeViewModel node)
     {
@@ -1407,6 +1465,167 @@ public sealed partial class SequencerPanelViewModel : ObservableObject, IDisposa
                 Category = "Utility",
                 Factory = () => new SaveSequenceInstruction(),
             },
+            new()
+            {
+                Name = "Dew Heater",
+                Icon = "💧",
+                Category = "Camera",
+                Factory = () => new DewHeaterInstruction(),
+            },
+            new()
+            {
+                Name = "Take Many Exposures",
+                Icon = "📸",
+                Category = "Capture",
+                Factory = () => new TakeManyExposuresInstruction(),
+            },
+            new()
+            {
+                Name = "Take Subframe",
+                Icon = "🔲",
+                Category = "Capture",
+                Factory = () => new TakeSubframeExposureInstruction(),
+            },
+            new()
+            {
+                Name = "Smart Exposure",
+                Icon = "🧠",
+                Category = "Capture",
+                Factory = () => new SmartExposureInstruction(),
+            },
+            new()
+            {
+                Name = "Open Dome Shutter",
+                Icon = "🏠",
+                Category = "Dome",
+                Factory = () => new OpenDomeShutterInstruction(),
+            },
+            new()
+            {
+                Name = "Close Dome Shutter",
+                Icon = "🏠",
+                Category = "Dome",
+                Factory = () => new CloseDomeShutterInstruction(),
+            },
+            new()
+            {
+                Name = "Park Dome",
+                Icon = "🅿",
+                Category = "Dome",
+                Factory = () => new ParkDomeInstruction(),
+            },
+            new()
+            {
+                Name = "Slew Dome Azimuth",
+                Icon = "🧭",
+                Category = "Dome",
+                Factory = () => new SlewDomeAzimuthInstruction(),
+            },
+            new()
+            {
+                Name = "Synchronize Dome",
+                Icon = "🔄",
+                Category = "Dome",
+                Factory = () => new SynchronizeDomeInstruction(),
+            },
+            new()
+            {
+                Name = "Enable Dome Sync",
+                Icon = "🔗",
+                Category = "Dome",
+                Factory = () => new EnableDomeSyncInstruction(),
+            },
+            new()
+            {
+                Name = "Trained Flat Exposure",
+                Icon = "🔆",
+                Category = "Flat Panel",
+                Factory = () => new TrainedFlatExposureInstruction(),
+            },
+            new()
+            {
+                Name = "Trained Dark Exposure",
+                Icon = "🌑",
+                Category = "Flat Panel",
+                Factory = () => new TrainedDarkExposureInstruction(),
+            },
+            new()
+            {
+                Name = "Find Home",
+                Icon = "🏠",
+                Category = "Mount",
+                Factory = () => new FindHomeInstruction(),
+            },
+            new()
+            {
+                Name = "Slew And Center",
+                Icon = "🎯",
+                Category = "Mount",
+                Factory = () => new SlewAndCenterInstruction(),
+            },
+            new()
+            {
+                Name = "Slew Center Rotate",
+                Icon = "🔄",
+                Category = "Mount",
+                Factory = () => new SlewCenterRotateInstruction(),
+            },
+            new()
+            {
+                Name = "Solve And Sync",
+                Icon = "📡",
+                Category = "Mount",
+                Factory = () => new SolveAndSyncInstruction(),
+            },
+            new()
+            {
+                Name = "Move Focuser By Temp",
+                Icon = "🌡",
+                Category = "Focuser",
+                Factory = () => new MoveFocuserByTempInstruction(),
+            },
+            new()
+            {
+                Name = "Solve And Rotate",
+                Icon = "🔃",
+                Category = "Rotator",
+                Factory = () => new SolveAndRotateInstruction(),
+            },
+            new()
+            {
+                Name = "Wait Until Safe",
+                Icon = "🛡",
+                Category = "Safety",
+                Factory = () => new WaitUntilSafeInstruction(),
+            },
+            new()
+            {
+                Name = "Wait If Moon Alt",
+                Icon = "🌙",
+                Category = "Utility",
+                Factory = () => new WaitIfMoonAltitudeInstruction(),
+            },
+            new()
+            {
+                Name = "Wait If Sun Alt",
+                Icon = "☀",
+                Category = "Utility",
+                Factory = () => new WaitIfSunAltitudeInstruction(),
+            },
+            new()
+            {
+                Name = "Wait Until Above Horizon",
+                Icon = "⛰",
+                Category = "Utility",
+                Factory = () => new WaitUntilAboveHorizonInstruction(),
+            },
+            new()
+            {
+                Name = "Restore Guiding",
+                Icon = "▶",
+                Category = "Guiding",
+                Factory = () => new RestoreGuidingInstruction(),
+            },
         };
 
     private static IReadOnlyList<ConditionTemplate> BuildConditionTemplates() =>
@@ -1467,6 +1686,83 @@ public sealed partial class SequencerPanelViewModel : ObservableObject, IDisposa
                 Icon = "🔀",
                 Category = "Trigger",
                 TriggerFactory = () => new MeridianFlipTrigger(),
+            },
+            new()
+            {
+                Name = "Loop For Time Span",
+                Icon = "⏱",
+                Category = "Flow",
+                ConditionFactory = () => new TimeSpanCondition { Name = "TimeSpan", MaxSeconds = 3600 },
+            },
+            new()
+            {
+                Name = "Loop Until Time",
+                Icon = "🕐",
+                Category = "Flow",
+                ConditionFactory = () => new LoopUntilTimeCondition { Name = "Until Time" },
+            },
+            new()
+            {
+                Name = "Loop Until Alt Below",
+                Icon = "📐",
+                Category = "Sky",
+                ConditionFactory = () => new LoopUntilAltitudeBelowCondition { Name = "Alt Below", TargetAltitude = 30 },
+            },
+            new()
+            {
+                Name = "Loop While Above Horizon",
+                Icon = "⛰",
+                Category = "Sky",
+                ConditionFactory = () => new LoopWhileAboveHorizonCondition { Name = "Above Horizon" },
+            },
+            new()
+            {
+                Name = "Loop While Safe",
+                Icon = "🛡",
+                Category = "Safety",
+                ConditionFactory = () => new LoopWhileSafeCondition(),
+            },
+            new()
+            {
+                Name = "Loop While Unsafe",
+                Icon = "⚠",
+                Category = "Safety",
+                ConditionFactory = () => new LoopWhileUnsafeCondition(),
+            },
+            new()
+            {
+                Name = "AF After HFR Increase",
+                Icon = "📈",
+                Category = "Trigger",
+                TriggerFactory = () => new AutofocusAfterHFRTrigger(),
+            },
+            new()
+            {
+                Name = "AF After Temp Change",
+                Icon = "🌡",
+                Category = "Trigger",
+                TriggerFactory = () => new AutofocusAfterTemperatureChangeTrigger(),
+            },
+            new()
+            {
+                Name = "Restore Guiding",
+                Icon = "▶",
+                Category = "Trigger",
+                TriggerFactory = () => new RestoreGuidingTrigger(),
+            },
+            new()
+            {
+                Name = "Center After Drift",
+                Icon = "🎯",
+                Category = "Trigger",
+                TriggerFactory = () => new CenterAfterDriftTrigger(),
+            },
+            new()
+            {
+                Name = "Sync Dome",
+                Icon = "🏠",
+                Category = "Trigger",
+                TriggerFactory = () => new SynchronizeDomeTrigger(),
             },
         };
 
