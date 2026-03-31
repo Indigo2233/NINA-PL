@@ -247,10 +247,6 @@
                     <Border Grid.Row="1" Padding="8" Background="{StaticResource Brush.InputBg}"
                             CornerRadius="0,0,4,4"
                             Visibility="{Binding IsExpanded, Converter={StaticResource BoolToVis}}"
-                            AllowDrop="True"
-                            DragOver="OnNodeDragOver"
-                            DragLeave="OnNodeDragLeave"
-                            Drop="OnNodeDrop"
                             Tag="{Binding}">
                         <StackPanel>
                             <ItemsControl ItemsSource="{Binding Properties}" Margin="4,0,4,8">
@@ -289,10 +285,6 @@
                 <!-- Instruction leaf (NINA-style compact row) -->
                 <Border x:Name="InstructionCard" Padding="0" Margin="0,0,0,2"
                         CornerRadius="3" Height="Auto" MinHeight="32"
-                        AllowDrop="True"
-                        DragOver="OnNodeDragOver"
-                        DragLeave="OnNodeDragLeave"
-                        Drop="OnNodeDrop"
                         PreviewMouseLeftButtonDown="OnNodeMouseDown"
                         PreviewMouseMove="OnNodeMouseMove"
                         MouseLeave="OnNodeMouseLeave"
@@ -563,12 +555,14 @@
                 </DockPanel>
 
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
-                              Padding="0,0,4,0">
+                              Padding="0,0,4,0"
+                              AllowDrop="True"
+                              PreviewDragOver="OnUnifiedDragOver"
+                              PreviewDrop="OnUnifiedDrop">
                     <StackPanel>
                         <!-- Sequence Start -->
                         <Border Background="{StaticResource Brush.InputBg}" CornerRadius="4" Margin="0,0,0,6" Padding="8,6"
-                                AllowDrop="True" Tag="Start"
-                                DragOver="OnSectionDragOver" Drop="OnSectionDrop">
+                                Tag="Start">
                             <StackPanel>
                                 <DockPanel Margin="0,0,0,4">
                                     <TextBlock Text="▶ SEQUENCE START" FontWeight="Bold" FontSize="11"
@@ -595,8 +589,7 @@
 
                         <!-- Targets (main area) -->
                         <Border Background="{StaticResource Brush.InputBg}" CornerRadius="4" Margin="0,0,0,6" Padding="8,6"
-                                MinHeight="120" AllowDrop="True" Tag="Target"
-                                DragOver="OnSectionDragOver" Drop="OnSectionDrop">
+                                MinHeight="120" Tag="Target">
                             <StackPanel>
                                 <DockPanel Margin="0,0,0,4">
                                     <TextBlock Text="🎯 TARGETS" FontWeight="Bold" FontSize="11"
@@ -626,8 +619,7 @@
 
                         <!-- Sequence End -->
                         <Border Background="{StaticResource Brush.InputBg}" CornerRadius="4" Margin="0,0,0,6" Padding="8,6"
-                                AllowDrop="True" Tag="End"
-                                DragOver="OnSectionDragOver" Drop="OnSectionDrop">
+                                Tag="End">
                             <StackPanel>
                                 <DockPanel Margin="0,0,0,4">
                                     <TextBlock Text="⏹ SEQUENCE END" FontWeight="Bold" FontSize="11"
