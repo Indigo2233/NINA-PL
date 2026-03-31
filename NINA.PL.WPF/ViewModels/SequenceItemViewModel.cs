@@ -954,27 +954,14 @@ public static class SequenceItemViewModelFactory
     {
         return item switch
         {
-            SequenceContainer sc => new[]
-            {
-                SeqProp(nameof(SequenceContainer.Name), sc.Name, typeof(string)),
-                SeqProp(nameof(SequenceContainer.Description), sc.Description, typeof(string)),
-                SeqProp(nameof(SequenceContainer.IsEnabled), sc.IsEnabled, typeof(bool)),
-            },
-            ParallelContainer pc => new[]
-            {
-                SeqProp(nameof(ParallelContainer.Name), pc.Name, typeof(string)),
-                SeqProp(nameof(ParallelContainer.Description), pc.Description, typeof(string)),
-                SeqProp(nameof(ParallelContainer.IsEnabled), pc.IsEnabled, typeof(bool)),
-            },
+            SequenceContainer => Array.Empty<SequenceItemPropertyViewModel>(),
+            ParallelContainer => Array.Empty<SequenceItemPropertyViewModel>(),
             DeepSkyObjectContainer d => new[]
             {
-                SeqProp(nameof(DeepSkyObjectContainer.Name), d.Name, typeof(string)),
-                SeqProp(nameof(DeepSkyObjectContainer.Description), d.Description, typeof(string)),
                 SeqProp(nameof(DeepSkyObjectContainer.TargetName), d.TargetName, typeof(string)),
                 SeqProp(nameof(DeepSkyObjectContainer.RA), d.RA, typeof(double)),
                 SeqProp(nameof(DeepSkyObjectContainer.Dec), d.Dec, typeof(double)),
                 SeqProp(nameof(DeepSkyObjectContainer.PositionAngle), d.PositionAngle, typeof(double)),
-                SeqProp(nameof(DeepSkyObjectContainer.IsEnabled), d.IsEnabled, typeof(bool)),
             },
             ConditionInstruction ci => WithInstructionMeta(ci, BuildPropertiesForCondition(ci.Condition)),
             TriggerInstruction ti => WithInstructionMeta(ti, BuildPropertiesForTrigger(ti.Trigger)),

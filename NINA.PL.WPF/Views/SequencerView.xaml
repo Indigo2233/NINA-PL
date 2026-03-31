@@ -249,8 +249,8 @@
                             Visibility="{Binding IsExpanded, Converter={StaticResource BoolToVis}}"
                             Tag="{Binding}">
                         <StackPanel>
-                            <!-- Container properties -->
-                            <ItemsControl ItemsSource="{Binding Properties}" Margin="4,0,4,4">
+                            <!-- Container properties (compact inline) -->
+                            <ItemsControl ItemsSource="{Binding Properties}" Margin="4,2,4,4">
                                 <ItemsControl.Style>
                                     <Style TargetType="ItemsControl">
                                         <Setter Property="Visibility" Value="Collapsed"/>
@@ -261,18 +261,19 @@
                                         </Style.Triggers>
                                     </Style>
                                 </ItemsControl.Style>
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Orientation="Horizontal"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate DataType="{x:Type vm:SequenceItemPropertyViewModel}">
-                                        <Grid Margin="0,4">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="110"/>
-                                                <ColumnDefinition Width="*"/>
-                                            </Grid.ColumnDefinitions>
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,10,2">
                                             <TextBlock Text="{Binding Name}" VerticalAlignment="Center"
-                                                       Foreground="{StaticResource Brush.TextSecondary}" FontSize="11"/>
-                                            <TextBox Grid.Column="1" Text="{Binding ValueAsString, UpdateSourceTrigger=PropertyChanged}"
-                                                     VerticalAlignment="Center"/>
-                                        </Grid>
+                                                       Foreground="{StaticResource Brush.TextSecondary}" FontSize="10" Margin="0,0,4,0"/>
+                                            <TextBox Text="{Binding ValueAsString, UpdateSourceTrigger=PropertyChanged}"
+                                                     VerticalAlignment="Center" MinWidth="60" FontSize="10" Padding="2,1"/>
+                                        </StackPanel>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
@@ -504,14 +505,16 @@
             <DockPanel>
                 <!-- Tab bar -->
                 <UniformGrid DockPanel.Dock="Top" Rows="1" Margin="4,4,4,0">
-                    <RadioButton Content="📋 Instructions" GroupName="PaletteTab" FontSize="10" Padding="4,6"
-                                 IsChecked="{Binding PaletteTabIndex, Converter={x:Static conv:GreaterThanZeroConverter.Instance}, ConverterParameter=tab0}"
+                    <RadioButton Content="Instructions" GroupName="PaletteTab" FontSize="10" Padding="4,6"
+                                 IsChecked="{Binding PaletteTabIndex, Converter={x:Static conv:IntEqualsConverter.Instance}, ConverterParameter=0}"
                                  Command="{Binding SetPaletteTabCommand}" CommandParameter="0"
                                  Style="{StaticResource {x:Type ToggleButton}}"/>
-                    <RadioButton Content="🔄 Conditions" GroupName="PaletteTab" FontSize="10" Padding="4,6"
+                    <RadioButton Content="Conditions" GroupName="PaletteTab" FontSize="10" Padding="4,6"
+                                 IsChecked="{Binding PaletteTabIndex, Converter={x:Static conv:IntEqualsConverter.Instance}, ConverterParameter=1}"
                                  Command="{Binding SetPaletteTabCommand}" CommandParameter="1"
                                  Style="{StaticResource {x:Type ToggleButton}}"/>
-                    <RadioButton Content="⚡ Triggers" GroupName="PaletteTab" FontSize="10" Padding="4,6"
+                    <RadioButton Content="Triggers" GroupName="PaletteTab" FontSize="10" Padding="4,6"
+                                 IsChecked="{Binding PaletteTabIndex, Converter={x:Static conv:IntEqualsConverter.Instance}, ConverterParameter=2}"
                                  Command="{Binding SetPaletteTabCommand}" CommandParameter="2"
                                  Style="{StaticResource {x:Type ToggleButton}}"/>
                 </UniformGrid>

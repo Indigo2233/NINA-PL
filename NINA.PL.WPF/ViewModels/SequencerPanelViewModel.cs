@@ -1427,8 +1427,15 @@ public sealed partial class SequencerPanelViewModel : ObservableObject, IDisposa
 
     public ObservableCollection<SequenceNodeViewModel> GetParentCollection(SequenceNodeViewModel node)
     {
-        if (node.Parent?.Children is not null)
-            return node.Parent.Children;
+        if (node.Parent is not null)
+        {
+            if (node.Parent.Conditions.Contains(node))
+                return node.Parent.Conditions;
+            if (node.Parent.Triggers.Contains(node))
+                return node.Parent.Triggers;
+            if (node.Parent.Children.Contains(node))
+                return node.Parent.Children;
+        }
 
         if (StartSectionNodes.Contains(node))
             return StartSectionNodes;
@@ -1436,6 +1443,16 @@ public sealed partial class SequencerPanelViewModel : ObservableObject, IDisposa
             return EndSectionNodes;
         if (TargetSectionNodes.Contains(node))
             return TargetSectionNodes;
+
+        foreach (var section in AllSections())
+            foreach (var container in section)
+            {
+                if (container.Conditions.Contains(node))
+                    return container.Conditions;
+                if (container.Triggers.Contains(node))
+                    return container.Triggers;
+            }
+
         return RootNodes;
     }
 
