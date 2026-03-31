@@ -249,7 +249,8 @@
                             Visibility="{Binding IsExpanded, Converter={StaticResource BoolToVis}}"
                             Tag="{Binding}">
                         <StackPanel>
-                            <ItemsControl ItemsSource="{Binding Properties}" Margin="4,0,4,8">
+                            <!-- Container properties -->
+                            <ItemsControl ItemsSource="{Binding Properties}" Margin="4,0,4,4">
                                 <ItemsControl.Style>
                                     <Style TargetType="ItemsControl">
                                         <Setter Property="Visibility" Value="Collapsed"/>
@@ -275,8 +276,48 @@
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
-                            <ItemsControl ItemsSource="{Binding Children}" ItemTemplate="{DynamicResource SequenceNodeTemplate}"
-                                          Margin="12,4,0,0"/>
+
+                            <!-- Triggers sub-area -->
+                            <Border Background="#1A3F51B5" CornerRadius="3" Padding="6,4" Margin="4,2,4,4"
+                                    BorderBrush="#333F51B5" BorderThickness="1">
+                                <StackPanel>
+                                    <DockPanel Margin="0,0,0,2">
+                                        <TextBlock Text="⚡ TRIGGERS" FontSize="9" FontWeight="SemiBold"
+                                                   Foreground="#7986CB" VerticalAlignment="Center"/>
+                                        <Button DockPanel.Dock="Right" Content="+" FontSize="12" Width="18" Height="18"
+                                                Style="{StaticResource SmallIconButton}" HorizontalAlignment="Right"
+                                                Command="{Binding DataContext.AddTriggerToContainerCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}" ToolTip="Add trigger"/>
+                                    </DockPanel>
+                                    <ItemsControl ItemsSource="{Binding Triggers}" ItemTemplate="{DynamicResource SequenceNodeTemplate}"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Conditions sub-area -->
+                            <Border Background="#1AFF9800" CornerRadius="3" Padding="6,4" Margin="4,0,4,4"
+                                    BorderBrush="#33FF9800" BorderThickness="1">
+                                <StackPanel>
+                                    <DockPanel Margin="0,0,0,2">
+                                        <TextBlock Text="🔄 CONDITIONS" FontSize="9" FontWeight="SemiBold"
+                                                   Foreground="#FFB74D" VerticalAlignment="Center"/>
+                                        <Button DockPanel.Dock="Right" Content="+" FontSize="12" Width="18" Height="18"
+                                                Style="{StaticResource SmallIconButton}" HorizontalAlignment="Right"
+                                                Command="{Binding DataContext.AddConditionToContainerCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}" ToolTip="Add condition"/>
+                                    </DockPanel>
+                                    <ItemsControl ItemsSource="{Binding Conditions}" ItemTemplate="{DynamicResource SequenceNodeTemplate}"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Instructions sub-area -->
+                            <Border Background="#1A4CAF50" CornerRadius="3" Padding="6,4" Margin="4,0,4,0"
+                                    BorderBrush="#334CAF50" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="📋 INSTRUCTIONS" FontSize="9" FontWeight="SemiBold"
+                                               Foreground="#81C784" Margin="0,0,0,2"/>
+                                    <ItemsControl ItemsSource="{Binding Children}" ItemTemplate="{DynamicResource SequenceNodeTemplate}"/>
+                                </StackPanel>
+                            </Border>
                         </StackPanel>
                     </Border>
                     </Grid>
@@ -560,6 +601,31 @@
                               PreviewDragOver="OnUnifiedDragOver"
                               PreviewDrop="OnUnifiedDrop">
                     <StackPanel>
+                        <!-- Global Triggers -->
+                        <Border Background="#1A3F51B5" CornerRadius="4" Margin="0,0,0,6" Padding="8,6"
+                                BorderBrush="#333F51B5" BorderThickness="1">
+                            <StackPanel>
+                                <DockPanel Margin="0,0,0,4">
+                                    <TextBlock Text="⚡ GLOBAL TRIGGERS" FontWeight="Bold" FontSize="11"
+                                               Foreground="#7986CB" VerticalAlignment="Center"/>
+                                    <Button DockPanel.Dock="Right" Content="+" FontSize="14" Width="22" Height="22"
+                                            Style="{StaticResource SmallIconButton}" HorizontalAlignment="Right"
+                                            Command="{Binding AddGlobalTriggerCommand}"
+                                            ToolTip="Add selected trigger to global triggers"/>
+                                </DockPanel>
+                                <TextBlock Text="Triggers that apply to the entire sequence"
+                                           FontSize="9" Foreground="{StaticResource Brush.TextSecondary}" Margin="0,0,0,4"
+                                           Visibility="{Binding GlobalTriggers.Count, Converter={x:Static conv:GreaterThanZeroConverter.Instance}, ConverterParameter=invert}"/>
+                                <ItemsControl ItemsSource="{Binding GlobalTriggers}" ItemTemplate="{DynamicResource SequenceNodeTemplate}">
+                                    <ItemsControl.ItemContainerStyle>
+                                        <Style TargetType="ContentPresenter">
+                                            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                                        </Style>
+                                    </ItemsControl.ItemContainerStyle>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+
                         <!-- Sequence Start -->
                         <Border Background="{StaticResource Brush.InputBg}" CornerRadius="4" Margin="0,0,0,6" Padding="8,6"
                                 Tag="Start">

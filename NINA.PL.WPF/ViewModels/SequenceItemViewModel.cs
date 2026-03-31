@@ -175,6 +175,10 @@ public sealed partial class SequenceNodeViewModel : ObservableObject
 
     public ObservableCollection<SequenceNodeViewModel> Children { get; } = new();
 
+    public ObservableCollection<SequenceNodeViewModel> Conditions { get; } = new();
+
+    public ObservableCollection<SequenceNodeViewModel> Triggers { get; } = new();
+
     public ObservableCollection<SequenceItemPropertyViewModel> Properties { get; }
 
     public SequenceNodeViewModel? Parent { get; set; }

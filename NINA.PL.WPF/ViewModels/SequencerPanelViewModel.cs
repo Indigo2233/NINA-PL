@@ -129,6 +129,8 @@ public sealed partial class SequencerPanelViewModel : ObservableObject, IDisposa
 
     public ObservableCollection<SequenceNodeViewModel> RootNodes { get; } = new();
 
+    public ObservableCollection<SequenceNodeViewModel> GlobalTriggers { get; } = new();
+
     public ObservableCollection<UserTemplate> UserTemplates { get; } = new();
 
     public ObservableCollection<SavedTarget> SavedTargets { get; } = new();
@@ -145,6 +147,9 @@ public sealed partial class SequencerPanelViewModel : ObservableObject, IDisposa
 
     [ObservableProperty]
     private InstructionTemplate? selectedInstructionTemplate;
+
+    [ObservableProperty]
+    private ConditionTemplate? selectedConditionTemplate;
 
     [ObservableProperty]
     private SequenceNodeViewModel? selectedNode;
@@ -514,6 +519,44 @@ public sealed partial class SequencerPanelViewModel : ObservableObject, IDisposa
             return;
         SequenceNodeViewModel node = SequenceItemViewModelFactory.FromContainerTemplate(template);
         TargetSectionNodes.Add(node);
+        SelectedNode = node;
+    }
+
+    [RelayCommand]
+    private void AddConditionToContainer(SequenceNodeViewModel? container)
+    {
+        if (container is null || !container.IsContainer || SelectedConditionTemplate is null)
+            return;
+        if (SelectedConditionTemplate.ConditionFactory is not null)
+        {
+            var node = SequenceItemViewModelFactory.FromConditionTemplate(SelectedConditionTemplate);
+            container.Conditions.Add(node);
+            node.Parent = container;
+            SelectedNode = node;
+        }
+    }
+
+    [RelayCommand]
+    private void AddTriggerToContainer(SequenceNodeViewModel? container)
+    {
+        if (container is null || !container.IsContainer || SelectedConditionTemplate is null)
+            return;
+        if (SelectedConditionTemplate.TriggerFactory is not null)
+        {
+            var node = SequenceItemViewModelFactory.FromConditionTemplate(SelectedConditionTemplate);
+            container.Triggers.Add(node);
+            node.Parent = container;
+            SelectedNode = node;
+        }
+    }
+
+    [RelayCommand]
+    private void AddGlobalTrigger()
+    {
+        if (SelectedConditionTemplate?.TriggerFactory is null)
+            return;
+        var node = SequenceItemViewModelFactory.FromConditionTemplate(SelectedConditionTemplate);
+        GlobalTriggers.Add(node);
         SelectedNode = node;
     }
 
