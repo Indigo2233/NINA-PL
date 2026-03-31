@@ -727,7 +727,7 @@ public sealed partial class SequencerPanelViewModel : ObservableObject, IDisposa
                 break;
             default:
                 newParent = target.Parent;
-                targetColl = newParent?.Children ?? RootNodes;
+                targetColl = newParent?.Children ?? FindSectionCollection(target);
                 insertIndex = targetColl.IndexOf(target);
                 if (insertIndex < 0)
                     return;
