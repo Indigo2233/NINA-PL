@@ -288,7 +288,7 @@
 
                 <!-- Instruction leaf (NINA-style compact row) -->
                 <Border x:Name="InstructionCard" Padding="0" Margin="0,0,0,2"
-                        CornerRadius="3" Height="32"
+                        CornerRadius="3" Height="Auto" MinHeight="32"
                         AllowDrop="True"
                         PreviewDragOver="OnNodeDragOver"
                         DragLeave="OnNodeDragLeave"
@@ -330,55 +330,90 @@
                                       Command="{Binding DataContext.SelectNodeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                       CommandParameter="{Binding}"/>
                     </Border.InputBindings>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="4"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Border x:Name="StatusStripe" Grid.Column="0" Background="{StaticResource Brush.StatusPending}"
-                                CornerRadius="3,0,0,3"/>
-                        <DockPanel Grid.Column="1" Margin="6,0,4,0">
-                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                    <StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="4"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Border x:Name="StatusStripe" Grid.Column="0" Background="{StaticResource Brush.StatusPending}"
+                                    CornerRadius="3,0,0,3"/>
+                            <DockPanel Grid.Column="1" Margin="6,0,4,0">
+                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <ToggleButton Width="20" Height="20" Padding="0" FontSize="12"
+                                                  IsChecked="{Binding ShowAdvancedSettings, Mode=TwoWay}"
+                                                  Background="Transparent" BorderThickness="0"
+                                                  Foreground="{StaticResource Brush.TextSecondary}"
+                                                  ToolTip="Advanced settings" VerticalAlignment="Center"
+                                                  Content="⋯"/>
+                                <Button Style="{StaticResource SmallIconButton}" Content="⋯" ToolTip="Advanced settings"
+                                        Width="20" Height="20" FontSize="12"
+                                        Command="{Binding DataContext.ToggleAdvancedSettingsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}"/>
                                 <Button Style="{StaticResource SmallIconButton}" Content="📋" ToolTip="Duplicate"
                                         Command="{Binding DataContext.DuplicateNodeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                         CommandParameter="{Binding}" Width="20" Height="20" FontSize="10"/>
                                 <Button Style="{StaticResource SmallIconButton}" Content="✕" Foreground="{StaticResource Brush.Accent}" ToolTip="Remove"
                                         Command="{Binding DataContext.RemoveNodeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                         CommandParameter="{Binding}" Width="20" Height="20" FontSize="10"/>
+                                </StackPanel>
+                                <CheckBox DockPanel.Dock="Left" VerticalAlignment="Center" Margin="0,0,6,0"
+                                          IsChecked="{Binding IsEnabled, Mode=TwoWay}" ToolTip="Enabled"/>
+                                <Ellipse DockPanel.Dock="Left" Width="6" Height="6" Margin="0,0,6,0" VerticalAlignment="Center"
+                                         Fill="{StaticResource Brush.StatusPending}" x:Name="StatusDot"/>
+                                <Border DockPanel.Dock="Left" Width="16" Height="16" Margin="0,0,6,0"
+                                        CornerRadius="8" Background="#FFFF5252" VerticalAlignment="Center"
+                                        ToolTip="{Binding ValidationMessage}"
+                                        Visibility="{Binding HasValidationIssue, Converter={StaticResource BoolToVis}}">
+                                    <TextBlock Text="!" FontSize="10" FontWeight="Bold" Foreground="White"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <TextBlock DockPanel.Dock="Left" Text="{Binding Icon}" FontSize="14" Margin="0,0,6,0"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock DockPanel.Dock="Left" Text="{Binding DisplayName}" FontWeight="SemiBold" FontSize="12"
+                                           VerticalAlignment="Center" Margin="0,0,12,0" MinWidth="100"
+                                           TextTrimming="CharacterEllipsis"/>
+                                <ItemsControl DockPanel.Dock="Left" ItemsSource="{Binding Properties}" VerticalAlignment="Center">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate DataType="{x:Type vm:SequenceItemPropertyViewModel}">
+                                            <StackPanel Orientation="Horizontal" Margin="0,0,8,0" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Name}" Foreground="{StaticResource Brush.TextSecondary}"
+                                                           FontSize="11" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                                <TextBox Text="{Binding ValueAsString, UpdateSourceTrigger=PropertyChanged}"
+                                                         VerticalAlignment="Center" MinWidth="40" MaxWidth="90"
+                                                         FontSize="11" Padding="3,1" BorderThickness="1"
+                                                         BorderBrush="{StaticResource Brush.BorderSubtle}"
+                                                         Background="{StaticResource Brush.InputBg}"/>
+                                                <TextBlock Text="|" Foreground="{StaticResource Brush.BorderSubtle}"
+                                                           FontSize="11" VerticalAlignment="Center" Margin="8,0,0,0"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </DockPanel>
+                        </Grid>
+                        <Border Padding="4,2" Background="{StaticResource Brush.InputBg}"
+                                Visibility="{Binding ShowAdvancedSettings, Converter={StaticResource BoolToVis}}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Attempts" FontSize="10" Margin="0,0,4,0" Foreground="{StaticResource Brush.TextSecondary}" VerticalAlignment="Center"/>
+                                <TextBox Text="{Binding Attempts, UpdateSourceTrigger=PropertyChanged}" Width="30" FontSize="10" VerticalAlignment="Center"/>
+                                <TextBlock Text="On Error" FontSize="10" Margin="10,0,4,0" Foreground="{StaticResource Brush.TextSecondary}" VerticalAlignment="Center"/>
+                                <ComboBox SelectedValue="{Binding OnErrorBehavior, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          SelectedValuePath="Content" FontSize="10" Width="80" VerticalAlignment="Center">
+                                    <ComboBoxItem Content="Continue"/>
+                                    <ComboBoxItem Content="Skip"/>
+                                    <ComboBoxItem Content="Abort"/>
+                                </ComboBox>
+                                <Button Content="Reset" FontSize="10" Padding="6,2" Margin="10,0,0,0" VerticalAlignment="Center"
+                                        Command="{Binding ResetAdvancedSettingsCommand}"/>
                             </StackPanel>
-                            <CheckBox DockPanel.Dock="Left" VerticalAlignment="Center" Margin="0,0,6,0"
-                                      IsChecked="{Binding IsEnabled, Mode=TwoWay}" ToolTip="Enabled"/>
-                            <Ellipse DockPanel.Dock="Left" Width="6" Height="6" Margin="0,0,6,0" VerticalAlignment="Center"
-                                     Fill="{StaticResource Brush.StatusPending}" x:Name="StatusDot"/>
-                            <TextBlock DockPanel.Dock="Left" Text="{Binding Icon}" FontSize="14" Margin="0,0,6,0"
-                                       VerticalAlignment="Center"/>
-                            <TextBlock DockPanel.Dock="Left" Text="{Binding DisplayName}" FontWeight="SemiBold" FontSize="12"
-                                       VerticalAlignment="Center" Margin="0,0,12,0" MinWidth="100"
-                                       TextTrimming="CharacterEllipsis"/>
-                            <ItemsControl DockPanel.Dock="Left" ItemsSource="{Binding Properties}" VerticalAlignment="Center">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <WrapPanel Orientation="Horizontal"/>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate DataType="{x:Type vm:SequenceItemPropertyViewModel}">
-                                        <StackPanel Orientation="Horizontal" Margin="0,0,8,0" VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Name}" Foreground="{StaticResource Brush.TextSecondary}"
-                                                       FontSize="11" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                                            <TextBox Text="{Binding ValueAsString, UpdateSourceTrigger=PropertyChanged}"
-                                                     VerticalAlignment="Center" MinWidth="40" MaxWidth="90"
-                                                     FontSize="11" Padding="3,1" BorderThickness="1"
-                                                     BorderBrush="{StaticResource Brush.BorderSubtle}"
-                                                     Background="{StaticResource Brush.InputBg}"/>
-                                            <TextBlock Text="|" Foreground="{StaticResource Brush.BorderSubtle}"
-                                                       FontSize="11" VerticalAlignment="Center" Margin="8,0,0,0"/>
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </DockPanel>
-                    </Grid>
+                        </Border>
+                    </StackPanel>
                 </Border>
 
                 <!-- Drop-after indicator -->
@@ -651,7 +686,7 @@
                                Foreground="{StaticResource Brush.Text}"/>
 
                     <Border Background="{StaticResource Brush.InputBg}" CornerRadius="4" Padding="10"
-                            BorderBrush="{StaticResource Brush.Border}" BorderThickness="1">
+                            BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" Margin="0,0,0,16">
                         <StackPanel>
                             <TextBlock Text="SELECTED ITEM" FontSize="10" FontWeight="SemiBold"
                                        Foreground="{StaticResource Brush.Primary}" Margin="0,0,0,8"/>
@@ -678,7 +713,12 @@
                                         </Style.Triggers>
                                     </Style>
                                 </StackPanel.Style>
-                                <TextBlock Text="{Binding Item.Name}" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                <DockPanel>
+                                    <Button DockPanel.Dock="Right" Content="📌 Save Template" FontSize="10" Padding="4,2"
+                                            Command="{Binding DataContext.SaveAsTemplateCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}"/>
+                                    <TextBlock Text="{Binding Item.Name}" FontWeight="SemiBold" Margin="0,0,0,8" VerticalAlignment="Center"/>
+                                </DockPanel>
                                 <ItemsControl ItemsSource="{Binding Properties}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate DataType="{x:Type vm:SequenceItemPropertyViewModel}">
@@ -698,6 +738,80 @@
                             </StackPanel>
                         </StackPanel>
                     </Border>
+
+                    <!-- Templates -->
+                    <TextBlock Text="TEMPLATES" Style="{StaticResource PaletteSectionHeader}" Margin="0,0,0,6"/>
+                    <ItemsControl ItemsSource="{Binding UserTemplates}" Margin="0,0,0,16">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="{StaticResource Brush.InputBg}" CornerRadius="3" Padding="6,4" Margin="0,0,0,3"
+                                        BorderBrush="{StaticResource Brush.Border}" BorderThickness="1">
+                                    <DockPanel>
+                                        <Button DockPanel.Dock="Right" Content="✕" FontSize="9" Width="18" Height="18"
+                                                Style="{StaticResource SmallIconButton}" Foreground="{StaticResource Brush.Accent}"
+                                                Command="{Binding DataContext.RemoveTemplateCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}"/>
+                                        <Button DockPanel.Dock="Right" Content="+" FontSize="12" Width="18" Height="18"
+                                                Style="{StaticResource SmallIconButton}" Margin="0,0,4,0"
+                                                Command="{Binding DataContext.AddFromTemplateCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}" ToolTip="Add to sequence"/>
+                                        <TextBlock Text="{Binding Name}" FontSize="11" VerticalAlignment="Center"
+                                                   Foreground="{StaticResource Brush.Text}"/>
+                                    </DockPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBlock Text="No templates saved" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}"
+                               Margin="0,-12,0,16">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Visible"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding UserTemplates.Count}" Value="0">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+
+                    <!-- Targets -->
+                    <TextBlock Text="TARGETS" Style="{StaticResource PaletteSectionHeader}" Margin="0,0,0,6"/>
+                    <Button Content="💾 Save Current DSO Target" FontSize="10" Padding="6,4" HorizontalAlignment="Stretch"
+                            Margin="0,0,0,6"
+                            Command="{Binding SaveTargetCommand}" CommandParameter="{Binding SelectedNode}"/>
+                    <ItemsControl ItemsSource="{Binding SavedTargets}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="{StaticResource Brush.InputBg}" CornerRadius="3" Padding="6,4" Margin="0,0,0,3"
+                                        BorderBrush="{StaticResource Brush.Border}" BorderThickness="1">
+                                    <DockPanel>
+                                        <Button DockPanel.Dock="Right" Content="✕" FontSize="9" Width="18" Height="18"
+                                                Style="{StaticResource SmallIconButton}" Foreground="{StaticResource Brush.Accent}"
+                                                Command="{Binding DataContext.RemoveTargetCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}"/>
+                                        <Button DockPanel.Dock="Right" Content="+" FontSize="12" Width="18" Height="18"
+                                                Style="{StaticResource SmallIconButton}" Margin="0,0,4,0"
+                                                Command="{Binding DataContext.AddFromTargetCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}" ToolTip="Add to sequence"/>
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding Name}" FontSize="11" FontWeight="SemiBold"
+                                                       Foreground="{StaticResource Brush.Text}"/>
+                                            <TextBlock FontSize="9" Foreground="{StaticResource Brush.TextSecondary}">
+                                                <TextBlock.Text>
+                                                    <MultiBinding StringFormat="RA {0:F4}h  Dec {1:F2}°">
+                                                        <Binding Path="RA"/>
+                                                        <Binding Path="Dec"/>
+                                                    </MultiBinding>
+                                                </TextBlock.Text>
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </DockPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </StackPanel>
             </ScrollViewer>
         </Border>

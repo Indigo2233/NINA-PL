@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using NINA.PL.Capture;
 using NINA.PL.Core;
 using NINA.PL.Guider;
@@ -105,7 +106,72 @@ public sealed partial class SequenceNodeViewModel : ObservableObject
     [ObservableProperty]
     private int nestingLevel;
 
+    [ObservableProperty]
+    private string? validationMessage;
+
+    [ObservableProperty]
+    private bool hasValidationIssue;
+
+    [ObservableProperty]
+    private bool showAdvancedSettings;
+
+    [ObservableProperty]
+    private int attempts = 1;
+
+    [ObservableProperty]
+    private string onErrorBehavior = "Continue";
+
     public bool IsContainer => NodeType != SequenceNodeType.Instruction;
+
+    public void UpdateValidation()
+    {
+        string? issue = Item switch
+        {
+            CoolCameraInstruction or WarmCameraInstruction or DewHeaterInstruction
+                or TakeExposureInstruction or TakeManyExposuresInstruction
+                or TakeSubframeExposureInstruction or SmartExposureInstruction
+                or CaptureVideoInstruction or SetReadoutModeInstruction
+                => Category.Contains("Camera", StringComparison.OrdinalIgnoreCase) ||
+                   Category.Contains("Imaging", StringComparison.OrdinalIgnoreCase) ||
+                   Category.Contains("Capture", StringComparison.OrdinalIgnoreCase)
+                    ? null : null,
+
+            SlewInstruction or CenterTargetInstruction or SlewAndCenterInstruction
+                or SlewCenterRotateInstruction or SolveAndSyncInstruction
+                or ParkMountInstruction or UnparkMountInstruction or FindHomeInstruction
+                or SetTrackingInstruction or MeridianFlipInstruction
+                or SlewScopeToAltAzInstruction
+                => null,
+
+            MoveFocuserAbsoluteInstruction or MoveFocuserRelativeInstruction
+                or MoveFocuserByTempInstruction or RunAutoFocusInstruction
+                => null,
+
+            StartGuidingInstruction or StopGuidingInstruction or DitherGuidingInstruction
+                or RestoreGuidingInstruction
+                => null,
+
+            MoveRotatorInstruction or SolveAndRotateInstruction
+                => null,
+
+            SetFlatBrightnessInstruction or ToggleFlatLightInstruction
+                or OpenFlatCoverInstruction or CloseFlatCoverInstruction
+                or TrainedFlatExposureInstruction or TrainedDarkExposureInstruction
+                => null,
+
+            _ => null,
+        };
+
+        HasValidationIssue = issue is not null;
+        ValidationMessage = issue ?? "";
+    }
+
+    [RelayCommand]
+    private void ResetAdvancedSettings()
+    {
+        Attempts = 1;
+        OnErrorBehavior = "Continue";
+    }
 
     public ObservableCollection<SequenceNodeViewModel> Children { get; } = new();
 

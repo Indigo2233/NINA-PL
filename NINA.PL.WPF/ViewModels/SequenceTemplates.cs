@@ -36,3 +36,25 @@ public sealed class ContainerTemplate
 
     public required SequenceNodeType NodeType { get; init; }
 }
+
+public sealed class UserTemplate
+{
+    public required string Name { get; set; }
+
+    public string Description { get; set; } = "";
+
+    public required SequenceNodeViewModel Node { get; init; }
+}
+
+public sealed class SavedTarget
+{
+    public required string Name { get; set; }
+
+    public double RA { get; set; }
+
+    public double Dec { get; set; }
+
+    public double PositionAngle { get; set; }
+
+    public SequenceNodeViewModel? Node { get; init; }
+}

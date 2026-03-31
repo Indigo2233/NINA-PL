@@ -129,6 +129,10 @@ public sealed partial class SequencerPanelViewModel : ObservableObject, IDisposa
 
     public ObservableCollection<SequenceNodeViewModel> RootNodes { get; } = new();
 
+    public ObservableCollection<UserTemplate> UserTemplates { get; } = new();
+
+    public ObservableCollection<SavedTarget> SavedTargets { get; } = new();
+
     public ObservableCollection<InstructionTemplate> AvailableInstructions { get; } = new();
 
     public ObservableCollection<ConditionTemplate> AvailableConditions { get; } = new();
@@ -581,9 +585,100 @@ public sealed partial class SequencerPanelViewModel : ObservableObject, IDisposa
     }
 
     [RelayCommand]
+    private void SaveAsTemplate(SequenceNodeViewModel? vm)
+    {
+        if (vm is null)
+            return;
+        SequenceNodeViewModel copy = SequenceItemViewModelFactory.CloneNode(vm);
+        string name = vm.DisplayName;
+        UserTemplate? existing = UserTemplates.FirstOrDefault(t =>
+            string.Equals(t.Name, name, StringComparison.OrdinalIgnoreCase));
+        if (existing is not null)
+            UserTemplates.Remove(existing);
+
+        UserTemplates.Add(new UserTemplate { Name = name, Node = copy });
+    }
+
+    [RelayCommand]
+    private void AddFromTemplate(UserTemplate? template)
+    {
+        if (template is null)
+            return;
+        SequenceNodeViewModel copy = SequenceItemViewModelFactory.CloneNode(template.Node);
+        TargetSectionNodes.Add(copy);
+        SelectedNode = copy;
+    }
+
+    [RelayCommand]
+    private void RemoveTemplate(UserTemplate? template)
+    {
+        if (template is not null)
+            UserTemplates.Remove(template);
+    }
+
+    [RelayCommand]
+    private void SaveTarget(SequenceNodeViewModel? vm)
+    {
+        if (vm is null || vm.NodeType != SequenceNodeType.DsoContainer)
+            return;
+        vm.ApplyPropertiesToItem();
+        string name = vm.DisplayName;
+        double ra = 0, dec = 0, pa = 0;
+        if (vm.Item is DeepSkyObjectContainer dso)
+        {
+            name = !string.IsNullOrWhiteSpace(dso.TargetName) ? dso.TargetName : name;
+            ra = dso.RA;
+            dec = dso.Dec;
+            pa = dso.PositionAngle;
+        }
+
+        SequenceNodeViewModel copy = SequenceItemViewModelFactory.CloneNode(vm);
+        SavedTarget? existing = SavedTargets.FirstOrDefault(t =>
+            string.Equals(t.Name, name, StringComparison.OrdinalIgnoreCase));
+        if (existing is not null)
+            SavedTargets.Remove(existing);
+
+        SavedTargets.Add(new SavedTarget
+        {
+            Name = name,
+            RA = ra,
+            Dec = dec,
+            PositionAngle = pa,
+            Node = copy,
+        });
+    }
+
+    [RelayCommand]
+    private void AddFromTarget(SavedTarget? target)
+    {
+        if (target?.Node is null)
+            return;
+        SequenceNodeViewModel copy = SequenceItemViewModelFactory.CloneNode(target.Node);
+        TargetSectionNodes.Add(copy);
+        SelectedNode = copy;
+    }
+
+    [RelayCommand]
+    private void RemoveTarget(SavedTarget? target)
+    {
+        if (target is not null)
+            SavedTargets.Remove(target);
+    }
+
+    [RelayCommand]
+    private void ToggleAdvancedSettings(SequenceNodeViewModel? vm)
+    {
+        if (vm is not null)
+            vm.ShowAdvancedSettings = !vm.ShowAdvancedSettings;
+    }
+
+    [RelayCommand]
     private void ClearAll()
     {
         RootNodes.Clear();
+        StartSectionNodes.Clear();
+        TargetSectionNodes.Clear();
+        EndSectionNodes.Clear();
         SelectedNode = null;
     }
 
