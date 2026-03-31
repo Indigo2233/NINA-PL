@@ -1,0 +1,227 @@
+<UserControl x:Class="NINA.PL.WPF.Views.CaptureView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="820" d:DesignWidth="1200">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="7*"/>
+            <ColumnDefinition Width="3*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Live view -->
+        <Border Grid.Row="0" Grid.Column="0"
+                Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="3"
+                Margin="0,0,16,0" ClipToBounds="True">
+            <Grid>
+                <Viewbox Stretch="Uniform" StretchDirection="Both">
+                    <Grid Width="800" Height="600">
+                        <Image Source="{Binding LiveImage}" Stretch="Uniform"
+                               RenderTransformOrigin="0.5,0.5">
+                            <Image.RenderTransform>
+                                <ScaleTransform ScaleX="{Binding LiveImageZoom}" ScaleY="{Binding LiveImageZoom}"/>
+                            </Image.RenderTransform>
+                        </Image>
+                        <Canvas IsHitTestVisible="False" Visibility="{Binding ShowCrosshair, Converter={StaticResource BoolToVis}}">
+                            <Line X1="400" Y1="0" X2="400" Y2="600" Stroke="{StaticResource Brush.Primary}" StrokeThickness="1" Opacity="0.6"/>
+                            <Line X1="0" Y1="300" X2="800" Y2="300" Stroke="{StaticResource Brush.Primary}" StrokeThickness="1" Opacity="0.6"/>
+                        </Canvas>
+                        <Border Background="#66000000" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="8" Padding="8,4" CornerRadius="3">
+                            <TextBlock Text="ROI: drag overlay (planned)" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}"/>
+                        </Border>
+                    </Grid>
+                </Viewbox>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="8">
+                    <ToggleButton IsChecked="{Binding ShowCrosshair, Mode=TwoWay}" Content="Crosshair" Margin="0,0,8,0"/>
+                    <Button Content="−" Command="{Binding ZoomOutCommand}" Width="32" Margin="0,0,4,0"/>
+                    <Button Content="+" Command="{Binding ZoomInCommand}" Width="32" Margin="0,0,4,0"/>
+                    <Button Content="1:1" Command="{Binding ResetZoomCommand}" Padding="10,4"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Right stack -->
+        <ScrollViewer Grid.Row="0" Grid.Column="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <GroupBox Header="CAMERA" Margin="0,0,0,16">
+                    <StackPanel>
+                        <TextBlock Text="{Binding ConnectedCameraDisplayName}" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                        <TextBlock Text="{Binding CameraSensorLine}" Foreground="{StaticResource Brush.TextSecondary}" TextWrapping="Wrap"/>
+                        <Label Content="{Binding ExposureMicroseconds, StringFormat=Exposure (µs): {0:F0}}"/>
+                        <Slider Minimum="0" Maximum="1" Value="{Binding ExposureSliderValue, Mode=TwoWay}" TickFrequency="0.01"/>
+                        <Label Content="{Binding Gain, StringFormat=Gain: {0:F1}}"/>
+                        <Slider Minimum="{Binding GainMin}" Maximum="{Binding GainMax}" Value="{Binding Gain, Mode=TwoWay}" TickFrequency="0.5"/>
+                        <TextBlock Text="ROI" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource Brush.Primary}" Margin="0,12,0,8"/>
+                        <UniformGrid Columns="2">
+                            <StackPanel Margin="0,0,8,8">
+                                <Label Content="X"/>
+                                <TextBox Text="{Binding RoiOffsetX, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+                            <StackPanel Margin="0,0,0,8">
+                                <Label Content="Y"/>
+                                <TextBox Text="{Binding RoiOffsetY, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+                            <StackPanel Margin="0,0,8,0">
+                                <Label Content="W"/>
+                                <TextBox Text="{Binding RoiWidth, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+                            <StackPanel>
+                                <Label Content="H"/>
+                                <TextBox Text="{Binding RoiHeight, UpdateSourceTrigger=PropertyChanged}"/>
+                            </StackPanel>
+                        </UniformGrid>
+                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                            <Button Content="Apply ROI" Command="{Binding ApplyRoiCommand}" Margin="0,0,8,0"/>
+                            <Button Content="Reset ROI" Command="{Binding ResetRoiCommand}"/>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="HISTOGRAM" Margin="0,0,0,16">
+                    <StackPanel>
+                        <Border Height="120" Background="{StaticResource Brush.InputBg}" CornerRadius="3" ClipToBounds="True" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1">
+                            <Polyline Points="{Binding HistogramLinePoints}" Stroke="{StaticResource Brush.Primary}" StrokeThickness="1.25" Stretch="Fill"/>
+                        </Border>
+                        <UniformGrid Columns="3" Margin="0,8,0,0">
+                            <TextBlock Foreground="{StaticResource Brush.TextSecondary}" Text="{Binding HistogramMin, StringFormat=Min {0}}"/>
+                            <TextBlock Foreground="{StaticResource Brush.TextSecondary}" Text="{Binding HistogramMax, StringFormat=Max {0}}"/>
+                            <TextBlock Foreground="{StaticResource Brush.TextSecondary}" Text="{Binding HistogramMean, StringFormat=Mean {0:F1}}"/>
+                        </UniformGrid>
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="FILTER">
+                    <StackPanel>
+                        <TextBlock Text="Current" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}"/>
+                        <TextBlock Text="{Binding CurrentFilterQuickName}" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                        <ItemsControl ItemsSource="{Binding FilterQuickSlots}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Content="{Binding Name}" Margin="0,0,8,8" Padding="10,6"
+                                            Command="{Binding DataContext.SelectFilterQuickCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding Index}">
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsCurrent}" Value="True">
+                                                        <Setter Property="BorderBrush" Value="{StaticResource Brush.Primary}"/>
+                                                        <Setter Property="Foreground" Value="{StaticResource Brush.Primary}"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Recording bar -->
+        <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="3" Padding="16" Margin="0,16,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Center" Margin="0,0,24,0">
+                    <Button Width="80" Height="80" Command="{Binding StartCaptureCommand}" IsEnabled="{Binding IsCapturing, Converter={StaticResource InverseBool}}">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                <Setter Property="Content" Value="●"/>
+                                <Setter Property="FontSize" Value="40"/>
+                                <Setter Property="Foreground" Value="{StaticResource Brush.TextSecondary}"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border x:Name="Circle" Width="80" Height="80" CornerRadius="40" BorderThickness="2"
+                                                    BorderBrush="{StaticResource Brush.Border}" Background="{StaticResource Brush.Surface}">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <DataTrigger Binding="{Binding IsCapturing}" Value="True">
+                                                    <Setter TargetName="Circle" Property="BorderBrush" Value="{StaticResource Brush.Accent}"/>
+                                                </DataTrigger>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="Circle" Property="BorderBrush" Value="{StaticResource Brush.Primary}"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Border Width="12" Height="12" CornerRadius="6" HorizontalAlignment="Center" Margin="0,8,0,0"
+                            Background="{StaticResource Brush.TextSecondary}">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsCapturing}" Value="True">
+                                        <Setter Property="Background" Value="{StaticResource Brush.Accent}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                    </Border>
+                    <TextBlock Text="REC" FontSize="9" HorizontalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}" Margin="0,2,0,0"/>
+                    <Button Content="Stop" Command="{Binding StopCaptureCommand}" Margin="0,8,0,0" HorizontalAlignment="Center" MinWidth="72"/>
+                </StackPanel>
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <WrapPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+                        <Label Content="Format" VerticalAlignment="Center"/>
+                        <ComboBox Width="120" Margin="8,0,16,0" ItemsSource="{Binding CaptureFormats}" SelectedItem="{Binding SelectedFormat, Mode=TwoWay}"/>
+                        <Label Content="Frame limit (0=∞)" VerticalAlignment="Center"/>
+                        <TextBox Width="72" Margin="8,0,16,0" Text="{Binding FrameLimit, UpdateSourceTrigger=PropertyChanged}"/>
+                        <Label Content="Time limit (s)" VerticalAlignment="Center"/>
+                        <TextBox Width="72" Margin="8,0,0,0" Text="{Binding TimeLimitSeconds, UpdateSourceTrigger=PropertyChanged}"/>
+                    </WrapPanel>
+                    <Grid Grid.Row="1" Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Folder:" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}" Margin="0,0,8,0"/>
+                            <TextBlock Text="{Binding OutputDirectory}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" MaxWidth="400"/>
+                            <Button Content="Browse…" Command="{Binding BrowseOutputCommand}" Margin="12,0,0,0"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                            <Label Content="Prefix" VerticalAlignment="Center"/>
+                            <TextBox Width="160" Margin="8,0,0,0" Text="{Binding FilePrefix, UpdateSourceTrigger=PropertyChanged}"/>
+                        </StackPanel>
+                    </Grid>
+                    <TextBlock Grid.Row="2" Foreground="{StaticResource Brush.TextSecondary}">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="Frames: {0}  |  FPS: {1:F2}  |  Dropped: {2}  |  Est. size: {3:N0} B">
+                                <Binding Path="FramesCaptured"/>
+                                <Binding Path="CurrentFps"/>
+                                <Binding Path="FramesDropped"/>
+                                <Binding Path="EstimatedSessionBytes"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                </Grid>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <!-- <ApplicationIcon>Resources\nina-pl.ico</ApplicationIcon> -->
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NINA.PL.Core\NINA.PL.Core.csproj" />
+    <ProjectReference Include="..\NINA.PL.Equipment\NINA.PL.Equipment.csproj" />
+    <ProjectReference Include="..\NINA.PL.Capture\NINA.PL.Capture.csproj" />
+    <ProjectReference Include="..\NINA.PL.Guider\NINA.PL.Guider.csproj" />
+    <ProjectReference Include="..\NINA.PL.AutoFocus\NINA.PL.AutoFocus.csproj" />
+    <ProjectReference Include="..\NINA.PL.LiveStack\NINA.PL.LiveStack.csproj" />
+    <ProjectReference Include="..\NINA.PL.Sequencer\NINA.PL.Sequencer.csproj" />
+    <ProjectReference Include="..\NINA.PL.Image\NINA.PL.Image.csproj" />
+    <ProjectReference Include="..\NINA.PL.Profile\NINA.PL.Profile.csproj" />
+    <ProjectReference Include="..\NINA.PL.Plugin\NINA.PL.Plugin.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.*" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.*" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="9.*" />
+    <PackageReference Include="NLog.Extensions.Logging" Version="5.*" />
+  </ItemGroup>
+</Project>

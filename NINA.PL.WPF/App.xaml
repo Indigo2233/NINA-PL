@@ -1,0 +1,18 @@
+<Application x:Class="NINA.PL.WPF.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:NINA.PL.WPF.Converters"
+             ShutdownMode="OnMainWindowClose">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Themes/DarkTheme.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <converters:BoolToVisibilityConverter x:Key="BoolToVis"/>
+            <converters:InverseBoolConverter x:Key="InverseBool"/>
+            <converters:PercentageConverter x:Key="Percentage"/>
+            <converters:BoolToColorConverter x:Key="BoolToColor"/>
+            <converters:FocusMetricBarHeightMultiConverter x:Key="FocusBarMulti" MaxBarHeight="140"/>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

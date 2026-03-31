@@ -1,0 +1,72 @@
+<UserControl x:Class="NINA.PL.WPF.Views.LiveStackView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="820" d:DesignWidth="1100">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="7*"/>
+            <ColumnDefinition Width="3*"/>
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Column="0" Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="3" Margin="0,0,16,0">
+            <Image Source="{Binding StackedImage}" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </Border>
+
+        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <TextBlock Text="LIVE STACK" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource Brush.Primary}" Margin="0,0,0,16"/>
+
+                <GroupBox Header="QUALITY">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                            <TextBlock Text="Threshold " Foreground="{StaticResource Brush.TextSecondary}"/>
+                            <TextBlock Foreground="{StaticResource Brush.TextSecondary}" Text="{Binding QualityThreshold, Converter={StaticResource Percentage}}"/>
+                        </StackPanel>
+                        <Slider Minimum="0" Maximum="1" Value="{Binding QualityThreshold, Mode=TwoWay}" TickFrequency="0.02"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="STACKING MODE" Margin="0,16,0,0">
+                    <ComboBox ItemsSource="{Binding StackingModes}" SelectedItem="{Binding SelectedMode, Mode=TwoWay}"/>
+                </GroupBox>
+
+                <GroupBox Header="WAVELET SHARPENING" Margin="0,16,0,0">
+                    <StackPanel>
+                        <Label Content="{Binding WaveletLayer1, StringFormat=Layer 1: {0:F2}}"/>
+                        <Slider Minimum="-3" Maximum="3" Value="{Binding WaveletLayer1, Mode=TwoWay}" TickFrequency="0.1"/>
+                        <Label Content="{Binding WaveletLayer2, StringFormat=Layer 2: {0:F2}}"/>
+                        <Slider Minimum="-3" Maximum="3" Value="{Binding WaveletLayer2, Mode=TwoWay}" TickFrequency="0.1"/>
+                        <Label Content="{Binding WaveletLayer3, StringFormat=Layer 3: {0:F2}}"/>
+                        <Slider Minimum="-3" Maximum="3" Value="{Binding WaveletLayer3, Mode=TwoWay}" TickFrequency="0.1"/>
+                        <Label Content="{Binding WaveletLayer4, StringFormat=Layer 4: {0:F2}}"/>
+                        <Slider Minimum="-3" Maximum="3" Value="{Binding WaveletLayer4, Mode=TwoWay}" TickFrequency="0.1"/>
+                        <Label Content="{Binding WaveletLayer5, StringFormat=Layer 5: {0:F2}}"/>
+                        <Slider Minimum="-3" Maximum="3" Value="{Binding WaveletLayer5, Mode=TwoWay}" TickFrequency="0.1"/>
+                        <Label Content="{Binding WaveletLayer6, StringFormat=Layer 6: {0:F2}}"/>
+                        <Slider Minimum="-3" Maximum="3" Value="{Binding WaveletLayer6, Mode=TwoWay}" TickFrequency="0.1"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <StackPanel Orientation="Horizontal" Margin="0,16,0,12">
+                    <Button Content="Start" Command="{Binding StartCommand}" Style="{StaticResource AccentActionButtonStyle}" Margin="0,0,8,0"/>
+                    <Button Content="Stop" Command="{Binding StopCommand}" Margin="0,0,8,0"/>
+                    <Button Content="Reset" Command="{Binding ResetCommand}"/>
+                </StackPanel>
+
+                <Border Background="{StaticResource Brush.InputBg}" CornerRadius="3" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" Padding="14">
+                    <StackPanel>
+                        <TextBlock Text="STATISTICS" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource Brush.Primary}" Margin="0,0,0,8"/>
+                        <TextBlock Foreground="{StaticResource Brush.TextSecondary}" Text="{Binding TotalFrames, StringFormat=Total frames: {0}}"/>
+                        <TextBlock Foreground="{StaticResource Brush.TextSecondary}" Text="{Binding AcceptedFrames, StringFormat=Accepted: {0}}"/>
+                        <TextBlock Foreground="{StaticResource Brush.TextSecondary}" Text="{Binding RejectedFrames, StringFormat=Rejected: {0}}"/>
+                        <TextBlock Margin="0,8,0,0" Foreground="{StaticResource Brush.Primary}"
+                                   Text="{Binding AcceptanceRatePercent, StringFormat=Acceptance rate: {0:F1}%}"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

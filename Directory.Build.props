@@ -1,0 +1,13 @@
+<Project>
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Platforms>x64</Platforms>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <Authors>NINA-PL Contributors</Authors>
+    <Product>NINA-PL Planetary Imaging Suite</Product>
+    <Copyright>Copyright (c) 2026 NINA-PL Contributors</Copyright>
+    <Version>0.1.0</Version>
+  </PropertyGroup>
+</Project>

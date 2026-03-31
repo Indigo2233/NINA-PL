@@ -1,0 +1,75 @@
+<UserControl x:Class="NINA.PL.WPF.Views.FocusView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="700" d:DesignWidth="1000">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="340"/>
+        </Grid.ColumnDefinitions>
+
+        <GroupBox Grid.Column="0" Header="FOCUS CURVE (V)" Margin="0,0,16,0">
+            <Border Background="{StaticResource Brush.InputBg}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="3" Height="360">
+                <Canvas ClipToBounds="True">
+                    <Polyline Points="{Binding FocusCurvePoints}" Stroke="{StaticResource Brush.Primary}" StrokeThickness="2" Stretch="Uniform"
+                              Canvas.Left="8" Canvas.Top="60" Width="784" Height="220"/>
+                    <TextBlock Canvas.Left="12" Canvas.Top="8" Text="Metric vs. focuser position" Foreground="{StaticResource Brush.TextSecondary}" FontSize="11"/>
+                </Canvas>
+            </Border>
+        </GroupBox>
+
+        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <GroupBox Header="AUTOFOCUS">
+                    <StackPanel>
+                        <Label Content="Metric type"/>
+                        <ComboBox ItemsSource="{Binding FocusMetricTypes}" SelectedItem="{Binding MetricType, Mode=TwoWay}" Margin="0,0,0,8"/>
+                        <Label Content="Step size"/>
+                        <TextBox Text="{Binding StepSize, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,8"/>
+                        <Label Content="Number of steps"/>
+                        <TextBox Text="{Binding NumberOfSteps, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,8"/>
+                        <Label Content="Settle time (ms)"/>
+                        <TextBox Text="{Binding SettleTimeMs, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,12"/>
+                        <Button Content="Run AutoFocus" Command="{Binding RunAutoFocusCommand}" Style="{StaticResource AccentActionButtonStyle}"
+                                IsEnabled="{Binding IsRunning, Converter={StaticResource InverseBool}}" Padding="16,12" Margin="0,0,0,8"/>
+                        <Button Content="Abort" Command="{Binding AbortCommand}" Style="{StaticResource DangerButtonStyle}"
+                                Visibility="{Binding IsRunning, Converter={StaticResource BoolToVis}}"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="LAST RESULT" Margin="0,16,0,0">
+                    <StackPanel>
+                        <TextBlock Foreground="{StaticResource Brush.TextSecondary}" Text="Best position"/>
+                        <TextBlock Text="{Binding BestPosition}" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                        <TextBlock Foreground="{StaticResource Brush.TextSecondary}" Text="Metric at best"/>
+                        <TextBlock Text="{Binding LastBestMetric, StringFormat=F4}" FontSize="16"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <GroupBox Header="MANUAL FOCUSER" Margin="0,16,0,0">
+                    <StackPanel>
+                        <TextBlock TextWrapping="Wrap" Foreground="{StaticResource Brush.TextSecondary}" Margin="0,0,0,8"
+                                   Text="{Binding FocusMessage}"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+                            <Button Content="&lt;&lt;" Command="{Binding FocuserJogCommand}" CommandParameter="-500" Width="44" Margin="0,0,8,0"/>
+                            <Button Content="&lt;" Command="{Binding FocuserJogCommand}" CommandParameter="-50" Width="44" Margin="0,0,8,0"/>
+                            <Border Background="{StaticResource Brush.InputBg}" CornerRadius="3" Padding="12,8" MinWidth="80" Margin="0,0,8,0" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding FocuserPosition}" HorizontalAlignment="Center" FontWeight="SemiBold"/>
+                            </Border>
+                            <Button Content="&gt;" Command="{Binding FocuserJogCommand}" CommandParameter="50" Width="44" Margin="0,0,8,0"/>
+                            <Button Content="&gt;&gt;" Command="{Binding FocuserJogCommand}" CommandParameter="500" Width="44"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                            <TextBlock Text="Target" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="{StaticResource Brush.TextSecondary}"/>
+                            <TextBox Width="100" Text="{Binding FocuserTargetPosition, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,8,0"/>
+                            <Button Content="Go" Command="{Binding MoveFocuserToTargetCommand}"/>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

@@ -1,0 +1,143 @@
+<UserControl x:Class="NINA.PL.WPF.Views.GuiderView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:guider="clr-namespace:NINA.PL.Guider;assembly=NINA.PL.Guider"
+             mc:Ignorable="d"
+             d:DesignHeight="720" d:DesignWidth="1100">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="3" Padding="12" Margin="0,0,0,16">
+            <StackPanel>
+                <TextBlock Text="TRACKING MODE" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource Brush.Primary}" Margin="0,0,0,8"/>
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="Disk centroid" Command="{Binding SetTrackingModeCommand}" CommandParameter="{x:Static guider:TrackingMode.DiskCentroid}" Margin="0,0,8,0" Padding="14,8">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedTrackingMode}" Value="{x:Static guider:TrackingMode.DiskCentroid}">
+                                        <Setter Property="BorderBrush" Value="{StaticResource Brush.Primary}"/>
+                                        <Setter Property="Foreground" Value="{StaticResource Brush.Primary}"/>
+                                        <Setter Property="Background" Value="#FF1E3A4A"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Button Content="Limb" Command="{Binding SetTrackingModeCommand}" CommandParameter="{x:Static guider:TrackingMode.Limb}" Margin="0,0,8,0" Padding="14,8">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedTrackingMode}" Value="{x:Static guider:TrackingMode.Limb}">
+                                        <Setter Property="BorderBrush" Value="{StaticResource Brush.Primary}"/>
+                                        <Setter Property="Foreground" Value="{StaticResource Brush.Primary}"/>
+                                        <Setter Property="Background" Value="#FF1E3A4A"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                    <Button Content="Surface feature" Command="{Binding SetTrackingModeCommand}" CommandParameter="{x:Static guider:TrackingMode.SurfaceFeature}" Padding="14,8">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SelectedTrackingMode}" Value="{x:Static guider:TrackingMode.SurfaceFeature}">
+                                        <Setter Property="BorderBrush" Value="{StaticResource Brush.Primary}"/>
+                                        <Setter Property="Foreground" Value="{StaticResource Brush.Primary}"/>
+                                        <Setter Property="Background" Value="#FF1E3A4A"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="380"/>
+            </Grid.ColumnDefinitions>
+            <Border Grid.Column="0" Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="3" Margin="0,0,16,0" ClipToBounds="True">
+                <Grid>
+                    <Image Source="{Binding GuidePreviewImage}" Stretch="Uniform"/>
+                    <TextBlock Text="+" FontSize="56" Foreground="#99FF6B6B" HorizontalAlignment="Center" VerticalAlignment="Center"
+                               IsHitTestVisible="False" FontWeight="Light"/>
+                </Grid>
+            </Border>
+            <StackPanel Grid.Column="1">
+                <Border Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="3" Padding="12" Margin="0,0,0,12">
+                    <StackPanel>
+                        <TextBlock Text="RA / Dec error (arcsec)" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource Brush.Primary}" Margin="0,0,0,8"/>
+                        <Border Height="140" Background="{StaticResource Brush.InputBg}" CornerRadius="3" ClipToBounds="True" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1">
+                            <Grid>
+                                <Polyline Points="{Binding RaGraphPoints}" Stroke="#FF4FC3F7" StrokeThickness="1.5" Stretch="Fill" Opacity="0.9"/>
+                                <Polyline Points="{Binding DecGraphPoints}" Stroke="#FFFF6B6B" StrokeThickness="1.5" Stretch="Fill" Opacity="0.85"/>
+                            </Grid>
+                        </Border>
+                    </StackPanel>
+                </Border>
+                <Border Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="3" Padding="16">
+                    <StackPanel>
+                        <TextBlock Text="RMS (arcsec)" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource Brush.Primary}" Margin="0,0,0,12"/>
+                        <UniformGrid Columns="3">
+                            <StackPanel Margin="0,0,12,0">
+                                <TextBlock Foreground="{StaticResource Brush.TextSecondary}" Text="RA"/>
+                                <TextBlock FontSize="20" Text="{Binding RmsRa, StringFormat=F3}"/>
+                            </StackPanel>
+                            <StackPanel Margin="0,0,12,0">
+                                <TextBlock Foreground="{StaticResource Brush.TextSecondary}" Text="Dec"/>
+                                <TextBlock FontSize="20" Text="{Binding RmsDec, StringFormat=F3}"/>
+                            </StackPanel>
+                            <StackPanel>
+                                <TextBlock Foreground="{StaticResource Brush.TextSecondary}" Text="Total"/>
+                                <TextBlock FontSize="20" Text="{Binding RmsTotal, StringFormat=F3}"/>
+                            </StackPanel>
+                        </UniformGrid>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Grid>
+
+        <Border Grid.Row="2" Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="3" Padding="16" Margin="0,16,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Ellipse Width="10" Height="10" Margin="0,0,8,0" VerticalAlignment="Center">
+                        <Ellipse.Style>
+                            <Style TargetType="Ellipse">
+                                <Setter Property="Fill" Value="{StaticResource Brush.TextSecondary}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding GuiderStatusText}" Value="Guiding">
+                                        <Setter Property="Fill" Value="#FF4CAF50"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding GuiderStatusText}" Value="Calibrating">
+                                        <Setter Property="Fill" Value="{StaticResource Brush.Primary}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Ellipse.Style>
+                    </Ellipse>
+                    <TextBlock VerticalAlignment="Center" FontWeight="SemiBold" Text="{Binding GuiderStatusText}"/>
+                    <TextBlock VerticalAlignment="Center" Margin="16,0,0,0" Foreground="{StaticResource Brush.TextSecondary}" Text="{Binding GuiderMessage}" TextTrimming="CharacterEllipsis"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Content="Calibrate" Command="{Binding CalibrateCommand}" Margin="0,0,8,0" IsEnabled="{Binding IsGuiding, Converter={StaticResource InverseBool}}"/>
+                    <Button Content="Start guiding" Command="{Binding StartGuidingCommand}" Margin="0,0,8,0" Style="{StaticResource AccentActionButtonStyle}"
+                            IsEnabled="{Binding IsGuiding, Converter={StaticResource InverseBool}}"/>
+                    <Button Content="Stop guiding" Command="{Binding StopGuidingCommand}" IsEnabled="{Binding IsGuiding}"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

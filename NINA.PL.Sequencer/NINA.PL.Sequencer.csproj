@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0-windows</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NINA.PL.Core\NINA.PL.Core.csproj" />
+    <ProjectReference Include="..\NINA.PL.Equipment\NINA.PL.Equipment.csproj" />
+    <ProjectReference Include="..\NINA.PL.Capture\NINA.PL.Capture.csproj" />
+    <ProjectReference Include="..\NINA.PL.AutoFocus\NINA.PL.AutoFocus.csproj" />
+    <ProjectReference Include="..\NINA.PL.Guider\NINA.PL.Guider.csproj" />
+  </ItemGroup>
+</Project>

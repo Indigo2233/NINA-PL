@@ -1,0 +1,670 @@
+<UserControl x:Class="NINA.PL.WPF.Views.SequencerView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:vm="clr-namespace:NINA.PL.WPF.ViewModels"
+             xmlns:conv="clr-namespace:NINA.PL.WPF.Converters"
+             mc:Ignorable="d"
+             d:DesignHeight="720" d:DesignWidth="1280"
+             Background="Transparent">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <conv:ReferenceEqualityMultiConverter x:Key="RefEq"/>
+
+        <SolidColorBrush x:Key="Brush.SequentialHeader" Color="#FF1E3A5F"/>
+        <SolidColorBrush x:Key="Brush.ParallelHeader" Color="#FF5C3D1E"/>
+        <SolidColorBrush x:Key="Brush.DsoHeader" Color="#FF2E4A3F"/>
+        <SolidColorBrush x:Key="Brush.StatusPending" Color="#FF6A6A78"/>
+        <SolidColorBrush x:Key="Brush.StatusRunning" Color="#FF4FC3F7"/>
+        <SolidColorBrush x:Key="Brush.StatusCompleted" Color="#FF66BB6A"/>
+        <SolidColorBrush x:Key="Brush.StatusFailed" Color="#FFFF6B6B"/>
+        <SolidColorBrush x:Key="Brush.StatusSkipped" Color="#FF787890"/>
+
+        <Style x:Key="PaletteSectionHeader" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="10"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{StaticResource Brush.Primary}"/>
+            <Setter Property="Margin" Value="0,12,0,8"/>
+        </Style>
+
+        <Style x:Key="SmallIconButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Width" Value="24"/>
+            <Setter Property="Height" Value="24"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="MinWidth" Value="24"/>
+            <Setter Property="MinHeight" Value="24"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="{StaticResource Brush.TextSecondary}"/>
+            <Setter Property="ToolTipService.ShowOnDisabled" Value="True"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource Brush.SurfaceHover}"/>
+                    <Setter Property="Foreground" Value="{StaticResource Brush.Text}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="InstructionTile" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Padding" Value="8,8"/>
+            <Setter Property="Margin" Value="0,0,0,6"/>
+            <Setter Property="Background" Value="{StaticResource Brush.InputBg}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Brush.BorderSubtle}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource Brush.SurfaceHover}"/>
+                    <Setter Property="BorderBrush" Value="{StaticResource Brush.Border}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="ContainerAddButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Padding" Value="12,14"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Background" Value="{StaticResource Brush.InputBg}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Brush.Border}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource Brush.SurfaceHover}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="RunPrimaryButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Padding" Value="20,14"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Background" Value="{StaticResource Brush.Primary}"/>
+            <Setter Property="Foreground" Value="#FF101018"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Brush.PrimaryDark}"/>
+        </Style>
+
+        <Style x:Key="StopDangerButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Padding" Value="16,10"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Background" Value="#33FF6B6B"/>
+            <Setter Property="Foreground" Value="{StaticResource Brush.Accent}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource Brush.Accent}"/>
+        </Style>
+
+        <Style x:Key="DropInsertLine" TargetType="Border">
+            <Setter Property="Height" Value="3"/>
+            <Setter Property="Background" Value="{StaticResource Brush.Primary}"/>
+            <Setter Property="CornerRadius" Value="2"/>
+            <Setter Property="Margin" Value="0,0,0,2"/>
+            <Setter Property="Visibility" Value="Collapsed"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        </Style>
+
+        <!-- Recursive tree node -->
+        <DataTemplate x:Key="SequenceNodeTemplate" DataType="{x:Type vm:SequenceNodeViewModel}">
+            <StackPanel Margin="0,0,0,4">
+                <!-- Drop-before indicator -->
+                <Border x:Name="DropBeforeLine" Style="{StaticResource DropInsertLine}"/>
+
+                <!-- Container -->
+                <Border x:Name="ContainerChrome" Padding="0" CornerRadius="4" Margin="0,0,0,4"
+                        Background="{StaticResource Brush.Surface}"
+                        BorderBrush="{StaticResource Brush.Border}" BorderThickness="1"
+                        Tag="{Binding}">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Setter Property="Opacity" Value="1"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsContainer}" Value="True">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsEnabled}" Value="False">
+                                    <Setter Property="Opacity" Value="0.4"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <Border.InputBindings>
+                        <MouseBinding MouseAction="LeftClick"
+                                      Command="{Binding DataContext.SelectNodeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                      CommandParameter="{Binding}"/>
+                    </Border.InputBindings>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                    <Border Grid.Row="0" Padding="8,6" CornerRadius="4,4,0,0"
+                            PreviewMouseLeftButtonDown="OnNodeMouseDown"
+                            PreviewMouseMove="OnNodeMouseMove"
+                            MouseLeave="OnNodeMouseLeave"
+                            Tag="{Binding}">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="{StaticResource Brush.SequentialHeader}"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding NodeType}" Value="{x:Static vm:SequenceNodeType.ParallelContainer}">
+                                        <Setter Property="Background" Value="{StaticResource Brush.ParallelHeader}"/>
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding NodeType}" Value="{x:Static vm:SequenceNodeType.DsoContainer}">
+                                        <Setter Property="Background" Value="{StaticResource Brush.DsoHeader}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <ToggleButton Grid.Column="0" Width="22" Height="22" Padding="0"
+                                          IsChecked="{Binding IsExpanded, Mode=TwoWay}"
+                                          Background="Transparent" BorderThickness="0"
+                                          Foreground="{StaticResource Brush.Text}"
+                                          Content="▼" FontSize="10">
+                                <ToggleButton.Style>
+                                    <Style TargetType="ToggleButton">
+                                        <Setter Property="Content" Value="▼"/>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsChecked" Value="False">
+                                                <Setter Property="Content" Value="▶"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ToggleButton.Style>
+                            </ToggleButton>
+                            <CheckBox Grid.Column="1" VerticalAlignment="Center" Margin="4,0,6,0"
+                                      IsChecked="{Binding IsEnabled, Mode=TwoWay}"
+                                      ToolTip="Enabled"/>
+                            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,0">
+                                <TextBlock Text="{Binding Icon}" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding Item.Name}" FontWeight="SemiBold" FontSize="13"
+                                           Foreground="{StaticResource Brush.Text}" VerticalAlignment="Center"/>
+                                <TextBlock Text=" · " FontSize="11" Margin="8,0,0,0" VerticalAlignment="Center" Foreground="#FF8EC5FF"/>
+                                <TextBlock FontSize="11" VerticalAlignment="Center">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="#FF8EC5FF"/>
+                                            <Setter Property="Text" Value="Sequential"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding NodeType}" Value="{x:Static vm:SequenceNodeType.ParallelContainer}">
+                                                    <Setter Property="Text" Value="Parallel"/>
+                                                    <Setter Property="Foreground" Value="#FFFFB74D"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding NodeType}" Value="{x:Static vm:SequenceNodeType.DsoContainer}">
+                                                    <Setter Property="Text" Value="DSO Target"/>
+                                                    <Setter Property="Foreground" Value="#FFB2DFDB"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                                <TextBlock FontSize="11" Margin="4,0,0,0" VerticalAlignment="Center"
+                                           Text="{Binding Children.Count, StringFormat=' · {0} iterations'}">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Foreground" Value="#FF8EC5FF"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding NodeType}" Value="{x:Static vm:SequenceNodeType.ParallelContainer}">
+                                                    <Setter Property="Foreground" Value="#FFFFB74D"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding NodeType}" Value="{x:Static vm:SequenceNodeType.DsoContainer}">
+                                                    <Setter Property="Foreground" Value="#FFB2DFDB"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </StackPanel>
+                            <StackPanel Grid.Column="3" Orientation="Horizontal">
+                                <Button Style="{StaticResource SmallIconButton}" Content="＋" ToolTip="Add child instruction"
+                                        Command="{Binding DataContext.AddChildInstructionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}"/>
+                                <Button Style="{StaticResource SmallIconButton}" Content="▲"
+                                        Command="{Binding DataContext.MoveUpCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}"/>
+                                <Button Style="{StaticResource SmallIconButton}" Content="▼"
+                                        Command="{Binding DataContext.MoveDownCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}"/>
+                                <Button Style="{StaticResource SmallIconButton}" Content="📋"
+                                        Command="{Binding DataContext.DuplicateNodeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}"/>
+                                <Button Style="{StaticResource SmallIconButton}" Content="✕" Foreground="{StaticResource Brush.Accent}"
+                                        Command="{Binding DataContext.RemoveNodeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    <Border Grid.Row="1" Padding="8" Background="{StaticResource Brush.InputBg}"
+                            CornerRadius="0,0,4,4"
+                            Visibility="{Binding IsExpanded, Converter={StaticResource BoolToVis}}"
+                            AllowDrop="True"
+                            DragOver="OnNodeDragOver"
+                            DragLeave="OnNodeDragLeave"
+                            Drop="OnNodeDrop"
+                            Tag="{Binding}">
+                        <StackPanel>
+                            <ItemsControl ItemsSource="{Binding Properties}" Margin="4,0,4,8">
+                                <ItemsControl.Style>
+                                    <Style TargetType="ItemsControl">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Properties.Count, FallbackValue=0, Converter={x:Static conv:GreaterThanZeroConverter.Instance}}" Value="True">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ItemsControl.Style>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type vm:SequenceItemPropertyViewModel}">
+                                        <Grid Margin="0,4">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="110"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center"
+                                                       Foreground="{StaticResource Brush.TextSecondary}" FontSize="11"/>
+                                            <TextBox Grid.Column="1" Text="{Binding ValueAsString, UpdateSourceTrigger=PropertyChanged}"
+                                                     VerticalAlignment="Center"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <ItemsControl ItemsSource="{Binding Children}" ItemTemplate="{DynamicResource SequenceNodeTemplate}"
+                                          Margin="12,4,0,0"/>
+                        </StackPanel>
+                    </Border>
+                    </Grid>
+                </Border>
+
+                <!-- Instruction leaf -->
+                <Border x:Name="InstructionCard" Padding="0" Margin="0,0,0,4"
+                        CornerRadius="4"
+                        Background="{StaticResource Brush.Surface}"
+                        BorderBrush="{StaticResource Brush.Border}" BorderThickness="1"
+                        AllowDrop="True"
+                        PreviewDragOver="OnNodeDragOver"
+                        DragLeave="OnNodeDragLeave"
+                        Drop="OnNodeDrop"
+                        PreviewMouseLeftButtonDown="OnNodeMouseDown"
+                        PreviewMouseMove="OnNodeMouseMove"
+                        MouseLeave="OnNodeMouseLeave"
+                        Tag="{Binding}">
+                    <Border.Style>
+                        <Style TargetType="Border">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Setter Property="BorderBrush" Value="{StaticResource Brush.Border}"/>
+                            <Setter Property="Background" Value="{StaticResource Brush.Surface}"/>
+                            <Setter Property="Opacity" Value="1"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsContainer}" Value="False">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsEnabled}" Value="False">
+                                    <Setter Property="Opacity" Value="0.4"/>
+                                </DataTrigger>
+                                <DataTrigger Value="True">
+                                    <DataTrigger.Binding>
+                                        <MultiBinding Converter="{StaticResource RefEq}">
+                                            <Binding Path="DataContext.SelectedNode" RelativeSource="{RelativeSource AncestorType=UserControl}"/>
+                                            <Binding/>
+                                        </MultiBinding>
+                                    </DataTrigger.Binding>
+                                    <Setter Property="BorderBrush" Value="{StaticResource Brush.Primary}"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsDragOver}" Value="True">
+                                    <Setter Property="Background" Value="{StaticResource Brush.SurfaceHover}"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <Border.InputBindings>
+                        <MouseBinding MouseAction="LeftClick"
+                                      Command="{Binding DataContext.SelectNodeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                      CommandParameter="{Binding}"/>
+                    </Border.InputBindings>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="4"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Border x:Name="StatusStripe" Grid.Column="0" Background="{StaticResource Brush.StatusPending}"
+                                CornerRadius="4,0,0,4"/>
+                        <Expander Grid.Column="1" IsExpanded="{Binding IsExpanded, Mode=TwoWay}"
+                                  Background="Transparent" BorderThickness="0" Padding="0">
+                            <Expander.Header>
+                                <DockPanel LastChildFill="True" Margin="8,8,8,4" MinHeight="36">
+                                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Button Style="{StaticResource SmallIconButton}" Content="▲"
+                                                Command="{Binding DataContext.MoveUpCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}"/>
+                                        <Button Style="{StaticResource SmallIconButton}" Content="▼"
+                                                Command="{Binding DataContext.MoveDownCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}"/>
+                                        <Button Style="{StaticResource SmallIconButton}" Content="📋"
+                                                Command="{Binding DataContext.DuplicateNodeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}"/>
+                                        <Button Style="{StaticResource SmallIconButton}" Content="✕" Foreground="{StaticResource Brush.Accent}"
+                                                Command="{Binding DataContext.RemoveNodeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}"/>
+                                    </StackPanel>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Ellipse Grid.Column="0" Width="8" Height="8" Margin="0,0,10,0" VerticalAlignment="Center"
+                                                 Fill="{StaticResource Brush.StatusPending}" x:Name="StatusDot"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding StepNumber, StringFormat={}{0}}"
+                                                   Foreground="{StaticResource Brush.TextSecondary}" FontSize="11"
+                                                   VerticalAlignment="Center" MinWidth="22" Margin="0,0,10,0"/>
+                                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                                            <CheckBox VerticalAlignment="Center" Margin="0,0,10,0"
+                                                      IsChecked="{Binding IsEnabled, Mode=TwoWay}"
+                                                      ToolTip="Enabled"/>
+                                            <TextBlock Text="{Binding Icon}" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold" FontSize="13"
+                                                       VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </DockPanel>
+                            </Expander.Header>
+                            <Border Padding="12,0,12,12" Background="{StaticResource Brush.InputBg}" Margin="8,0,8,8" CornerRadius="3">
+                                <ItemsControl ItemsSource="{Binding Properties}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate DataType="{x:Type vm:SequenceItemPropertyViewModel}">
+                                            <Grid Margin="0,6">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="120"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center"
+                                                           Foreground="{StaticResource Brush.TextSecondary}" FontSize="11"/>
+                                                <TextBox Grid.Column="1" Text="{Binding ValueAsString, UpdateSourceTrigger=PropertyChanged}"
+                                                         VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Border>
+                        </Expander>
+                    </Grid>
+                </Border>
+
+                <!-- Drop-after indicator -->
+                <Border x:Name="DropAfterLine" Style="{StaticResource DropInsertLine}"/>
+            </StackPanel>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding Status}" Value="{x:Static vm:SequenceItemStatus.Pending}">
+                    <Setter TargetName="StatusStripe" Property="Background" Value="{StaticResource Brush.StatusPending}"/>
+                    <Setter TargetName="StatusDot" Property="Fill" Value="{StaticResource Brush.StatusPending}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Status}" Value="{x:Static vm:SequenceItemStatus.Running}">
+                    <Setter TargetName="StatusStripe" Property="Background" Value="{StaticResource Brush.StatusRunning}"/>
+                    <Setter TargetName="InstructionCard" Property="BorderBrush" Value="{StaticResource Brush.StatusRunning}"/>
+                    <Setter TargetName="StatusDot" Property="Fill" Value="{StaticResource Brush.StatusRunning}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Status}" Value="{x:Static vm:SequenceItemStatus.Completed}">
+                    <Setter TargetName="StatusStripe" Property="Background" Value="{StaticResource Brush.StatusCompleted}"/>
+                    <Setter TargetName="StatusDot" Property="Fill" Value="{StaticResource Brush.StatusCompleted}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Status}" Value="{x:Static vm:SequenceItemStatus.Failed}">
+                    <Setter TargetName="StatusStripe" Property="Background" Value="{StaticResource Brush.StatusFailed}"/>
+                    <Setter TargetName="InstructionCard" Property="BorderBrush" Value="{StaticResource Brush.StatusFailed}"/>
+                    <Setter TargetName="StatusDot" Property="Fill" Value="{StaticResource Brush.StatusFailed}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Status}" Value="{x:Static vm:SequenceItemStatus.Skipped}">
+                    <Setter TargetName="StatusStripe" Property="Background" Value="{StaticResource Brush.StatusSkipped}"/>
+                    <Setter TargetName="StatusDot" Property="Fill" Value="{StaticResource Brush.StatusSkipped}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding ShowDropBefore}" Value="True">
+                    <Setter TargetName="DropBeforeLine" Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding ShowDropAfter}" Value="True">
+                    <Setter TargetName="DropAfterLine" Property="Visibility" Value="Visible"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding ShowDropInside}" Value="True">
+                    <Setter TargetName="ContainerChrome" Property="BorderBrush" Value="{StaticResource Brush.Primary}"/>
+                    <Setter TargetName="ContainerChrome" Property="BorderThickness" Value="2"/>
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Grid Margin="12">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="240"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="280"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Left -->
+        <Border Grid.Column="0" Padding="0" Background="{StaticResource Brush.Surface}" CornerRadius="4"
+                BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" Margin="0,0,8,0">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                          Padding="0">
+                <StackPanel Margin="12">
+                    <TextBlock Style="{StaticResource PaletteSectionHeader}" Text="ADD CONTAINER" Margin="0,0,0,6"/>
+                    <Button Style="{StaticResource ContainerAddButton}" Content="📋 Sequential"
+                            Command="{Binding AddContainerCommand}" CommandParameter="Sequential"/>
+                    <Button Style="{StaticResource ContainerAddButton}" Content="⚡ Parallel"
+                            Command="{Binding AddContainerCommand}" CommandParameter="Parallel"/>
+                    <Button Style="{StaticResource ContainerAddButton}" Content="🌟 DSO Target"
+                            Command="{Binding AddContainerCommand}" CommandParameter="DSO"/>
+
+                    <TextBlock Style="{StaticResource PaletteSectionHeader}" Text="INSTRUCTIONS"/>
+                    <ItemsControl ItemsSource="{Binding GroupedInstructions}">
+                        <ItemsControl.GroupStyle>
+                            <GroupStyle>
+                                <GroupStyle.HeaderTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Name}" FontSize="11" FontWeight="SemiBold"
+                                                   Foreground="{StaticResource Brush.TextSecondary}" Margin="0,8,0,4"/>
+                                    </DataTemplate>
+                                </GroupStyle.HeaderTemplate>
+                            </GroupStyle>
+                        </ItemsControl.GroupStyle>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="{x:Type vm:InstructionTemplate}">
+                                <Button Style="{StaticResource InstructionTile}"
+                                        PreviewMouseLeftButtonDown="OnPaletteTileMouseDown"
+                                        PreviewMouseMove="OnPaletteTileMouseMove"
+                                        PreviewMouseLeftButtonUp="OnPaletteTileMouseUp"
+                                        Tag="{Binding}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding Icon}" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding Name}" TextWrapping="Wrap" TextAlignment="Left"
+                                                   VerticalAlignment="Center" Foreground="{StaticResource Brush.Text}"/>
+                                    </StackPanel>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <TextBlock Style="{StaticResource PaletteSectionHeader}" Text="CONDITIONS"/>
+                    <ItemsControl ItemsSource="{Binding GroupedConditions}">
+                        <ItemsControl.GroupStyle>
+                            <GroupStyle>
+                                <GroupStyle.HeaderTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Name}" FontSize="11" FontWeight="SemiBold"
+                                                   Foreground="{StaticResource Brush.TextSecondary}" Margin="0,8,0,4"/>
+                                    </DataTemplate>
+                                </GroupStyle.HeaderTemplate>
+                            </GroupStyle>
+                        </ItemsControl.GroupStyle>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="{x:Type vm:ConditionTemplate}">
+                                <Button Style="{StaticResource InstructionTile}"
+                                        PreviewMouseLeftButtonDown="OnPaletteTileMouseDown"
+                                        PreviewMouseMove="OnPaletteTileMouseMove"
+                                        PreviewMouseLeftButtonUp="OnPaletteTileMouseUp"
+                                        Tag="{Binding}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding Icon}" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding Name}" TextWrapping="Wrap"
+                                                   VerticalAlignment="Center" Foreground="{StaticResource Brush.Text}"/>
+                                    </StackPanel>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Center -->
+        <Border Grid.Column="1" Padding="12" Background="{StaticResource Brush.Background}" CornerRadius="4"
+                BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" Margin="0,0,8,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <DockPanel Grid.Row="0" LastChildFill="False" Margin="0,0,0,10">
+                    <TextBlock DockPanel.Dock="Left" Text="SEQUENCE" VerticalAlignment="Center"
+                               FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource Brush.Primary}"/>
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                        <Button Content="🗑 Clear" Padding="10,6" Margin="4,0,0,0"
+                                Command="{Binding ClearAllCommand}" FontSize="11"/>
+                        <Button Content="💾 Save" Padding="10,6" Margin="4,0,0,0"
+                                Command="{Binding SaveSequenceCommand}" FontSize="11"/>
+                        <Button Content="📂 Load" Padding="10,6" Margin="4,0,0,0"
+                                Command="{Binding LoadSequenceCommand}" FontSize="11"/>
+                    </StackPanel>
+                </DockPanel>
+
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                              Padding="0,0,4,0"
+                              AllowDrop="True"
+                              DragOver="OnSequenceAreaDragOver"
+                              Drop="OnSequenceAreaDrop">
+                    <ItemsControl ItemsSource="{Binding RootNodes}" ItemTemplate="{StaticResource SequenceNodeTemplate}">
+                        <ItemsControl.ItemContainerStyle>
+                            <Style TargetType="ContentPresenter">
+                                <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                            </Style>
+                        </ItemsControl.ItemContainerStyle>
+                    </ItemsControl>
+                </ScrollViewer>
+
+                <ProgressBar Grid.Row="2" Height="6" Margin="0,10,0,4" Minimum="0" Maximum="100"
+                             Value="{Binding ProgressPercent}"
+                             Foreground="{StaticResource Brush.Primary}"
+                             Background="{StaticResource Brush.InputBg}"
+                             BorderThickness="0"/>
+            </Grid>
+        </Border>
+
+        <!-- Right -->
+        <Border Grid.Column="2" Padding="12" Background="{StaticResource Brush.Surface}" CornerRadius="4"
+                BorderBrush="{StaticResource Brush.Border}" BorderThickness="1">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Text="EXECUTION" Style="{StaticResource PaletteSectionHeader}" Margin="0,0,0,10"/>
+
+                    <Button Style="{StaticResource RunPrimaryButton}" HorizontalAlignment="Stretch"
+                            Content="▶ RUN SEQUENCE" Command="{Binding RunSequenceCommand}" Margin="0,0,0,8"/>
+
+                    <Button Style="{StaticResource StopDangerButton}" HorizontalAlignment="Stretch"
+                            Content="⏹ STOP" Command="{Binding StopSequenceCommand}" Margin="0,0,0,16"
+                            Visibility="{Binding IsRunning, Converter={StaticResource BoolToVis}}"/>
+
+                    <TextBlock Text="Current step" Foreground="{StaticResource Brush.TextSecondary}" FontSize="11"/>
+                    <TextBlock Margin="0,2,0,12" FontSize="15" FontWeight="SemiBold">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="Step {0} / {1}">
+                                <Binding Path="CurrentStepIndex"/>
+                                <Binding Path="TotalSteps"/>
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+
+                    <TextBlock Text="Status" Foreground="{StaticResource Brush.TextSecondary}" FontSize="11"/>
+                    <TextBlock Text="{Binding ExecutionStatus}" TextWrapping="Wrap" Margin="0,2,0,12"
+                               Foreground="{StaticResource Brush.Text}"/>
+
+                    <TextBlock Text="Elapsed" Foreground="{StaticResource Brush.TextSecondary}" FontSize="11"/>
+                    <TextBlock Text="{Binding ElapsedTime}" Margin="0,2,0,12" FontSize="16" FontFamily="Consolas"
+                               Foreground="{StaticResource Brush.Text}"/>
+
+                    <TextBlock Text="Progress" Foreground="{StaticResource Brush.TextSecondary}" FontSize="11"/>
+                    <Grid Margin="0,4,0,12">
+                        <ProgressBar Height="10" Minimum="0" Maximum="100" Value="{Binding ProgressPercent}"
+                                     Foreground="{StaticResource Brush.Primary}"
+                                     Background="{StaticResource Brush.InputBg}"/>
+                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="10"
+                                   Foreground="{StaticResource Brush.Text}"
+                                   Text="{Binding ProgressPercent, StringFormat={}{0:F0}%}"/>
+                    </Grid>
+
+                    <TextBlock Text="Estimated duration" Foreground="{StaticResource Brush.TextSecondary}" FontSize="11"/>
+                    <TextBlock Text="{Binding EstimatedDuration}" Margin="0,2,0,16" FontSize="14"
+                               Foreground="{StaticResource Brush.Text}"/>
+
+                    <Border Background="{StaticResource Brush.InputBg}" CornerRadius="4" Padding="10"
+                            BorderBrush="{StaticResource Brush.Border}" BorderThickness="1">
+                        <StackPanel>
+                            <TextBlock Text="SELECTED ITEM" FontSize="10" FontWeight="SemiBold"
+                                       Foreground="{StaticResource Brush.Primary}" Margin="0,0,0,8"/>
+                            <TextBlock Text="No item selected" Foreground="{StaticResource Brush.TextSecondary}" FontSize="11">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding DataContext.SelectedNode, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="{x:Null}">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                            <StackPanel DataContext="{Binding SelectedNode}">
+                                <StackPanel.Style>
+                                    <Style TargetType="StackPanel">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding DataContext.SelectedNode, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="{x:Null}">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
+                                <TextBlock Text="{Binding Item.Name}" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                <ItemsControl ItemsSource="{Binding Properties}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate DataType="{x:Type vm:SequenceItemPropertyViewModel}">
+                                            <Grid Margin="0,4">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="100"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center" FontSize="11"
+                                                           Foreground="{StaticResource Brush.TextSecondary}"/>
+                                                <TextBox Grid.Column="1" Text="{Binding ValueAsString, UpdateSourceTrigger=PropertyChanged}"
+                                                         VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</UserControl>

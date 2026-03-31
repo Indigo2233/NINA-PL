@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NINA.PL.Core\NINA.PL.Core.csproj" />
+    <ProjectReference Include="..\NINA.PL.Image\NINA.PL.Image.csproj" />
+  </ItemGroup>
+</Project>
