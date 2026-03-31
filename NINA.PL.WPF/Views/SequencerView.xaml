@@ -569,15 +569,23 @@
                               Drop="OnSequenceAreaDrop">
                     <StackPanel>
                         <!-- Sequence Start -->
-                        <Border Background="{StaticResource Brush.InputBg}" CornerRadius="4" Margin="0,0,0,6" Padding="8,6">
+                        <Border Background="{StaticResource Brush.InputBg}" CornerRadius="4" Margin="0,0,0,6" Padding="8,6"
+                                AllowDrop="True" Tag="Start"
+                                DragOver="OnSequenceAreaDragOver" Drop="OnSequenceAreaDrop">
                             <StackPanel>
                                 <DockPanel Margin="0,0,0,4">
                                     <TextBlock Text="▶ SEQUENCE START" FontWeight="Bold" FontSize="11"
                                                Foreground="{StaticResource Brush.Primary}" VerticalAlignment="Center"/>
-                                    <Button DockPanel.Dock="Right" Content="+" FontSize="14" Width="22" Height="22"
-                                            Style="{StaticResource SmallIconButton}" HorizontalAlignment="Right"
-                                            Command="{Binding AddInstructionToSectionCommand}" CommandParameter="Start" ToolTip="Add instruction"/>
+                                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <Button Content="+" FontSize="14" Width="22" Height="22"
+                                                Style="{StaticResource SmallIconButton}"
+                                                Command="{Binding AddInstructionToSectionCommand}" CommandParameter="Start"
+                                                ToolTip="Add selected instruction to Start"/>
+                                    </StackPanel>
                                 </DockPanel>
+                                <TextBlock Text="Drag instructions here or click + (select instruction first)"
+                                           FontSize="9" Foreground="{StaticResource Brush.TextSecondary}" Margin="0,0,0,4"
+                                           Visibility="{Binding StartSectionNodes.Count, Converter={x:Static conv:GreaterThanZeroConverter.Instance}, ConverterParameter=invert}"/>
                                 <ItemsControl ItemsSource="{Binding StartSectionNodes}" ItemTemplate="{StaticResource SequenceNodeTemplate}">
                                     <ItemsControl.ItemContainerStyle>
                                         <Style TargetType="ContentPresenter">
@@ -590,15 +598,25 @@
 
                         <!-- Targets (main area) -->
                         <Border Background="{StaticResource Brush.InputBg}" CornerRadius="4" Margin="0,0,0,6" Padding="8,6"
-                                MinHeight="120">
+                                MinHeight="120" AllowDrop="True" Tag="Target"
+                                DragOver="OnSequenceAreaDragOver" Drop="OnSequenceAreaDrop">
                             <StackPanel>
                                 <DockPanel Margin="0,0,0,4">
                                     <TextBlock Text="🎯 TARGETS" FontWeight="Bold" FontSize="11"
                                                Foreground="{StaticResource Brush.Primary}" VerticalAlignment="Center"/>
-                                    <Button DockPanel.Dock="Right" Content="+" FontSize="14" Width="22" Height="22"
-                                            Style="{StaticResource SmallIconButton}" HorizontalAlignment="Right"
-                                            Command="{Binding AddInstructionToSectionCommand}" CommandParameter="Target" ToolTip="Add instruction"/>
+                                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <Button Content="+ DSO" FontSize="10" Padding="4,2" Margin="0,0,4,0"
+                                                Command="{Binding AddContainerCommand}" CommandParameter="DSO"
+                                                ToolTip="Add DSO Target container"/>
+                                        <Button Content="+" FontSize="14" Width="22" Height="22"
+                                                Style="{StaticResource SmallIconButton}"
+                                                Command="{Binding AddInstructionToSectionCommand}" CommandParameter="Target"
+                                                ToolTip="Add selected instruction to Targets"/>
+                                    </StackPanel>
                                 </DockPanel>
+                                <TextBlock Text="Add DSO Target containers here with imaging instructions"
+                                           FontSize="9" Foreground="{StaticResource Brush.TextSecondary}" Margin="0,0,0,4"
+                                           Visibility="{Binding TargetSectionNodes.Count, Converter={x:Static conv:GreaterThanZeroConverter.Instance}, ConverterParameter=invert}"/>
                                 <ItemsControl ItemsSource="{Binding TargetSectionNodes}" ItemTemplate="{StaticResource SequenceNodeTemplate}">
                                     <ItemsControl.ItemContainerStyle>
                                         <Style TargetType="ContentPresenter">
@@ -610,15 +628,23 @@
                         </Border>
 
                         <!-- Sequence End -->
-                        <Border Background="{StaticResource Brush.InputBg}" CornerRadius="4" Margin="0,0,0,6" Padding="8,6">
+                        <Border Background="{StaticResource Brush.InputBg}" CornerRadius="4" Margin="0,0,0,6" Padding="8,6"
+                                AllowDrop="True" Tag="End"
+                                DragOver="OnSequenceAreaDragOver" Drop="OnSequenceAreaDrop">
                             <StackPanel>
                                 <DockPanel Margin="0,0,0,4">
                                     <TextBlock Text="⏹ SEQUENCE END" FontWeight="Bold" FontSize="11"
                                                Foreground="{StaticResource Brush.Primary}" VerticalAlignment="Center"/>
-                                    <Button DockPanel.Dock="Right" Content="+" FontSize="14" Width="22" Height="22"
-                                            Style="{StaticResource SmallIconButton}" HorizontalAlignment="Right"
-                                            Command="{Binding AddInstructionToSectionCommand}" CommandParameter="End" ToolTip="Add instruction"/>
+                                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <Button Content="+" FontSize="14" Width="22" Height="22"
+                                                Style="{StaticResource SmallIconButton}"
+                                                Command="{Binding AddInstructionToSectionCommand}" CommandParameter="End"
+                                                ToolTip="Add selected instruction to End"/>
+                                    </StackPanel>
                                 </DockPanel>
+                                <TextBlock Text="Drag instructions here or click + (select instruction first)"
+                                           FontSize="9" Foreground="{StaticResource Brush.TextSecondary}" Margin="0,0,0,4"
+                                           Visibility="{Binding EndSectionNodes.Count, Converter={x:Static conv:GreaterThanZeroConverter.Instance}, ConverterParameter=invert}"/>
                                 <ItemsControl ItemsSource="{Binding EndSectionNodes}" ItemTemplate="{StaticResource SequenceNodeTemplate}">
                                     <ItemsControl.ItemContainerStyle>
                                         <Style TargetType="ContentPresenter">

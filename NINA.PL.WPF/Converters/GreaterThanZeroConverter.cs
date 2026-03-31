@@ -10,11 +10,21 @@ public sealed class GreaterThanZeroConverter : IValueConverter
 
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
+        bool result;
         if (value is int i)
-            return i > 0;
-        if (value is double d)
-            return d > 0;
-        return false;
+            result = i > 0;
+        else if (value is double d)
+            result = d > 0;
+        else
+            result = false;
+
+        if (parameter is string s && s.Equals("invert", StringComparison.OrdinalIgnoreCase))
+            result = !result;
+
+        if (targetType == typeof(System.Windows.Visibility))
+            return result ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
+
+        return result;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

@@ -217,10 +217,20 @@ public partial class SequencerView
             return;
         }
 
+        string section = (sender as FrameworkElement)?.Tag as string ?? "Target";
+        var targetColl = section switch
+        {
+            "Start" => panel.StartSectionNodes,
+            "End" => panel.EndSectionNodes,
+            _ => panel.TargetSectionNodes,
+        };
+
         if (e.Data.GetDataPresent(typeof(InstructionTemplate)) &&
             e.Data.GetData(typeof(InstructionTemplate)) is InstructionTemplate it)
         {
-            panel.AddInstructionCommand.Execute(it);
+            var node = SequenceItemViewModelFactory.FromTemplate(it);
+            targetColl.Add(node);
+            panel.SelectedNode = node;
             e.Handled = true;
             return;
         }
@@ -228,7 +238,9 @@ public partial class SequencerView
         if (e.Data.GetDataPresent(typeof(ConditionTemplate)) &&
             e.Data.GetData(typeof(ConditionTemplate)) is ConditionTemplate ct)
         {
-            panel.AddInstructionCommand.Execute(ct);
+            var node = SequenceItemViewModelFactory.FromConditionTemplate(ct);
+            targetColl.Add(node);
+            panel.SelectedNode = node;
             e.Handled = true;
         }
     }
