@@ -160,6 +160,9 @@ public sealed partial class SequencerPanelViewModel : ObservableObject, IDisposa
     private ConditionTemplate? selectedConditionTemplate;
 
     [ObservableProperty]
+    private int paletteTabIndex;
+
+    [ObservableProperty]
     private SequenceNodeViewModel? selectedNode;
 
     [ObservableProperty]
@@ -460,6 +463,13 @@ public sealed partial class SequencerPanelViewModel : ObservableObject, IDisposa
     private void StopSequence()
     {
         _runCts?.Cancel();
+    }
+
+    [RelayCommand]
+    private void SetPaletteTab(string? index)
+    {
+        if (int.TryParse(index, out int idx))
+            PaletteTabIndex = idx;
     }
 
     [RelayCommand]

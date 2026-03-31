@@ -501,6 +501,20 @@
         <!-- Left -->
         <Border Grid.Column="0" Padding="0" Background="{StaticResource Brush.Surface}" CornerRadius="4"
                 BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" Margin="0,0,8,0">
+            <DockPanel>
+                <!-- Tab bar -->
+                <UniformGrid DockPanel.Dock="Top" Rows="1" Margin="4,4,4,0">
+                    <RadioButton Content="📋 Instructions" GroupName="PaletteTab" FontSize="10" Padding="4,6"
+                                 IsChecked="{Binding PaletteTabIndex, Converter={x:Static conv:GreaterThanZeroConverter.Instance}, ConverterParameter=tab0}"
+                                 Command="{Binding SetPaletteTabCommand}" CommandParameter="0"
+                                 Style="{StaticResource {x:Type ToggleButton}}"/>
+                    <RadioButton Content="🔄 Conditions" GroupName="PaletteTab" FontSize="10" Padding="4,6"
+                                 Command="{Binding SetPaletteTabCommand}" CommandParameter="1"
+                                 Style="{StaticResource {x:Type ToggleButton}}"/>
+                    <RadioButton Content="⚡ Triggers" GroupName="PaletteTab" FontSize="10" Padding="4,6"
+                                 Command="{Binding SetPaletteTabCommand}" CommandParameter="2"
+                                 Style="{StaticResource {x:Type ToggleButton}}"/>
+                </UniformGrid>
             <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
                           Padding="0">
                 <StackPanel Margin="12">
@@ -512,6 +526,17 @@
                     <Button Style="{StaticResource ContainerAddButton}" Content="🌟 DSO Target"
                             Command="{Binding AddContainerCommand}" CommandParameter="DSO"/>
 
+                    <StackPanel>
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding PaletteTabIndex}" Value="0">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
                     <TextBlock Style="{StaticResource PaletteSectionHeader}" Text="INSTRUCTIONS"/>
                     <ItemsControl ItemsSource="{Binding GroupedInstructions}">
                         <ItemsControl.GroupStyle>
@@ -541,6 +566,19 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
 
+                    </StackPanel>
+
+                    <StackPanel>
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding PaletteTabIndex}" Value="1">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
                     <TextBlock Style="{StaticResource PaletteSectionHeader}" Text="🔄 CONDITIONS" Foreground="#FFB74D"/>
                     <ItemsControl ItemsSource="{Binding GroupedConditions}">
                         <ItemsControl.GroupStyle>
@@ -570,6 +608,19 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
 
+                    </StackPanel>
+
+                    <StackPanel>
+                        <StackPanel.Style>
+                            <Style TargetType="StackPanel">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding PaletteTabIndex}" Value="2">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </StackPanel.Style>
                     <TextBlock Style="{StaticResource PaletteSectionHeader}" Text="⚡ TRIGGERS" Foreground="#7986CB"/>
                     <ItemsControl ItemsSource="{Binding GroupedTriggers}">
                         <ItemsControl.GroupStyle>
@@ -598,9 +649,11 @@
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
+                    </StackPanel>
 
                 </StackPanel>
             </ScrollViewer>
+            </DockPanel>
         </Border>
 
         <!-- Center -->
