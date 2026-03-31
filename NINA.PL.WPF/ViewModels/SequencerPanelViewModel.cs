@@ -218,14 +218,25 @@ public sealed partial class SequencerPanelViewModel : ObservableObject, IDisposa
     {
         if (coll is null)
             return null;
-        foreach (SequenceNodeViewModel r in RootNodes)
+        foreach (var sectionNodes in AllSections())
         {
-            SequenceNodeViewModel? f = FindParentRecursive(r, coll);
-            if (f is not null)
-                return f;
+            foreach (SequenceNodeViewModel r in sectionNodes)
+            {
+                SequenceNodeViewModel? f = FindParentRecursive(r, coll);
+                if (f is not null)
+                    return f;
+            }
         }
 
         return null;
+    }
+
+    private IEnumerable<ObservableCollection<SequenceNodeViewModel>> AllSections()
+    {
+        yield return StartSectionNodes;
+        yield return TargetSectionNodes;
+        yield return EndSectionNodes;
+        yield return RootNodes;
     }
 
     private static SequenceNodeViewModel? FindParentRecursive(SequenceNodeViewModel node, ObservableCollection<SequenceNodeViewModel> target)
@@ -259,8 +270,9 @@ public sealed partial class SequencerPanelViewModel : ObservableObject, IDisposa
                 Walk(c, level + 1);
         }
 
-        foreach (SequenceNodeViewModel r in RootNodes)
-            Walk(r, 0);
+        foreach (var section in AllSections())
+            foreach (SequenceNodeViewModel r in section)
+                Walk(r, 0);
     }
 
     private void RefreshStepNumbers()
@@ -273,8 +285,9 @@ public sealed partial class SequencerPanelViewModel : ObservableObject, IDisposa
                 Walk(c);
         }
 
-        foreach (SequenceNodeViewModel r in RootNodes)
-            Walk(r);
+        foreach (var section in AllSections())
+            foreach (SequenceNodeViewModel r in section)
+                Walk(r);
     }
 
     partial void OnLoopCountChanged(int value) => OnPropertyChanged(nameof(EstimatedDuration));
@@ -748,6 +761,17 @@ public sealed partial class SequencerPanelViewModel : ObservableObject, IDisposa
     public void AddInstructionToNode(InstructionTemplate template, SequenceNodeViewModel target)
     {
         var node = SequenceItemViewModelFactory.FromTemplate(template);
+        InsertNodeRelativeTo(node, target);
+    }
+
+    public void AddConditionToNode(ConditionTemplate template, SequenceNodeViewModel target)
+    {
+        var node = SequenceItemViewModelFactory.FromConditionTemplate(template);
+        InsertNodeRelativeTo(node, target);
+    }
+
+    private void InsertNodeRelativeTo(SequenceNodeViewModel node, SequenceNodeViewModel target)
+    {
         if (target.IsContainer)
         {
             target.Children.Add(node);
@@ -761,36 +785,29 @@ public sealed partial class SequencerPanelViewModel : ObservableObject, IDisposa
         }
         else
         {
-            int idx = RootNodes.IndexOf(target);
-            RootNodes.Insert(idx + 1, node);
+            ObservableCollection<SequenceNodeViewModel> coll = FindSectionCollection(target);
+            int idx = coll.IndexOf(target);
+            if (idx >= 0)
+                coll.Insert(idx + 1, node);
+            else
+                coll.Add(node);
             node.Parent = null;
         }
         RefreshStepNumbers();
         SelectedNode = node;
     }
 
-    public void AddConditionToNode(ConditionTemplate template, SequenceNodeViewModel target)
+    private ObservableCollection<SequenceNodeViewModel> FindSectionCollection(SequenceNodeViewModel node)
     {
-        var node = SequenceItemViewModelFactory.FromConditionTemplate(template);
-        if (target.IsContainer)
-        {
-            target.Children.Add(node);
-            node.Parent = target;
-        }
-        else if (target.Parent is { } parent)
-        {
-            int idx = parent.Children.IndexOf(target);
-            parent.Children.Insert(idx + 1, node);
-            node.Parent = parent;
-        }
-        else
-        {
-            int idx = RootNodes.IndexOf(target);
-            RootNodes.Insert(idx + 1, node);
-            node.Parent = null;
-        }
-        RefreshStepNumbers();
-        SelectedNode = node;
+        if (StartSectionNodes.Contains(node))
+            return StartSectionNodes;
+        if (EndSectionNodes.Contains(node))
+            return EndSectionNodes;
+        if (TargetSectionNodes.Contains(node))
+            return TargetSectionNodes;
+        if (RootNodes.Contains(node))
+            return RootNodes;
+        return TargetSectionNodes;
     }
 
     public void ClearDragVisuals()
@@ -1311,11 +1328,14 @@ public sealed partial class SequencerPanelViewModel : ObservableObject, IDisposa
             return null;
         }
 
-        foreach (SequenceNodeViewModel r in RootNodes)
+        foreach (var section in AllSections())
         {
-            SequenceNodeViewModel? f = Walk(r);
-            if (f is not null)
-                return f;
+            foreach (SequenceNodeViewModel r in section)
+            {
+                SequenceNodeViewModel? f = Walk(r);
+                if (f is not null)
+                    return f;
+            }
         }
 
         return null;
@@ -1356,9 +1376,9 @@ public sealed partial class SequencerPanelViewModel : ObservableObject, IDisposa
 
     public ObservableCollection<SequenceNodeViewModel> GetCollectionForNode(SequenceNodeViewModel node)
     {
-        if (node.Parent is null)
-            return RootNodes;
-        return node.Parent.Children;
+        if (node.Parent is not null)
+            return node.Parent.Children;
+        return FindSectionCollection(node);
     }
 
     private static IReadOnlyList<InstructionTemplate> BuildInstructionTemplates() =>
