@@ -220,10 +220,10 @@ public partial class SequencerView
 
         e.Effects = isPalette ? DragDropEffects.Copy : DragDropEffects.Move;
 
-        (SequenceNodeViewModel? node, _) = HitTestNode(sender as UIElement, e);
-        if (node is not null)
+        (SequenceNodeViewModel? node, _, FrameworkElement? nodeFe) = FindDropTarget(e);
+        if (node is not null && nodeFe is not null)
         {
-            SequencerDropMode mode = GetDropModeFromHit(node, sender as UIElement, e);
+            SequencerDropMode mode = GetDropMode(node, nodeFe, e);
             panel.SetDropIndicator(node, mode);
         }
         else
@@ -244,7 +244,7 @@ public partial class SequencerView
 
         panel.SetDropIndicator(null, SequencerDropMode.Before);
 
-        (SequenceNodeViewModel? targetNode, string section) = HitTestNode(sender as UIElement, e);
+        (SequenceNodeViewModel? targetNode, string section, FrameworkElement? nodeFe) = FindDropTarget(e);
 
         var targetColl = section switch
         {
@@ -253,14 +253,15 @@ public partial class SequencerView
             _ => panel.TargetSectionNodes,
         };
 
+        SequencerDropMode dropMode = SequencerDropMode.After;
+        if (targetNode is not null && nodeFe is not null)
+            dropMode = GetDropMode(targetNode, nodeFe, e);
+
         if (e.Data.GetDataPresent(typeof(InstructionTemplate)) &&
             e.Data.GetData(typeof(InstructionTemplate)) is InstructionTemplate it)
         {
             if (targetNode is not null)
-            {
-                SequencerDropMode mode = GetDropModeFromHit(targetNode, sender as UIElement, e);
-                panel.AddInstructionToNode(it, targetNode, mode);
-            }
+                panel.AddInstructionToNode(it, targetNode, dropMode);
             else
             {
                 var node = SequenceItemViewModelFactory.FromTemplate(it);
@@ -275,10 +276,7 @@ public partial class SequencerView
             e.Data.GetData(typeof(ConditionTemplate)) is ConditionTemplate ct)
         {
             if (targetNode is not null)
-            {
-                SequencerDropMode mode = GetDropModeFromHit(targetNode, sender as UIElement, e);
-                panel.AddConditionToNode(ct, targetNode, mode);
-            }
+                panel.AddConditionToNode(ct, targetNode, dropMode);
             else
             {
                 var node = SequenceItemViewModelFactory.FromConditionTemplate(ct);
@@ -291,14 +289,11 @@ public partial class SequencerView
 
         if (panel.DraggedNode is not null)
         {
-            var drag = panel.DraggedNode;
             if (targetNode is not null)
-            {
-                SequencerDropMode mode = GetDropModeFromHit(targetNode, sender as UIElement, e);
-                panel.DropAt(targetNode, mode);
-            }
+                panel.DropAt(targetNode, dropMode);
             else
             {
+                var drag = panel.DraggedNode;
                 ObservableCollection<SequenceNodeViewModel> dragColl = panel.GetParentCollection(drag);
                 dragColl.Remove(drag);
                 drag.Parent = null;
@@ -309,26 +304,22 @@ public partial class SequencerView
         }
     }
 
-    private (SequenceNodeViewModel? node, string section) HitTestNode(UIElement? reference, DragEventArgs e)
+    private (SequenceNodeViewModel? node, string section, FrameworkElement? nodeFe) FindDropTarget(DragEventArgs e)
     {
-        if (reference is null)
-            return (null, "Target");
-
-        Point pt = e.GetPosition(reference);
-        HitTestResult? result = VisualTreeHelper.HitTest(reference, pt);
-        if (result?.VisualHit is null)
-            return (null, "Target");
-
         string section = "Target";
         SequenceNodeViewModel? node = null;
+        FrameworkElement? nodeFe = null;
 
-        DependencyObject? current = result.VisualHit;
+        DependencyObject? current = e.OriginalSource as DependencyObject;
         while (current is not null)
         {
             if (current is FrameworkElement fe)
             {
                 if (node is null && fe.Tag is SequenceNodeViewModel vm)
+                {
                     node = vm;
+                    nodeFe = fe;
+                }
                 if (fe.Tag is string s && (s == "Start" || s == "Target" || s == "End"))
                 {
                     section = s;
@@ -338,36 +329,7 @@ public partial class SequencerView
             current = VisualTreeHelper.GetParent(current);
         }
 
-        return (node, section);
-    }
-
-    private SequencerDropMode GetDropModeFromHit(SequenceNodeViewModel target, UIElement? reference, DragEventArgs e)
-    {
-        if (reference is null)
-            return SequencerDropMode.After;
-
-        FrameworkElement? targetFe = FindFrameworkElementForNode(reference, target);
-        if (targetFe is null)
-            return SequencerDropMode.After;
-
-        return GetDropMode(target, targetFe, e);
-    }
-
-    private static FrameworkElement? FindFrameworkElementForNode(DependencyObject parent, SequenceNodeViewModel node)
-    {
-        if (parent is FrameworkElement fe && ReferenceEquals(fe.Tag, node))
-            return fe;
-
-        int count = VisualTreeHelper.GetChildrenCount(parent);
-        for (int i = 0; i < count; i++)
-        {
-            DependencyObject child = VisualTreeHelper.GetChild(parent, i);
-            FrameworkElement? found = FindFrameworkElementForNode(child, node);
-            if (found is not null)
-                return found;
-        }
-
-        return null;
+        return (node, section, nodeFe);
     }
 
     private static SequencerDropMode GetDropMode(SequenceNodeViewModel target, FrameworkElement fe, DragEventArgs e)
