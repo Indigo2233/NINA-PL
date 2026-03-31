@@ -382,10 +382,6 @@
                                                   Foreground="{StaticResource Brush.TextSecondary}"
                                                   ToolTip="Advanced settings" VerticalAlignment="Center"
                                                   Content="⋯"/>
-                                <Button Style="{StaticResource SmallIconButton}" Content="⋯" ToolTip="Advanced settings"
-                                        Width="20" Height="20" FontSize="12"
-                                        Command="{Binding DataContext.ToggleAdvancedSettingsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                        CommandParameter="{Binding}"/>
                                 <Button Style="{StaticResource SmallIconButton}" Content="📋" ToolTip="Duplicate"
                                         Command="{Binding DataContext.DuplicateNodeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                         CommandParameter="{Binding}" Width="20" Height="20" FontSize="10"/>

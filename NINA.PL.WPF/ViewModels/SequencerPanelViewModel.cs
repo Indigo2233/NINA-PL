@@ -1837,13 +1837,6 @@ public sealed partial class SequencerPanelViewModel : ObservableObject, IDisposa
             },
             new()
             {
-                Name = "Time Limit",
-                Icon = "⏱",
-                Category = "Flow",
-                ConditionFactory = () => new TimeCondition { Name = "Time", MaxDuration = TimeSpan.FromHours(1) },
-            },
-            new()
-            {
                 Name = "Altitude Limit",
                 Icon = "📐",
                 Category = "Sky",
