@@ -541,7 +541,7 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
 
-                    <TextBlock Style="{StaticResource PaletteSectionHeader}" Text="CONDITIONS"/>
+                    <TextBlock Style="{StaticResource PaletteSectionHeader}" Text="🔄 CONDITIONS" Foreground="#FFB74D"/>
                     <ItemsControl ItemsSource="{Binding GroupedConditions}">
                         <ItemsControl.GroupStyle>
                             <GroupStyle>
@@ -564,6 +564,35 @@
                                         <TextBlock Text="{Binding Icon}" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center"/>
                                         <TextBlock Text="{Binding Name}" TextWrapping="Wrap"
                                                    VerticalAlignment="Center" Foreground="{StaticResource Brush.Text}"/>
+                                    </StackPanel>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <TextBlock Style="{StaticResource PaletteSectionHeader}" Text="⚡ TRIGGERS" Foreground="#7986CB"/>
+                    <ItemsControl ItemsSource="{Binding GroupedTriggers}">
+                        <ItemsControl.GroupStyle>
+                            <GroupStyle>
+                                <GroupStyle.HeaderTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Name}" FontSize="11" FontWeight="SemiBold"
+                                                   Foreground="{StaticResource Brush.TextSecondary}" Margin="0,8,0,4"/>
+                                    </DataTemplate>
+                                </GroupStyle.HeaderTemplate>
+                            </GroupStyle>
+                        </ItemsControl.GroupStyle>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="{x:Type vm:ConditionTemplate}">
+                                <Button Style="{StaticResource InstructionTile}"
+                                        PreviewMouseLeftButtonDown="OnPaletteTileMouseDown"
+                                        PreviewMouseMove="OnPaletteTileMouseMove"
+                                        PreviewMouseLeftButtonUp="OnPaletteTileMouseUp"
+                                        Tag="{Binding}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding Icon}" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding Name}" TextWrapping="Wrap"
+                                                   VerticalAlignment="Center" Foreground="#7986CB"/>
                                     </StackPanel>
                                 </Button>
                             </DataTemplate>

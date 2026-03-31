@@ -111,6 +111,12 @@ public sealed partial class SequencerPanelViewModel : ObservableObject, IDisposa
 
         GroupedConditions = CollectionViewSource.GetDefaultView(AvailableConditions);
         GroupedConditions.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ConditionTemplate.Category)));
+        GroupedConditions.Filter = o => o is ConditionTemplate ct && ct.ConditionFactory is not null;
+
+        var triggerSource = new CollectionViewSource { Source = AvailableConditions };
+        GroupedTriggers = triggerSource.View;
+        GroupedTriggers.GroupDescriptions.Add(new PropertyGroupDescription(nameof(ConditionTemplate.Category)));
+        GroupedTriggers.Filter = o => o is ConditionTemplate ct && ct.TriggerFactory is not null;
 
         _elapsedTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(500) };
         _elapsedTimer.Tick += (_, _) =>
@@ -144,6 +150,8 @@ public sealed partial class SequencerPanelViewModel : ObservableObject, IDisposa
     public ICollectionView GroupedInstructions { get; }
 
     public ICollectionView GroupedConditions { get; }
+
+    public ICollectionView GroupedTriggers { get; }
 
     [ObservableProperty]
     private InstructionTemplate? selectedInstructionTemplate;
