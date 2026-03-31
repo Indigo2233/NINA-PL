@@ -680,27 +680,7 @@ public static class SequenceItemViewModelFactory
 
     private static SequenceItemPropertyViewModel[] WithInstructionMeta(ISequenceItem item, SequenceItemPropertyViewModel[] core)
     {
-        if (item is SequenceContainer or ParallelContainer or DeepSkyObjectContainer)
-            return core;
-
-        var list = new List<SequenceItemPropertyViewModel>(core);
-        AppendReflectiveInstructionMeta(item, list);
-        return list.ToArray();
-    }
-
-    private static void AppendReflectiveInstructionMeta(ISequenceItem item, List<SequenceItemPropertyViewModel> list)
-    {
-        Type t = item.GetType();
-        var existing = new HashSet<string>(list.Select(p => p.Name), StringComparer.OrdinalIgnoreCase);
-        foreach (string name in new[] { "Category", "ErrorBehavior", "Attempts" })
-        {
-            if (existing.Contains(name))
-                continue;
-            PropertyInfo? p = t.GetProperty(name, BindingFlags.Public | BindingFlags.Instance);
-            if (p?.CanRead != true)
-                continue;
-            list.Add(SeqProp(name, p.GetValue(item), p.PropertyType));
-        }
+        return core;
     }
 
     private static SequenceItemPropertyViewModel[] BuildPropertiesForTrigger(ISequenceTrigger t) =>

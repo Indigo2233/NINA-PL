@@ -286,11 +286,9 @@
                     </Grid>
                 </Border>
 
-                <!-- Instruction leaf -->
-                <Border x:Name="InstructionCard" Padding="0" Margin="0,0,0,4"
-                        CornerRadius="4"
-                        Background="{StaticResource Brush.Surface}"
-                        BorderBrush="{StaticResource Brush.Border}" BorderThickness="1"
+                <!-- Instruction leaf (NINA-style compact row) -->
+                <Border x:Name="InstructionCard" Padding="0" Margin="0,0,0,2"
+                        CornerRadius="3" Height="32"
                         AllowDrop="True"
                         PreviewDragOver="OnNodeDragOver"
                         DragLeave="OnNodeDragLeave"
@@ -338,66 +336,48 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <Border x:Name="StatusStripe" Grid.Column="0" Background="{StaticResource Brush.StatusPending}"
-                                CornerRadius="4,0,0,4"/>
-                        <Expander Grid.Column="1" IsExpanded="{Binding IsExpanded, Mode=TwoWay}"
-                                  Background="Transparent" BorderThickness="0" Padding="0">
-                            <Expander.Header>
-                                <DockPanel LastChildFill="True" Margin="8,8,8,4" MinHeight="36">
-                                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
-                                        <Button Style="{StaticResource SmallIconButton}" Content="▲"
-                                                Command="{Binding DataContext.MoveUpCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                CommandParameter="{Binding}"/>
-                                        <Button Style="{StaticResource SmallIconButton}" Content="▼"
-                                                Command="{Binding DataContext.MoveDownCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                CommandParameter="{Binding}"/>
-                                        <Button Style="{StaticResource SmallIconButton}" Content="📋"
-                                                Command="{Binding DataContext.DuplicateNodeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                CommandParameter="{Binding}"/>
-                                        <Button Style="{StaticResource SmallIconButton}" Content="✕" Foreground="{StaticResource Brush.Accent}"
-                                                Command="{Binding DataContext.RemoveNodeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                                CommandParameter="{Binding}"/>
-                                    </StackPanel>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
-                                        <Ellipse Grid.Column="0" Width="8" Height="8" Margin="0,0,10,0" VerticalAlignment="Center"
-                                                 Fill="{StaticResource Brush.StatusPending}" x:Name="StatusDot"/>
-                                        <TextBlock Grid.Column="1" Text="{Binding StepNumber, StringFormat={}{0}}"
-                                                   Foreground="{StaticResource Brush.TextSecondary}" FontSize="11"
-                                                   VerticalAlignment="Center" MinWidth="22" Margin="0,0,10,0"/>
-                                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                                            <CheckBox VerticalAlignment="Center" Margin="0,0,10,0"
-                                                      IsChecked="{Binding IsEnabled, Mode=TwoWay}"
-                                                      ToolTip="Enabled"/>
-                                            <TextBlock Text="{Binding Icon}" FontSize="16" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                                            <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold" FontSize="13"
-                                                       VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                CornerRadius="3,0,0,3"/>
+                        <DockPanel Grid.Column="1" Margin="6,0,4,0">
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                                <Button Style="{StaticResource SmallIconButton}" Content="📋" ToolTip="Duplicate"
+                                        Command="{Binding DataContext.DuplicateNodeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}" Width="20" Height="20" FontSize="10"/>
+                                <Button Style="{StaticResource SmallIconButton}" Content="✕" Foreground="{StaticResource Brush.Accent}" ToolTip="Remove"
+                                        Command="{Binding DataContext.RemoveNodeCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}" Width="20" Height="20" FontSize="10"/>
+                            </StackPanel>
+                            <CheckBox DockPanel.Dock="Left" VerticalAlignment="Center" Margin="0,0,6,0"
+                                      IsChecked="{Binding IsEnabled, Mode=TwoWay}" ToolTip="Enabled"/>
+                            <Ellipse DockPanel.Dock="Left" Width="6" Height="6" Margin="0,0,6,0" VerticalAlignment="Center"
+                                     Fill="{StaticResource Brush.StatusPending}" x:Name="StatusDot"/>
+                            <TextBlock DockPanel.Dock="Left" Text="{Binding Icon}" FontSize="14" Margin="0,0,6,0"
+                                       VerticalAlignment="Center"/>
+                            <TextBlock DockPanel.Dock="Left" Text="{Binding DisplayName}" FontWeight="SemiBold" FontSize="12"
+                                       VerticalAlignment="Center" Margin="0,0,12,0" MinWidth="100"
+                                       TextTrimming="CharacterEllipsis"/>
+                            <ItemsControl DockPanel.Dock="Left" ItemsSource="{Binding Properties}" VerticalAlignment="Center">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Orientation="Horizontal"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type vm:SequenceItemPropertyViewModel}">
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,8,0" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Name}" Foreground="{StaticResource Brush.TextSecondary}"
+                                                       FontSize="11" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                            <TextBox Text="{Binding ValueAsString, UpdateSourceTrigger=PropertyChanged}"
+                                                     VerticalAlignment="Center" MinWidth="40" MaxWidth="90"
+                                                     FontSize="11" Padding="3,1" BorderThickness="1"
+                                                     BorderBrush="{StaticResource Brush.BorderSubtle}"
+                                                     Background="{StaticResource Brush.InputBg}"/>
+                                            <TextBlock Text="|" Foreground="{StaticResource Brush.BorderSubtle}"
+                                                       FontSize="11" VerticalAlignment="Center" Margin="8,0,0,0"/>
                                         </StackPanel>
-                                    </Grid>
-                                </DockPanel>
-                            </Expander.Header>
-                            <Border Padding="12,0,12,12" Background="{StaticResource Brush.InputBg}" Margin="8,0,8,8" CornerRadius="3">
-                                <ItemsControl ItemsSource="{Binding Properties}">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate DataType="{x:Type vm:SequenceItemPropertyViewModel}">
-                                            <Grid Margin="0,6">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="120"/>
-                                                    <ColumnDefinition Width="*"/>
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock Text="{Binding Name}" VerticalAlignment="Center"
-                                                           Foreground="{StaticResource Brush.TextSecondary}" FontSize="11"/>
-                                                <TextBox Grid.Column="1" Text="{Binding ValueAsString, UpdateSourceTrigger=PropertyChanged}"
-                                                         VerticalAlignment="Center"/>
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </Border>
-                        </Expander>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </DockPanel>
                     </Grid>
                 </Border>
 
