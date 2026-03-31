@@ -278,13 +278,23 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
 
-                            <!-- Triggers sub-area -->
+                            <!-- Triggers sub-area (Sequential / DSO only) -->
                             <Border Background="#1A3F51B5" CornerRadius="3" Padding="6,4" Margin="4,2,4,4"
                                     BorderBrush="#333F51B5" BorderThickness="1"
                                     Tag="TriggersArea">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding NodeType}" Value="{x:Static vm:SequenceNodeType.ParallelContainer}">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
                                 <StackPanel>
                                     <DockPanel Margin="0,0,0,2">
-                                        <TextBlock Text="⚡ TRIGGERS" FontSize="9" FontWeight="SemiBold"
+                                        <TextBlock Text="TRIGGERS" FontSize="9" FontWeight="SemiBold"
                                                    Foreground="#7986CB" VerticalAlignment="Center"/>
                                         <Button DockPanel.Dock="Right" Content="+" FontSize="12" Width="18" Height="18"
                                                 Style="{StaticResource SmallIconButton}" HorizontalAlignment="Right"
@@ -295,13 +305,23 @@
                                 </StackPanel>
                             </Border>
 
-                            <!-- Conditions sub-area -->
+                            <!-- Conditions sub-area (Sequential / DSO only) -->
                             <Border Background="#1AFF9800" CornerRadius="3" Padding="6,4" Margin="4,0,4,4"
                                     BorderBrush="#33FF9800" BorderThickness="1"
                                     Tag="ConditionsArea">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding NodeType}" Value="{x:Static vm:SequenceNodeType.ParallelContainer}">
+                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
                                 <StackPanel>
                                     <DockPanel Margin="0,0,0,2">
-                                        <TextBlock Text="🔄 CONDITIONS" FontSize="9" FontWeight="SemiBold"
+                                        <TextBlock Text="CONDITIONS" FontSize="9" FontWeight="SemiBold"
                                                    Foreground="#FFB74D" VerticalAlignment="Center"/>
                                         <Button DockPanel.Dock="Right" Content="+" FontSize="12" Width="18" Height="18"
                                                 Style="{StaticResource SmallIconButton}" HorizontalAlignment="Right"
@@ -313,14 +333,7 @@
                             </Border>
 
                             <!-- Instructions sub-area -->
-                            <Border Background="#1A4CAF50" CornerRadius="3" Padding="6,4" Margin="4,0,4,0"
-                                    BorderBrush="#334CAF50" BorderThickness="1">
-                                <StackPanel>
-                                    <TextBlock Text="📋 INSTRUCTIONS" FontSize="9" FontWeight="SemiBold"
-                                               Foreground="#81C784" Margin="0,0,0,2"/>
-                                    <ItemsControl ItemsSource="{Binding Children}" ItemTemplate="{DynamicResource SequenceNodeTemplate}"/>
-                                </StackPanel>
-                            </Border>
+                            <ItemsControl ItemsSource="{Binding Children}" ItemTemplate="{DynamicResource SequenceNodeTemplate}"/>
                         </StackPanel>
                     </Border>
                     </Grid>
