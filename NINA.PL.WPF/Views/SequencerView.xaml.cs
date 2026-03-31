@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -192,7 +193,7 @@ public partial class SequencerView
         e.Handled = true;
     }
 
-    private void OnSequenceAreaDragOver(object sender, DragEventArgs e)
+    private void OnSectionPreviewDragOver(object sender, DragEventArgs e)
     {
         if (e.Data.GetDataPresent(typeof(InstructionTemplate)) ||
             e.Data.GetDataPresent(typeof(ConditionTemplate)))
@@ -209,7 +210,7 @@ public partial class SequencerView
         }
     }
 
-    private void OnSequenceAreaDrop(object sender, DragEventArgs e)
+    private void OnSectionPreviewDrop(object sender, DragEventArgs e)
     {
         if (DataContext is not SequencerPanelViewModel panel)
         {
@@ -241,6 +242,18 @@ public partial class SequencerView
             var node = SequenceItemViewModelFactory.FromConditionTemplate(ct);
             targetColl.Add(node);
             panel.SelectedNode = node;
+            e.Handled = true;
+            return;
+        }
+
+        if (panel.DraggedNode is not null)
+        {
+            var drag = panel.DraggedNode;
+            ObservableCollection<SequenceNodeViewModel> dragColl = panel.GetParentCollection(drag);
+            dragColl.Remove(drag);
+            drag.Parent = null;
+            targetColl.Add(drag);
+            panel.ClearDragVisuals();
             e.Handled = true;
         }
     }

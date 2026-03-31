@@ -1360,7 +1360,7 @@ public sealed partial class SequencerPanelViewModel : ObservableObject, IDisposa
             Visit(r);
     }
 
-    private ObservableCollection<SequenceNodeViewModel> GetParentCollection(SequenceNodeViewModel node)
+    public ObservableCollection<SequenceNodeViewModel> GetParentCollection(SequenceNodeViewModel node)
     {
         if (node.Parent?.Children is not null)
             return node.Parent.Children;
