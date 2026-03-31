@@ -464,6 +464,7 @@ public sealed partial class SequencerPanelViewModel : ObservableObject, IDisposa
                 InsertInstruction(SequenceItemViewModelFactory.FromTemplate(it));
                 return;
             case ConditionTemplate ct:
+                SelectedConditionTemplate = ct;
                 InsertInstruction(SequenceItemViewModelFactory.FromConditionTemplate(ct));
                 return;
         }

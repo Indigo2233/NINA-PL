@@ -220,7 +220,7 @@ public partial class SequencerView
 
         e.Effects = isPalette ? DragDropEffects.Copy : DragDropEffects.Move;
 
-        (SequenceNodeViewModel? node, _, FrameworkElement? nodeFe) = FindDropTarget(e);
+        (SequenceNodeViewModel? node, _, FrameworkElement? nodeFe, _, _) = FindDropTarget(e);
         if (node is not null && nodeFe is not null)
         {
             SequencerDropMode mode = GetDropMode(node, nodeFe, e);
@@ -244,7 +244,7 @@ public partial class SequencerView
 
         panel.SetDropIndicator(null, SequencerDropMode.Before);
 
-        (SequenceNodeViewModel? targetNode, string section, FrameworkElement? nodeFe) = FindDropTarget(e);
+        (SequenceNodeViewModel? targetNode, string section, FrameworkElement? nodeFe, string? subArea, SequenceNodeViewModel? containerOwner) = FindDropTarget(e);
 
         var targetColl = section switch
         {
@@ -275,8 +275,24 @@ public partial class SequencerView
         if (e.Data.GetDataPresent(typeof(ConditionTemplate)) &&
             e.Data.GetData(typeof(ConditionTemplate)) is ConditionTemplate ct)
         {
-            if (targetNode is not null)
+            if (subArea == "ConditionsArea" && containerOwner is not null && ct.ConditionFactory is not null)
+            {
+                var node = SequenceItemViewModelFactory.FromConditionTemplate(ct);
+                containerOwner.Conditions.Add(node);
+                node.Parent = containerOwner;
+                panel.SelectedNode = node;
+            }
+            else if (subArea == "TriggersArea" && containerOwner is not null && ct.TriggerFactory is not null)
+            {
+                var node = SequenceItemViewModelFactory.FromConditionTemplate(ct);
+                containerOwner.Triggers.Add(node);
+                node.Parent = containerOwner;
+                panel.SelectedNode = node;
+            }
+            else if (targetNode is not null)
+            {
                 panel.AddConditionToNode(ct, targetNode, dropMode);
+            }
             else
             {
                 var node = SequenceItemViewModelFactory.FromConditionTemplate(ct);
@@ -304,11 +320,13 @@ public partial class SequencerView
         }
     }
 
-    private (SequenceNodeViewModel? node, string section, FrameworkElement? nodeFe) FindDropTarget(DragEventArgs e)
+    private (SequenceNodeViewModel? node, string section, FrameworkElement? nodeFe, string? subArea, SequenceNodeViewModel? containerOwner) FindDropTarget(DragEventArgs e)
     {
         string section = "Target";
         SequenceNodeViewModel? node = null;
         FrameworkElement? nodeFe = null;
+        string? subArea = null;
+        SequenceNodeViewModel? containerOwner = null;
 
         DependencyObject? current = e.OriginalSource as DependencyObject;
         while (current is not null)
@@ -320,6 +338,15 @@ public partial class SequencerView
                     node = vm;
                     nodeFe = fe;
                 }
+                if (subArea is null && fe.Tag is string tag &&
+                    (tag == "TriggersArea" || tag == "ConditionsArea"))
+                {
+                    subArea = tag;
+                }
+                if (containerOwner is null && fe.Tag is SequenceNodeViewModel cvm && cvm.IsContainer && !ReferenceEquals(cvm, node))
+                {
+                    containerOwner = cvm;
+                }
                 if (fe.Tag is string s && (s == "Start" || s == "Target" || s == "End"))
                 {
                     section = s;
@@ -329,7 +356,10 @@ public partial class SequencerView
             current = VisualTreeHelper.GetParent(current);
         }
 
-        return (node, section, nodeFe);
+        if (containerOwner is null && node is not null && node.IsContainer)
+            containerOwner = node;
+
+        return (node, section, nodeFe, subArea, containerOwner);
     }
 
     private static SequencerDropMode GetDropMode(SequenceNodeViewModel target, FrameworkElement fe, DragEventArgs e)

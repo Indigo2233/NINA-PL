@@ -279,7 +279,8 @@
 
                             <!-- Triggers sub-area -->
                             <Border Background="#1A3F51B5" CornerRadius="3" Padding="6,4" Margin="4,2,4,4"
-                                    BorderBrush="#333F51B5" BorderThickness="1">
+                                    BorderBrush="#333F51B5" BorderThickness="1"
+                                    Tag="TriggersArea">
                                 <StackPanel>
                                     <DockPanel Margin="0,0,0,2">
                                         <TextBlock Text="⚡ TRIGGERS" FontSize="9" FontWeight="SemiBold"
@@ -295,7 +296,8 @@
 
                             <!-- Conditions sub-area -->
                             <Border Background="#1AFF9800" CornerRadius="3" Padding="6,4" Margin="4,0,4,4"
-                                    BorderBrush="#33FF9800" BorderThickness="1">
+                                    BorderBrush="#33FF9800" BorderThickness="1"
+                                    Tag="ConditionsArea">
                                 <StackPanel>
                                     <DockPanel Margin="0,0,0,2">
                                         <TextBlock Text="🔄 CONDITIONS" FontSize="9" FontWeight="SemiBold"
