@@ -758,21 +758,21 @@ public sealed partial class SequencerPanelViewModel : ObservableObject, IDisposa
         ClearDragVisuals();
     }
 
-    public void AddInstructionToNode(InstructionTemplate template, SequenceNodeViewModel target)
+    public void AddInstructionToNode(InstructionTemplate template, SequenceNodeViewModel target, SequencerDropMode mode = SequencerDropMode.After)
     {
         var node = SequenceItemViewModelFactory.FromTemplate(template);
-        InsertNodeRelativeTo(node, target);
+        InsertNodeRelativeTo(node, target, mode);
     }
 
-    public void AddConditionToNode(ConditionTemplate template, SequenceNodeViewModel target)
+    public void AddConditionToNode(ConditionTemplate template, SequenceNodeViewModel target, SequencerDropMode mode = SequencerDropMode.After)
     {
         var node = SequenceItemViewModelFactory.FromConditionTemplate(template);
-        InsertNodeRelativeTo(node, target);
+        InsertNodeRelativeTo(node, target, mode);
     }
 
-    private void InsertNodeRelativeTo(SequenceNodeViewModel node, SequenceNodeViewModel target)
+    private void InsertNodeRelativeTo(SequenceNodeViewModel node, SequenceNodeViewModel target, SequencerDropMode mode = SequencerDropMode.After)
     {
-        if (target.IsContainer)
+        if (mode == SequencerDropMode.Inside && target.IsContainer)
         {
             target.Children.Add(node);
             node.Parent = target;
@@ -780,17 +780,20 @@ public sealed partial class SequencerPanelViewModel : ObservableObject, IDisposa
         else if (target.Parent is { } parent)
         {
             int idx = parent.Children.IndexOf(target);
-            parent.Children.Insert(idx + 1, node);
+            int insertIdx = mode == SequencerDropMode.Before ? idx : idx + 1;
+            if (insertIdx < 0) insertIdx = 0;
+            if (insertIdx > parent.Children.Count) insertIdx = parent.Children.Count;
+            parent.Children.Insert(insertIdx, node);
             node.Parent = parent;
         }
         else
         {
             ObservableCollection<SequenceNodeViewModel> coll = FindSectionCollection(target);
             int idx = coll.IndexOf(target);
-            if (idx >= 0)
-                coll.Insert(idx + 1, node);
-            else
-                coll.Add(node);
+            int insertIdx = mode == SequencerDropMode.Before ? idx : idx + 1;
+            if (insertIdx < 0) insertIdx = 0;
+            if (insertIdx > coll.Count) insertIdx = coll.Count;
+            coll.Insert(insertIdx, node);
             node.Parent = null;
         }
         RefreshStepNumbers();

@@ -89,9 +89,8 @@ public partial class SequencerView
 
     private void OnNodeDragLeave(object sender, DragEventArgs e)
     {
-        if (DataContext is not SequencerPanelViewModel panel)
-            return;
-        panel.SetDropIndicator(null, SequencerDropMode.Before);
+        // Don't clear immediately - the next DragOver will set the correct indicator.
+        // Only clear if leaving entirely (handled by the section border's lack of indicator).
     }
 
     private void OnNodeDrop(object sender, DragEventArgs e)
@@ -104,10 +103,13 @@ public partial class SequencerView
 
         if (sender is FrameworkElement fe && fe.Tag is SequenceNodeViewModel target)
         {
+            SequencerDropMode mode = GetDropMode(target, fe, e);
+
             if (e.Data.GetDataPresent(typeof(InstructionTemplate)) &&
                 e.Data.GetData(typeof(InstructionTemplate)) is InstructionTemplate it)
             {
-                panel.AddInstructionToNode(it, target);
+                panel.AddInstructionToNode(it, target, mode);
+                panel.SetDropIndicator(null, SequencerDropMode.Before);
                 e.Handled = true;
                 return;
             }
@@ -115,7 +117,8 @@ public partial class SequencerView
             if (e.Data.GetDataPresent(typeof(ConditionTemplate)) &&
                 e.Data.GetData(typeof(ConditionTemplate)) is ConditionTemplate ct)
             {
-                panel.AddConditionToNode(ct, target);
+                panel.AddConditionToNode(ct, target, mode);
+                panel.SetDropIndicator(null, SequencerDropMode.Before);
                 e.Handled = true;
                 return;
             }
@@ -133,8 +136,8 @@ public partial class SequencerView
             return;
         }
 
-        SequencerDropMode mode = GetDropMode(target2, fe2, e);
-        panel.DropAt(target2, mode);
+        SequencerDropMode mode2 = GetDropMode(target2, fe2, e);
+        panel.DropAt(target2, mode2);
         panel.SetDropIndicator(null, SequencerDropMode.Before);
         e.Handled = true;
     }
