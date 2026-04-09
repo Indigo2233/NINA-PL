@@ -199,6 +199,45 @@ public sealed class AlpacaMountProvider : IMountProvider
         });
     }
 
+    public Task ParkAsync()
+    {
+        var c = ClientOrThrow();
+        return c.PutAsync("park", new Dictionary<string, string>());
+    }
+
+    public Task UnparkAsync()
+    {
+        var c = ClientOrThrow();
+        return c.PutAsync("unpark", new Dictionary<string, string>());
+    }
+
+    public Task FindHomeAsync()
+    {
+        var c = ClientOrThrow();
+        return c.PutAsync("findhome", new Dictionary<string, string>());
+    }
+
+    public Task StopSlewAsync()
+    {
+        var c = ClientOrThrow();
+        return c.PutAsync("abortslew", new Dictionary<string, string>());
+    }
+
+    public Task MoveAxisAsync(int axis, double rate)
+    {
+        var c = ClientOrThrow();
+        return c.PutAsync("moveaxis", new Dictionary<string, string>
+        {
+            ["Axis"] = axis.ToString(CultureInfo.InvariantCulture),
+            ["Rate"] = rate.ToString(CultureInfo.InvariantCulture)
+        });
+    }
+
+    public IReadOnlyList<string> GetSlewRates()
+    {
+        return new List<string> { "1x", "2x", "4x", "8x", "16x", "32x", "64x" };
+    }
+
     public void Dispose()
     {
         lock (_sync)

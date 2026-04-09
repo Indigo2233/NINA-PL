@@ -39,4 +39,16 @@ public interface IMountProvider : IDisposable
     Task PulseGuideAsync(GuideDirection direction, int durationMs);
 
     Task SetTrackingAsync(bool enabled);
+
+    Task ParkAsync();
+
+    Task UnparkAsync();
+
+    Task FindHomeAsync();
+
+    Task StopSlewAsync();
+
+    Task MoveAxisAsync(int axis, double rate);
+
+    IReadOnlyList<string> GetSlewRates();
 }

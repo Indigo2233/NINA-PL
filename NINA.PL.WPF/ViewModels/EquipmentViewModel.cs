@@ -92,6 +92,9 @@ public sealed partial class EquipmentViewModel : ObservableObject
     private int cameraMaxBin = 1;
 
     [ObservableProperty]
+    private ObservableCollection<int> cameraBinOptions = new() { 1 };
+
+    [ObservableProperty]
     private ObservableCollection<string> cameraPixelFormats = new();
 
     [ObservableProperty]
@@ -138,6 +141,12 @@ public sealed partial class EquipmentViewModel : ObservableObject
 
     [ObservableProperty]
     private bool mountIsTracking;
+
+    [ObservableProperty]
+    private ObservableCollection<string> mountSlewRates = new() { "1x" };
+
+    [ObservableProperty]
+    private string mountSelectedSlewRate = "1x";
 
     [ObservableProperty]
     private ObservableCollection<FocuserDeviceInfo> availableFocusers = new();
@@ -282,6 +291,9 @@ public sealed partial class EquipmentViewModel : ObservableObject
         CameraExposureMin = cam.ExposureMin;
         CameraExposureMax = cam.ExposureMax > 0 ? cam.ExposureMax : 60_000_000;
         CameraMaxBin = Math.Max(cam.MaxBinX, 1);
+        var bins = new ObservableCollection<int>();
+        for (int b = 1; b <= CameraMaxBin; b++) bins.Add(b);
+        CameraBinOptions = bins;
 
         try
         {
@@ -313,6 +325,14 @@ public sealed partial class EquipmentViewModel : ObservableObject
             ? $"Connected: {_mount.ConnectedDeviceName} ({_mount.ConnectedDeviceId})"
             : "Disconnected";
         SyncMountFromProviderProps();
+
+        if (_mount.IsConnected)
+        {
+            var rates = _mount.GetSlewRates();
+            MountSlewRates = new ObservableCollection<string>(rates);
+            if (MountSlewRates.Count > 0 && !MountSlewRates.Contains(MountSelectedSlewRate))
+                MountSelectedSlewRate = MountSlewRates[0];
+        }
     }
 
     private void SyncMountFromProviderProps()
@@ -497,6 +517,74 @@ public sealed partial class EquipmentViewModel : ObservableObject
     [RelayCommand]
     private void OpenMountSettings()
     {
+    }
+
+    private double SlewRateMultiplier()
+    {
+        var s = MountSelectedSlewRate.Replace("x", "");
+        return double.TryParse(s, out double v) ? v : 1;
+    }
+
+    [RelayCommand]
+    private async Task MountSlewNorthAsync()
+    {
+        await _mount.MoveAxisAsync(1, SlewRateMultiplier()).ConfigureAwait(true);
+        await Task.Delay(500).ConfigureAwait(true);
+        await _mount.MoveAxisAsync(1, 0).ConfigureAwait(true);
+    }
+
+    [RelayCommand]
+    private async Task MountSlewSouthAsync()
+    {
+        await _mount.MoveAxisAsync(1, -SlewRateMultiplier()).ConfigureAwait(true);
+        await Task.Delay(500).ConfigureAwait(true);
+        await _mount.MoveAxisAsync(1, 0).ConfigureAwait(true);
+    }
+
+    [RelayCommand]
+    private async Task MountSlewEastAsync()
+    {
+        await _mount.MoveAxisAsync(0, SlewRateMultiplier()).ConfigureAwait(true);
+        await Task.Delay(500).ConfigureAwait(true);
+        await _mount.MoveAxisAsync(0, 0).ConfigureAwait(true);
+    }
+
+    [RelayCommand]
+    private async Task MountSlewWestAsync()
+    {
+        await _mount.MoveAxisAsync(0, -SlewRateMultiplier()).ConfigureAwait(true);
+        await Task.Delay(500).ConfigureAwait(true);
+        await _mount.MoveAxisAsync(0, 0).ConfigureAwait(true);
+    }
+
+    [RelayCommand]
+    private async Task MountStopAsync()
+    {
+        await _mount.StopSlewAsync().ConfigureAwait(true);
+    }
+
+    [RelayCommand]
+    private async Task MountParkAsync()
+    {
+        await _mount.ParkAsync().ConfigureAwait(true);
+    }
+
+    [RelayCommand]
+    private async Task MountUnparkAsync()
+    {
+        await _mount.UnparkAsync().ConfigureAwait(true);
+    }
+
+    [RelayCommand]
+    private async Task MountFindHomeAsync()
+    {
+        await _mount.FindHomeAsync().ConfigureAwait(true);
+    }
+
+    [RelayCommand]
+    private async Task MountToggleTrackingAsync()
+    {
+        await _mount.SetTrackingAsync(!MountIsTracking).ConfigureAwait(true);
     }
 
     [RelayCommand]

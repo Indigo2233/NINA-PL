@@ -328,6 +328,72 @@ public sealed class AscomMountProvider : IMountProvider
         return Task.CompletedTask;
     }
 
+    public Task ParkAsync()
+    {
+        lock (_sync)
+        {
+            ThrowIfDisposed();
+            if (_telescope is null)
+                throw new InvalidOperationException("No mount connected.");
+            _telescope.Park();
+        }
+        return Task.CompletedTask;
+    }
+
+    public Task UnparkAsync()
+    {
+        lock (_sync)
+        {
+            ThrowIfDisposed();
+            if (_telescope is null)
+                throw new InvalidOperationException("No mount connected.");
+            _telescope.Unpark();
+        }
+        return Task.CompletedTask;
+    }
+
+    public Task FindHomeAsync()
+    {
+        lock (_sync)
+        {
+            ThrowIfDisposed();
+            if (_telescope is null)
+                throw new InvalidOperationException("No mount connected.");
+            _telescope.FindHome();
+        }
+        return Task.CompletedTask;
+    }
+
+    public Task StopSlewAsync()
+    {
+        lock (_sync)
+        {
+            ThrowIfDisposed();
+            if (_telescope is null)
+                throw new InvalidOperationException("No mount connected.");
+            _telescope.AbortSlew();
+        }
+        return Task.CompletedTask;
+    }
+
+    public Task MoveAxisAsync(int axis, double rate)
+    {
+        lock (_sync)
+        {
+            ThrowIfDisposed();
+            if (_telescope is null)
+                throw new InvalidOperationException("No mount connected.");
+            _telescope.MoveAxis(axis, rate);
+        }
+        return Task.CompletedTask;
+    }
+
+    public IReadOnlyList<string> GetSlewRates()
+    {
+        var rates = new List<string> { "1x", "2x", "4x", "8x", "16x", "32x", "64x" };
+        return rates;
+    }
+
     public void Dispose()
     {
         lock (_sync)

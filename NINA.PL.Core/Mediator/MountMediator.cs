@@ -208,6 +208,56 @@ public partial class MountMediator : ObservableObject, IDisposable
         RefreshStateFromProvider();
     }
 
+    public async Task ParkAsync(CancellationToken cancellationToken = default)
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        cancellationToken.ThrowIfCancellationRequested();
+        var m = GetConnectedOrThrow();
+        await m.ParkAsync().ConfigureAwait(false);
+        RefreshStateFromProvider();
+    }
+
+    public async Task UnparkAsync(CancellationToken cancellationToken = default)
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        cancellationToken.ThrowIfCancellationRequested();
+        var m = GetConnectedOrThrow();
+        await m.UnparkAsync().ConfigureAwait(false);
+        RefreshStateFromProvider();
+    }
+
+    public async Task FindHomeAsync(CancellationToken cancellationToken = default)
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        cancellationToken.ThrowIfCancellationRequested();
+        var m = GetConnectedOrThrow();
+        await m.FindHomeAsync().ConfigureAwait(false);
+        RefreshStateFromProvider();
+    }
+
+    public async Task StopSlewAsync(CancellationToken cancellationToken = default)
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        cancellationToken.ThrowIfCancellationRequested();
+        var m = GetConnectedOrThrow();
+        await m.StopSlewAsync().ConfigureAwait(false);
+        RefreshStateFromProvider();
+    }
+
+    public async Task MoveAxisAsync(int axis, double rate, CancellationToken cancellationToken = default)
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        cancellationToken.ThrowIfCancellationRequested();
+        var m = GetConnectedOrThrow();
+        await m.MoveAxisAsync(axis, rate).ConfigureAwait(false);
+    }
+
+    public IReadOnlyList<string> GetSlewRates()
+    {
+        var m = GetConnectedProvider();
+        return m?.GetSlewRates() ?? new List<string> { "1x" };
+    }
+
     public void Dispose()
     {
         if (_disposed)
