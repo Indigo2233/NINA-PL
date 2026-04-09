@@ -16,4 +16,6 @@ public sealed class FilterWheelDeviceInfo
     public string Description { get; init; } = string.Empty;
 
     public IReadOnlyList<string> FilterNames { get; init; } = [];
+
+    public override string ToString() => Name;
 }
