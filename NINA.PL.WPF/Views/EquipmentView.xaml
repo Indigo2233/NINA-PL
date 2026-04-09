@@ -345,7 +345,12 @@
                                 <TextBlock Text="Current filter" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource Brush.Primary}" Margin="0,0,0,8"/>
                                 <TextBlock Text="{Binding CurrentFilterName}" FontSize="18" Margin="0,0,0,16"/>
                                 <DataGrid ItemsSource="{Binding FilterSlots}" AutoGenerateColumns="False" IsReadOnly="True"
-                                          HeadersVisibility="Column" CanUserAddRows="False" MaxHeight="320">
+                                          HeadersVisibility="Column" CanUserAddRows="False" MaxHeight="320"
+                                          Background="{DynamicResource Brush.Surface}" Foreground="{DynamicResource Brush.Text}"
+                                          BorderBrush="{DynamicResource Brush.Border}" BorderThickness="1"
+                                          RowBackground="{DynamicResource Brush.Surface}"
+                                          AlternatingRowBackground="{DynamicResource Brush.InputBg}"
+                                          GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="{DynamicResource Brush.BorderSubtle}">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="#" Binding="{Binding Index}" Width="40"/>
                                         <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
