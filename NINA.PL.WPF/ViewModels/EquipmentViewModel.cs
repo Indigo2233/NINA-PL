@@ -45,6 +45,8 @@ public sealed partial class EquipmentViewModel : ObservableObject
         _telemetryTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(500) };
         _telemetryTimer.Tick += (_, _) => RefreshTelemetry();
         _telemetryTimer.Start();
+
+        _ = RefreshAllAsync();
     }
 
     [ObservableProperty]
