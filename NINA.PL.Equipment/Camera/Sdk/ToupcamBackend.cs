@@ -119,7 +119,7 @@ public sealed class ToupcamBackend : INativeCameraBackend
                     return;
                 }
 
-                _native = ToupcamNative.Load(_lib);
+                _native = ToupcamNative.Load(_lib, _vendorLabel);
             }
             catch (DllNotFoundException)
             {
@@ -618,39 +618,43 @@ public sealed class ToupcamBackend : INativeCameraBackend
             _getPixelSize = getPixelSize;
         }
 
-        public static ToupcamNative Load(nint lib)
+        /// <param name="prefix">
+        /// Export name prefix matching the SDK: "Toupcam" for toupcam.dll, "Ogmacam" for ogmacam.dll, etc.
+        /// </param>
+        public static ToupcamNative Load(nint lib, string prefix = "Toupcam")
         {
             T G<T>(string name) where T : class =>
                 Marshal.GetDelegateForFunctionPointer<T>(NativeLibrary.GetExport(lib, name));
 
+            string P(string suffix) => prefix + suffix;
+
             Toupcam_get_PixelSize? pix = null;
             try
             {
-                pix = G<Toupcam_get_PixelSize>("Toupcam_get_PixelSize");
+                pix = G<Toupcam_get_PixelSize>(P("_get_PixelSize"));
             }
             catch (EntryPointNotFoundException)
             {
-                // older DLLs
             }
 
             return new ToupcamNative(
-                G<Toupcam_EnumV2>("Toupcam_EnumV2"),
-                G<Toupcam_Open>("Toupcam_Open"),
-                G<Toupcam_Close>("Toupcam_Close"),
-                G<Toupcam_StartPullModeWithCallback>("Toupcam_StartPullModeWithCallback"),
-                G<Toupcam_Stop>("Toupcam_Stop"),
-                G<Toupcam_PullImageV3>("Toupcam_PullImageV3"),
-                G<Toupcam_put_ExpoTime>("Toupcam_put_ExpoTime"),
-                G<Toupcam_get_ExpoAGain>("Toupcam_get_ExpoAGain"),
-                G<Toupcam_put_ExpoAGain>("Toupcam_put_ExpoAGain"),
-                G<Toupcam_put_Roi>("Toupcam_put_Roi"),
-                G<Toupcam_get_Size>("Toupcam_get_Size"),
-                G<Toupcam_get_RawFormat>("Toupcam_get_RawFormat"),
-                G<Toupcam_put_Option>("Toupcam_put_Option"),
-                G<Toupcam_get_ExpTimeRange>("Toupcam_get_ExpTimeRange"),
-                G<Toupcam_get_ExpoAGainRange>("Toupcam_get_ExpoAGainRange"),
-                G<Toupcam_get_Chrome>("Toupcam_get_Chrome"),
-                G<Toupcam_get_SerialNumber>("Toupcam_get_SerialNumber"),
+                G<Toupcam_EnumV2>(P("_EnumV2")),
+                G<Toupcam_Open>(P("_Open")),
+                G<Toupcam_Close>(P("_Close")),
+                G<Toupcam_StartPullModeWithCallback>(P("_StartPullModeWithCallback")),
+                G<Toupcam_Stop>(P("_Stop")),
+                G<Toupcam_PullImageV3>(P("_PullImageV3")),
+                G<Toupcam_put_ExpoTime>(P("_put_ExpoTime")),
+                G<Toupcam_get_ExpoAGain>(P("_get_ExpoAGain")),
+                G<Toupcam_put_ExpoAGain>(P("_put_ExpoAGain")),
+                G<Toupcam_put_Roi>(P("_put_Roi")),
+                G<Toupcam_get_Size>(P("_get_Size")),
+                G<Toupcam_get_RawFormat>(P("_get_RawFormat")),
+                G<Toupcam_put_Option>(P("_put_Option")),
+                G<Toupcam_get_ExpTimeRange>(P("_get_ExpTimeRange")),
+                G<Toupcam_get_ExpoAGainRange>(P("_get_ExpoAGainRange")),
+                G<Toupcam_get_Chrome>(P("_get_Chrome")),
+                G<Toupcam_get_SerialNumber>(P("_get_SerialNumber")),
                 pix);
         }
 
