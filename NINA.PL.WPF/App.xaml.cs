@@ -29,6 +29,8 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
+        Localization.LocalizationManager.SetLanguage("en");
+
         DispatcherUnhandledException += (_, args) =>
         {
             File.AppendAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "crash.log"),

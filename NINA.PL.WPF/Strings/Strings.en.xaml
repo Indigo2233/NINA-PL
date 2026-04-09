@@ -1,0 +1,69 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <!-- Navigation -->
+    <sys:String x:Key="Nav.Equipment">Equip</sys:String>
+    <sys:String x:Key="Nav.Capture">Capture</sys:String>
+    <sys:String x:Key="Nav.Focus">Focus</sys:String>
+    <sys:String x:Key="Nav.Guider">Guider</sys:String>
+    <sys:String x:Key="Nav.Stack">Stack</sys:String>
+    <sys:String x:Key="Nav.Sequencer">Seq</sys:String>
+    <sys:String x:Key="Nav.Settings">Set</sys:String>
+
+    <!-- Equipment page -->
+    <sys:String x:Key="Eq.Title">EQUIPMENT</sys:String>
+    <sys:String x:Key="Eq.Camera">CAMERA</sys:String>
+    <sys:String x:Key="Eq.Mount">MOUNT</sys:String>
+    <sys:String x:Key="Eq.Focuser">FOCUSER</sys:String>
+    <sys:String x:Key="Eq.FilterWheel">FILTER WHEEL</sys:String>
+    <sys:String x:Key="Eq.Settings">Settings</sys:String>
+    <sys:String x:Key="Eq.Refresh">Refresh</sys:String>
+    <sys:String x:Key="Eq.RefreshAll">Refresh all</sys:String>
+    <sys:String x:Key="Eq.Connect">Connect</sys:String>
+    <sys:String x:Key="Eq.Disconnect">Disconnect</sys:String>
+    <sys:String x:Key="Eq.Disconnected">Disconnected</sys:String>
+
+    <!-- Camera controls -->
+    <sys:String x:Key="Cam.Controls">Camera Controls</sys:String>
+    <sys:String x:Key="Cam.Gain">Gain</sys:String>
+    <sys:String x:Key="Cam.Exposure">Exposure (µs)</sys:String>
+    <sys:String x:Key="Cam.Binning">Binning</sys:String>
+    <sys:String x:Key="Cam.PixelFormat">Pixel Format</sys:String>
+    <sys:String x:Key="Cam.SensorColor">Sensor &amp; color</sys:String>
+    <sys:String x:Key="Cam.Formats">Supported formats</sys:String>
+
+    <!-- Mount controls -->
+    <sys:String x:Key="Mt.ManualSlew">Manual Slew</sys:String>
+    <sys:String x:Key="Mt.SlewRate">Slew Rate</sys:String>
+    <sys:String x:Key="Mt.Park">Park</sys:String>
+    <sys:String x:Key="Mt.Unpark">Unpark</sys:String>
+    <sys:String x:Key="Mt.Home">Home</sys:String>
+    <sys:String x:Key="Mt.Tracking">Tracking</sys:String>
+    <sys:String x:Key="Mt.RA">Right ascension (h)</sys:String>
+    <sys:String x:Key="Mt.Dec">Declination (°)</sys:String>
+    <sys:String x:Key="Mt.AltAz">Altitude / Azimuth (°)</sys:String>
+
+    <!-- Focuser -->
+    <sys:String x:Key="Foc.Position">Position</sys:String>
+    <sys:String x:Key="Foc.Temperature">Temperature (°C)</sys:String>
+    <sys:String x:Key="Foc.Moving">Moving</sys:String>
+    <sys:String x:Key="Foc.ManualMove">Manual move</sys:String>
+    <sys:String x:Key="Foc.Target">Target</sys:String>
+    <sys:String x:Key="Foc.Go">Go</sys:String>
+
+    <!-- Filter wheel -->
+    <sys:String x:Key="Fw.CurrentFilter">Current filter</sys:String>
+    <sys:String x:Key="Fw.Select">Select</sys:String>
+
+    <!-- Settings -->
+    <sys:String x:Key="Set.Title">Settings</sys:String>
+    <sys:String x:Key="Set.Language">Language</sys:String>
+    <sys:String x:Key="Set.Profile">User profile (JSON)</sys:String>
+    <sys:String x:Key="Set.Browse">Browse…</sys:String>
+    <sys:String x:Key="Set.Load">Load</sys:String>
+    <sys:String x:Key="Set.Save">Save</sys:String>
+    <sys:String x:Key="Set.CreateDefault">Create / load default</sys:String>
+    <sys:String x:Key="Set.Location">Observer location</sys:String>
+    <sys:String x:Key="Set.Latitude">Latitude (°)</sys:String>
+    <sys:String x:Key="Set.Longitude">Longitude (°)</sys:String>
+</ResourceDictionary>

@@ -6,8 +6,13 @@
              mc:Ignorable="d"
              d:DesignHeight="500" d:DesignWidth="700">
     <StackPanel Margin="16">
-        <TextBlock Text="Settings" FontSize="22" FontWeight="Bold" Margin="0,0,0,16"/>
-        <GroupBox Header="User profile (JSON)">
+        <TextBlock Text="{DynamicResource Set.Title}" FontSize="22" FontWeight="Bold" Margin="0,0,0,16"/>
+
+        <GroupBox Header="{DynamicResource Set.Language}" Margin="0,0,0,16">
+            <ComboBox ItemsSource="{Binding AvailableLanguages}" SelectedItem="{Binding SelectedLanguage}" Margin="4"/>
+        </GroupBox>
+
+        <GroupBox Header="{DynamicResource Set.Profile}">
             <Grid Margin="4">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>

@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Windows;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -429,19 +431,33 @@ public sealed partial class EquipmentViewModel : ObservableObject
     [RelayCommand]
     private async Task ConnectCameraAsync()
     {
-        if (SelectedCamera is null)
-            return;
-        await _camera.ConnectAsync(SelectedCamera.Id).ConfigureAwait(true);
-        SyncCameraFromMediator();
-        RefreshTelemetry();
+        try
+        {
+            if (SelectedCamera is null)
+                return;
+            await _camera.ConnectAsync(SelectedCamera.Id).ConfigureAwait(true);
+            SyncCameraFromMediator();
+            RefreshTelemetry();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
 
     [RelayCommand]
     private async Task DisconnectCameraAsync()
     {
-        await _camera.DisconnectAsync().ConfigureAwait(true);
-        SyncCameraFromMediator();
-        RefreshTelemetry();
+        try
+        {
+            await _camera.DisconnectAsync().ConfigureAwait(true);
+            SyncCameraFromMediator();
+            RefreshTelemetry();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
 
     [RelayCommand]
@@ -492,17 +508,31 @@ public sealed partial class EquipmentViewModel : ObservableObject
     [RelayCommand]
     private async Task ConnectMountAsync()
     {
-        if (SelectedMount is null)
-            return;
-        await _mount.ConnectAsync(SelectedMount.Id).ConfigureAwait(true);
-        SyncMountFromMediator();
+        try
+        {
+            if (SelectedMount is null)
+                return;
+            await _mount.ConnectAsync(SelectedMount.Id).ConfigureAwait(true);
+            SyncMountFromMediator();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
 
     [RelayCommand]
     private async Task DisconnectMountAsync()
     {
-        await _mount.DisconnectAsync().ConfigureAwait(true);
-        SyncMountFromMediator();
+        try
+        {
+            await _mount.DisconnectAsync().ConfigureAwait(true);
+            SyncMountFromMediator();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
 
     [RelayCommand]
@@ -528,63 +558,126 @@ public sealed partial class EquipmentViewModel : ObservableObject
     [RelayCommand]
     private async Task MountSlewNorthAsync()
     {
-        await _mount.MoveAxisAsync(1, SlewRateMultiplier()).ConfigureAwait(true);
-        await Task.Delay(500).ConfigureAwait(true);
-        await _mount.MoveAxisAsync(1, 0).ConfigureAwait(true);
+        try
+        {
+            await _mount.MoveAxisAsync(1, SlewRateMultiplier()).ConfigureAwait(true);
+            await Task.Delay(500).ConfigureAwait(true);
+            await _mount.MoveAxisAsync(1, 0).ConfigureAwait(true);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
 
     [RelayCommand]
     private async Task MountSlewSouthAsync()
     {
-        await _mount.MoveAxisAsync(1, -SlewRateMultiplier()).ConfigureAwait(true);
-        await Task.Delay(500).ConfigureAwait(true);
-        await _mount.MoveAxisAsync(1, 0).ConfigureAwait(true);
+        try
+        {
+            await _mount.MoveAxisAsync(1, -SlewRateMultiplier()).ConfigureAwait(true);
+            await Task.Delay(500).ConfigureAwait(true);
+            await _mount.MoveAxisAsync(1, 0).ConfigureAwait(true);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
 
     [RelayCommand]
     private async Task MountSlewEastAsync()
     {
-        await _mount.MoveAxisAsync(0, SlewRateMultiplier()).ConfigureAwait(true);
-        await Task.Delay(500).ConfigureAwait(true);
-        await _mount.MoveAxisAsync(0, 0).ConfigureAwait(true);
+        try
+        {
+            await _mount.MoveAxisAsync(0, SlewRateMultiplier()).ConfigureAwait(true);
+            await Task.Delay(500).ConfigureAwait(true);
+            await _mount.MoveAxisAsync(0, 0).ConfigureAwait(true);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
 
     [RelayCommand]
     private async Task MountSlewWestAsync()
     {
-        await _mount.MoveAxisAsync(0, -SlewRateMultiplier()).ConfigureAwait(true);
-        await Task.Delay(500).ConfigureAwait(true);
-        await _mount.MoveAxisAsync(0, 0).ConfigureAwait(true);
+        try
+        {
+            await _mount.MoveAxisAsync(0, -SlewRateMultiplier()).ConfigureAwait(true);
+            await Task.Delay(500).ConfigureAwait(true);
+            await _mount.MoveAxisAsync(0, 0).ConfigureAwait(true);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
 
     [RelayCommand]
     private async Task MountStopAsync()
     {
-        await _mount.StopSlewAsync().ConfigureAwait(true);
+        try
+        {
+            await _mount.StopSlewAsync().ConfigureAwait(true);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
 
     [RelayCommand]
     private async Task MountParkAsync()
     {
-        await _mount.ParkAsync().ConfigureAwait(true);
+        try
+        {
+            await _mount.ParkAsync().ConfigureAwait(true);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
 
     [RelayCommand]
     private async Task MountUnparkAsync()
     {
-        await _mount.UnparkAsync().ConfigureAwait(true);
+        try
+        {
+            await _mount.UnparkAsync().ConfigureAwait(true);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
 
     [RelayCommand]
     private async Task MountFindHomeAsync()
     {
-        await _mount.FindHomeAsync().ConfigureAwait(true);
+        try
+        {
+            await _mount.FindHomeAsync().ConfigureAwait(true);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
 
     [RelayCommand]
     private async Task MountToggleTrackingAsync()
     {
-        await _mount.SetTrackingAsync(!MountIsTracking).ConfigureAwait(true);
+        try
+        {
+            await _mount.SetTrackingAsync(!MountIsTracking).ConfigureAwait(true);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
 
     [RelayCommand]
@@ -599,17 +692,31 @@ public sealed partial class EquipmentViewModel : ObservableObject
     [RelayCommand]
     private async Task ConnectFocuserAsync()
     {
-        if (SelectedFocuser is null)
-            return;
-        await _focuser.ConnectAsync(SelectedFocuser.Id).ConfigureAwait(true);
-        SyncFocuserFromMediator();
+        try
+        {
+            if (SelectedFocuser is null)
+                return;
+            await _focuser.ConnectAsync(SelectedFocuser.Id).ConfigureAwait(true);
+            SyncFocuserFromMediator();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
 
     [RelayCommand]
     private async Task DisconnectFocuserAsync()
     {
-        await _focuser.DisconnectAsync().ConfigureAwait(true);
-        SyncFocuserFromMediator();
+        try
+        {
+            await _focuser.DisconnectAsync().ConfigureAwait(true);
+            SyncFocuserFromMediator();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
 
     [RelayCommand]
@@ -672,17 +779,31 @@ public sealed partial class EquipmentViewModel : ObservableObject
     [RelayCommand]
     private async Task ConnectFilterWheelAsync()
     {
-        if (SelectedFilterWheel is null)
-            return;
-        await _filterWheel.ConnectAsync(SelectedFilterWheel.Id).ConfigureAwait(true);
-        SyncFilterWheelFromMediator();
+        try
+        {
+            if (SelectedFilterWheel is null)
+                return;
+            await _filterWheel.ConnectAsync(SelectedFilterWheel.Id).ConfigureAwait(true);
+            SyncFilterWheelFromMediator();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
 
     [RelayCommand]
     private async Task DisconnectFilterWheelAsync()
     {
-        await _filterWheel.DisconnectAsync().ConfigureAwait(true);
-        SyncFilterWheelFromMediator();
+        try
+        {
+            await _filterWheel.DisconnectAsync().ConfigureAwait(true);
+            SyncFilterWheelFromMediator();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
     }
 
     [RelayCommand]
@@ -702,15 +823,16 @@ public sealed partial class EquipmentViewModel : ObservableObject
     [RelayCommand]
     private async Task SelectFilterSlotAsync(int index)
     {
-        IFilterWheelProvider? w = _filterWheel.GetConnectedProvider();
-        if (w is null || !w.IsConnected)
-            return;
         try
         {
+            IFilterWheelProvider? w = _filterWheel.GetConnectedProvider();
+            if (w is null || !w.IsConnected)
+                return;
             await w.SetPositionAsync(index).ConfigureAwait(true);
         }
-        catch
+        catch (Exception ex)
         {
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
 
         RebuildFilterSlots();

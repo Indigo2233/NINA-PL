@@ -217,9 +217,13 @@ public sealed class AscomFocuserProvider : IFocuserProvider
             }
             catch
             {
-                ReleaseCom(_focuser);
-                _focuser = null;
-                throw;
+                try { _focuser.Link = true; }
+                catch
+                {
+                    ReleaseCom(_focuser);
+                    _focuser = null;
+                    throw;
+                }
             }
         }
 

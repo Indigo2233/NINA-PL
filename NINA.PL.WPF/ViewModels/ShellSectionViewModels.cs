@@ -1,13 +1,26 @@
+using System.Collections.ObjectModel;
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Win32;
 using NINA.PL.Profile;
+using NINA.PL.WPF.Localization;
 
 namespace NINA.PL.WPF.ViewModels;
 
 public sealed partial class SettingsPanelViewModel : ObservableObject
 {
+    public static ObservableCollection<string> AvailableLanguages { get; } = new() { "English", "中文" };
+
+    [ObservableProperty]
+    private string selectedLanguage = "English";
+
+    partial void OnSelectedLanguageChanged(string value)
+    {
+        var lang = value == "中文" ? "zh" : "en";
+        LocalizationManager.SetLanguage(lang);
+    }
+
     [ObservableProperty]
     private string profilePath = ProfileManager.GetDefaultPath();
 

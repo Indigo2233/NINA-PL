@@ -1,0 +1,69 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+    <!-- Navigation -->
+    <sys:String x:Key="Nav.Equipment">设备</sys:String>
+    <sys:String x:Key="Nav.Capture">拍摄</sys:String>
+    <sys:String x:Key="Nav.Focus">对焦</sys:String>
+    <sys:String x:Key="Nav.Guider">导星</sys:String>
+    <sys:String x:Key="Nav.Stack">叠加</sys:String>
+    <sys:String x:Key="Nav.Sequencer">序列</sys:String>
+    <sys:String x:Key="Nav.Settings">设置</sys:String>
+
+    <!-- Equipment page -->
+    <sys:String x:Key="Eq.Title">设备管理</sys:String>
+    <sys:String x:Key="Eq.Camera">相机</sys:String>
+    <sys:String x:Key="Eq.Mount">赤道仪</sys:String>
+    <sys:String x:Key="Eq.Focuser">电调焦</sys:String>
+    <sys:String x:Key="Eq.FilterWheel">滤镜轮</sys:String>
+    <sys:String x:Key="Eq.Settings">设置</sys:String>
+    <sys:String x:Key="Eq.Refresh">刷新</sys:String>
+    <sys:String x:Key="Eq.RefreshAll">全部刷新</sys:String>
+    <sys:String x:Key="Eq.Connect">连接</sys:String>
+    <sys:String x:Key="Eq.Disconnect">断开</sys:String>
+    <sys:String x:Key="Eq.Disconnected">未连接</sys:String>
+
+    <!-- Camera controls -->
+    <sys:String x:Key="Cam.Controls">相机控制</sys:String>
+    <sys:String x:Key="Cam.Gain">增益</sys:String>
+    <sys:String x:Key="Cam.Exposure">曝光 (µs)</sys:String>
+    <sys:String x:Key="Cam.Binning">合并像素</sys:String>
+    <sys:String x:Key="Cam.PixelFormat">像素格式</sys:String>
+    <sys:String x:Key="Cam.SensorColor">传感器</sys:String>
+    <sys:String x:Key="Cam.Formats">支持的格式</sys:String>
+
+    <!-- Mount controls -->
+    <sys:String x:Key="Mt.ManualSlew">手动移动</sys:String>
+    <sys:String x:Key="Mt.SlewRate">移动速率</sys:String>
+    <sys:String x:Key="Mt.Park">停放</sys:String>
+    <sys:String x:Key="Mt.Unpark">解除停放</sys:String>
+    <sys:String x:Key="Mt.Home">回零位</sys:String>
+    <sys:String x:Key="Mt.Tracking">跟踪</sys:String>
+    <sys:String x:Key="Mt.RA">赤经 (h)</sys:String>
+    <sys:String x:Key="Mt.Dec">赤纬 (°)</sys:String>
+    <sys:String x:Key="Mt.AltAz">高度角 / 方位角 (°)</sys:String>
+
+    <!-- Focuser -->
+    <sys:String x:Key="Foc.Position">位置</sys:String>
+    <sys:String x:Key="Foc.Temperature">温度 (°C)</sys:String>
+    <sys:String x:Key="Foc.Moving">移动中</sys:String>
+    <sys:String x:Key="Foc.ManualMove">手动移动</sys:String>
+    <sys:String x:Key="Foc.Target">目标</sys:String>
+    <sys:String x:Key="Foc.Go">移动</sys:String>
+
+    <!-- Filter wheel -->
+    <sys:String x:Key="Fw.CurrentFilter">当前滤镜</sys:String>
+    <sys:String x:Key="Fw.Select">选择</sys:String>
+
+    <!-- Settings -->
+    <sys:String x:Key="Set.Title">设置</sys:String>
+    <sys:String x:Key="Set.Language">语言</sys:String>
+    <sys:String x:Key="Set.Profile">用户配置 (JSON)</sys:String>
+    <sys:String x:Key="Set.Browse">浏览…</sys:String>
+    <sys:String x:Key="Set.Load">加载</sys:String>
+    <sys:String x:Key="Set.Save">保存</sys:String>
+    <sys:String x:Key="Set.CreateDefault">创建/加载默认配置</sys:String>
+    <sys:String x:Key="Set.Location">观测位置</sys:String>
+    <sys:String x:Key="Set.Latitude">纬度 (°)</sys:String>
+    <sys:String x:Key="Set.Longitude">经度 (°)</sys:String>
+</ResourceDictionary>
