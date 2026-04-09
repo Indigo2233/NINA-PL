@@ -55,6 +55,21 @@
     <sys:String x:Key="Fw.CurrentFilter">Current filter</sys:String>
     <sys:String x:Key="Fw.Select">Select</sys:String>
 
+    <!-- Etalon tuner -->
+    <sys:String x:Key="Eq.Etalon">ETALON</sys:String>
+    <sys:String x:Key="Et.Position">Position</sys:String>
+    <sys:String x:Key="Et.Temperature">Temperature (°C)</sys:String>
+    <sys:String x:Key="Et.Moving">Moving</sys:String>
+    <sys:String x:Key="Et.ManualMove">Manual move</sys:String>
+    <sys:String x:Key="Et.Target">Target</sys:String>
+    <sys:String x:Key="Et.Go">Go</sys:String>
+    <sys:String x:Key="Et.AutoTune">Auto-Tune</sys:String>
+    <sys:String x:Key="Et.StopTune">Stop Tune</sys:String>
+    <sys:String x:Key="Et.ScanRange">Scan range</sys:String>
+    <sys:String x:Key="Et.ScanStep">Step</sys:String>
+    <sys:String x:Key="Et.Start">Start</sys:String>
+    <sys:String x:Key="Et.End">End</sys:String>
+
     <!-- Settings -->
     <sys:String x:Key="Set.Title">Settings</sys:String>
     <sys:String x:Key="Set.Language">Language</sys:String>

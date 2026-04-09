@@ -19,6 +19,8 @@ public sealed partial class SettingsPanelViewModel : ObservableObject
     {
         var lang = value == "中文" ? "zh" : "en";
         LocalizationManager.SetLanguage(lang);
+        ProfileManager.Instance.ActiveProfile.Language = lang;
+        SaveProfileQuiet();
     }
 
     [ObservableProperty]
@@ -29,6 +31,35 @@ public sealed partial class SettingsPanelViewModel : ObservableObject
 
     [ObservableProperty]
     private double observerLongitude = -74.0;
+
+    partial void OnObserverLatitudeChanged(double value)
+    {
+        ProfileManager.Instance.ActiveProfile.Latitude = value;
+        SaveProfileQuiet();
+    }
+
+    partial void OnObserverLongitudeChanged(double value)
+    {
+        ProfileManager.Instance.ActiveProfile.Longitude = value;
+        SaveProfileQuiet();
+    }
+
+    /// <summary>
+    /// Restores UI state from the active profile (called after profile load).
+    /// </summary>
+    public void RestoreFromProfile()
+    {
+        var p = ProfileManager.Instance.ActiveProfile;
+
+        var lang = p.Language;
+        if (lang.StartsWith("zh", StringComparison.OrdinalIgnoreCase))
+            SelectedLanguage = "中文";
+        else
+            SelectedLanguage = "English";
+
+        ObserverLatitude = p.Latitude;
+        ObserverLongitude = p.Longitude;
+    }
 
     [RelayCommand]
     private void BrowseProfile()
@@ -48,6 +79,7 @@ public sealed partial class SettingsPanelViewModel : ObservableObject
         if (!File.Exists(ProfilePath))
             return;
         ProfileManager.Instance.Load(ProfilePath);
+        RestoreFromProfile();
     }
 
     [RelayCommand]
@@ -64,5 +96,12 @@ public sealed partial class SettingsPanelViewModel : ObservableObject
             ProfileManager.Instance.CreateDefault();
         else
             ProfileManager.Instance.Load(ProfilePath);
+        RestoreFromProfile();
+    }
+
+    private static void SaveProfileQuiet()
+    {
+        try { ProfileManager.Instance.Save(); }
+        catch { }
     }
 }

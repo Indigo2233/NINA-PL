@@ -2,11 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using NINA.PL.Core;
+using NINA.PL.Profile;
 
 namespace NINA.PL.WPF.ViewModels;
 
@@ -23,23 +27,33 @@ public sealed partial class EquipmentViewModel : ObservableObject
     private readonly MountMediator _mount;
     private readonly FocuserMediator _focuser;
     private readonly FilterWheelMediator _filterWheel;
+    private readonly EtalonMediator _etalon;
     private readonly DispatcherTimer _telemetryTimer;
+
+    private static readonly CameraDeviceInfo NoCamera = new() { Id = "", Name = "(No device)" };
+    private static readonly MountDeviceInfo NoMount = new() { Id = "", Name = "(No device)" };
+    private static readonly FocuserDeviceInfo NoFocuser = new() { Id = "", Name = "(No device)" };
+    private static readonly FilterWheelDeviceInfo NoFilterWheel = new() { Id = "", Name = "(No device)" };
+    private static readonly EtalonDeviceInfo NoEtalon = new() { Id = "", Name = "(No device)" };
 
     public EquipmentViewModel(
         CameraMediator camera,
         MountMediator mount,
         FocuserMediator focuser,
-        FilterWheelMediator filterWheel)
+        FilterWheelMediator filterWheel,
+        EtalonMediator etalon)
     {
         _camera = camera;
         _mount = mount;
         _focuser = focuser;
         _filterWheel = filterWheel;
+        _etalon = etalon;
 
         _camera.PropertyChanged += OnCameraMediatorPropertyChanged;
         _mount.PropertyChanged += OnMountMediatorPropertyChanged;
         _focuser.PropertyChanged += OnFocuserMediatorPropertyChanged;
         _filterWheel.PropertyChanged += OnFilterWheelMediatorPropertyChanged;
+        _etalon.PropertyChanged += OnEtalonMediatorPropertyChanged;
 
         SyncAllFromMediators();
         RefreshTelemetry();
@@ -204,6 +218,49 @@ public sealed partial class EquipmentViewModel : ObservableObject
     [ObservableProperty]
     private ObservableCollection<FilterSlotRow> filterSlots = new();
 
+    // ---- Etalon Tuner ----
+    [ObservableProperty]
+    private ObservableCollection<EtalonDeviceInfo> availableEtalons = new();
+
+    [ObservableProperty]
+    private EtalonDeviceInfo? selectedEtalon;
+
+    [ObservableProperty]
+    private bool isEtalonConnected;
+
+    [ObservableProperty]
+    private string etalonStatus = "Disconnected";
+
+    [ObservableProperty]
+    private int etalonPosition;
+
+    [ObservableProperty]
+    private int etalonMaxPosition;
+
+    [ObservableProperty]
+    private double etalonTemperature = double.NaN;
+
+    [ObservableProperty]
+    private bool etalonIsMoving;
+
+    [ObservableProperty]
+    private int etalonTargetPosition;
+
+    [ObservableProperty]
+    private bool etalonAutoTuneRunning;
+
+    [ObservableProperty]
+    private string etalonAutoTuneStatus = "";
+
+    [ObservableProperty]
+    private int etalonScanStart;
+
+    [ObservableProperty]
+    private int etalonScanEnd;
+
+    [ObservableProperty]
+    private int etalonScanStep = 10;
+
     private void OnCameraMediatorPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(CameraMediator.IsConnected)
@@ -251,12 +308,25 @@ public sealed partial class EquipmentViewModel : ObservableObject
         RebuildFilterSlots();
     }
 
+    private void OnEtalonMediatorPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(EtalonMediator.IsConnected)
+            or nameof(EtalonMediator.ConnectedDeviceName)
+            or nameof(EtalonMediator.ConnectedDeviceId))
+        {
+            SyncEtalonFromMediator();
+        }
+
+        SyncEtalonFromProviderProps();
+    }
+
     private void SyncAllFromMediators()
     {
         SyncCameraFromMediator();
         SyncMountFromMediator();
         SyncFocuserFromMediator();
         SyncFilterWheelFromMediator();
+        SyncEtalonFromMediator();
     }
 
     private void RefreshTelemetry()
@@ -267,10 +337,13 @@ public sealed partial class EquipmentViewModel : ObservableObject
             _focuser.RefreshStateFromProvider();
         if (_filterWheel.IsConnected)
             _filterWheel.RefreshStateFromProvider();
+        if (_etalon.IsConnected)
+            _etalon.RefreshStateFromProvider();
 
         SyncCameraTelemetry();
         SyncMountFromProviderProps();
         SyncFocuserFromProviderProps();
+        SyncEtalonFromProviderProps();
         RebuildFilterSlots();
     }
 
@@ -433,9 +506,13 @@ public sealed partial class EquipmentViewModel : ObservableObject
     private async Task RefreshCamerasAsync()
     {
         var list = await _camera.GetAllDevicesAsync().ConfigureAwait(true);
-        AvailableCameras = new ObservableCollection<CameraDeviceInfo>(list);
-        if (SelectedCamera is null && AvailableCameras.Count > 0)
-            SelectedCamera = AvailableCameras[0];
+        var col = new ObservableCollection<CameraDeviceInfo> { NoCamera };
+        foreach (var c in list) col.Add(c);
+        AvailableCameras = col;
+
+        var lastId = ProfileManager.Instance.ActiveProfile.LastCameraId;
+        var match = col.FirstOrDefault(c => c.Id == lastId && c.Id != "");
+        SelectedCamera = match ?? NoCamera;
     }
 
     [RelayCommand]
@@ -443,9 +520,11 @@ public sealed partial class EquipmentViewModel : ObservableObject
     {
         try
         {
-            if (SelectedCamera is null)
+            if (SelectedCamera is null || string.IsNullOrEmpty(SelectedCamera.Id))
                 return;
             await _camera.ConnectAsync(SelectedCamera.Id).ConfigureAwait(true);
+            ProfileManager.Instance.ActiveProfile.LastCameraId = SelectedCamera.Id;
+            SaveProfileQuiet();
             SyncCameraFromMediator();
             RefreshTelemetry();
         }
@@ -510,9 +589,13 @@ public sealed partial class EquipmentViewModel : ObservableObject
     private async Task RefreshMountsAsync()
     {
         var list = await _mount.GetAllDevicesAsync().ConfigureAwait(true);
-        AvailableMounts = new ObservableCollection<MountDeviceInfo>(list);
-        if (SelectedMount is null && AvailableMounts.Count > 0)
-            SelectedMount = AvailableMounts[0];
+        var col = new ObservableCollection<MountDeviceInfo> { NoMount };
+        foreach (var m in list) col.Add(m);
+        AvailableMounts = col;
+
+        var lastId = ProfileManager.Instance.ActiveProfile.LastMountId;
+        var match = col.FirstOrDefault(m => m.Id == lastId && m.Id != "");
+        SelectedMount = match ?? NoMount;
     }
 
     [RelayCommand]
@@ -520,9 +603,11 @@ public sealed partial class EquipmentViewModel : ObservableObject
     {
         try
         {
-            if (SelectedMount is null)
+            if (SelectedMount is null || string.IsNullOrEmpty(SelectedMount.Id))
                 return;
             await _mount.ConnectAsync(SelectedMount.Id).ConfigureAwait(true);
+            ProfileManager.Instance.ActiveProfile.LastMountId = SelectedMount.Id;
+            SaveProfileQuiet();
             SyncMountFromMediator();
         }
         catch (Exception ex)
@@ -685,9 +770,13 @@ public sealed partial class EquipmentViewModel : ObservableObject
     private async Task RefreshFocusersAsync()
     {
         var list = await _focuser.GetAllDevicesAsync().ConfigureAwait(true);
-        AvailableFocusers = new ObservableCollection<FocuserDeviceInfo>(list);
-        if (SelectedFocuser is null && AvailableFocusers.Count > 0)
-            SelectedFocuser = AvailableFocusers[0];
+        var col = new ObservableCollection<FocuserDeviceInfo> { NoFocuser };
+        foreach (var f in list) col.Add(f);
+        AvailableFocusers = col;
+
+        var lastId = ProfileManager.Instance.ActiveProfile.LastFocuserId;
+        var match = col.FirstOrDefault(f => f.Id == lastId && f.Id != "");
+        SelectedFocuser = match ?? NoFocuser;
     }
 
     [RelayCommand]
@@ -695,9 +784,11 @@ public sealed partial class EquipmentViewModel : ObservableObject
     {
         try
         {
-            if (SelectedFocuser is null)
+            if (SelectedFocuser is null || string.IsNullOrEmpty(SelectedFocuser.Id))
                 return;
             await _focuser.ConnectAsync(SelectedFocuser.Id).ConfigureAwait(true);
+            ProfileManager.Instance.ActiveProfile.LastFocuserId = SelectedFocuser.Id;
+            SaveProfileQuiet();
             SyncFocuserFromMediator();
         }
         catch (Exception ex)
@@ -772,9 +863,13 @@ public sealed partial class EquipmentViewModel : ObservableObject
     private async Task RefreshFilterWheelsAsync()
     {
         var list = await _filterWheel.GetAllDevicesAsync().ConfigureAwait(true);
-        AvailableFilterWheels = new ObservableCollection<FilterWheelDeviceInfo>(list);
-        if (SelectedFilterWheel is null && AvailableFilterWheels.Count > 0)
-            SelectedFilterWheel = AvailableFilterWheels[0];
+        var col = new ObservableCollection<FilterWheelDeviceInfo> { NoFilterWheel };
+        foreach (var fw in list) col.Add(fw);
+        AvailableFilterWheels = col;
+
+        var lastId = ProfileManager.Instance.ActiveProfile.LastFilterWheelId;
+        var match = col.FirstOrDefault(fw => fw.Id == lastId && fw.Id != "");
+        SelectedFilterWheel = match ?? NoFilterWheel;
     }
 
     [RelayCommand]
@@ -782,9 +877,11 @@ public sealed partial class EquipmentViewModel : ObservableObject
     {
         try
         {
-            if (SelectedFilterWheel is null)
+            if (SelectedFilterWheel is null || string.IsNullOrEmpty(SelectedFilterWheel.Id))
                 return;
             await _filterWheel.ConnectAsync(SelectedFilterWheel.Id).ConfigureAwait(true);
+            ProfileManager.Instance.ActiveProfile.LastFilterWheelId = SelectedFilterWheel.Id;
+            SaveProfileQuiet();
             SyncFilterWheelFromMediator();
         }
         catch (Exception ex)
@@ -839,6 +936,238 @@ public sealed partial class EquipmentViewModel : ObservableObject
         RebuildFilterSlots();
     }
 
+    // ---- Etalon Tuner sync / commands ----
+
+    private void SyncEtalonFromMediator()
+    {
+        IsEtalonConnected = _etalon.IsConnected;
+        EtalonStatus = _etalon.IsConnected
+            ? $"Connected: {_etalon.ConnectedDeviceName} ({_etalon.ConnectedDeviceId})"
+            : "Disconnected";
+        SyncEtalonFromProviderProps();
+    }
+
+    private void SyncEtalonFromProviderProps()
+    {
+        if (!_etalon.IsConnected)
+        {
+            EtalonPosition = 0;
+            EtalonMaxPosition = 0;
+            EtalonTemperature = double.NaN;
+            EtalonIsMoving = false;
+            return;
+        }
+
+        EtalonPosition = _etalon.Position;
+        EtalonMaxPosition = _etalon.MaxPosition;
+        EtalonTemperature = _etalon.Temperature;
+        EtalonIsMoving = _etalon.IsMoving;
+
+        if (EtalonScanEnd == 0 && EtalonMaxPosition > 0)
+            EtalonScanEnd = EtalonMaxPosition;
+    }
+
+    [RelayCommand]
+    private async Task RefreshEtalonsAsync()
+    {
+        var list = await _etalon.GetAllDevicesAsync().ConfigureAwait(true);
+        var col = new ObservableCollection<EtalonDeviceInfo> { NoEtalon };
+        foreach (var e in list) col.Add(e);
+        AvailableEtalons = col;
+
+        var lastId = ProfileManager.Instance.ActiveProfile.LastEtalonId;
+        var match = col.FirstOrDefault(e => e.Id == lastId && e.Id != "");
+        SelectedEtalon = match ?? NoEtalon;
+    }
+
+    [RelayCommand]
+    private async Task ConnectEtalonAsync()
+    {
+        try
+        {
+            if (SelectedEtalon is null || string.IsNullOrEmpty(SelectedEtalon.Id))
+                return;
+            await _etalon.ConnectAsync(SelectedEtalon.Id).ConfigureAwait(true);
+            ProfileManager.Instance.ActiveProfile.LastEtalonId = SelectedEtalon.Id;
+            SaveProfileQuiet();
+            SyncEtalonFromMediator();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+    }
+
+    [RelayCommand]
+    private async Task DisconnectEtalonAsync()
+    {
+        try
+        {
+            await _etalon.DisconnectAsync().ConfigureAwait(true);
+            SyncEtalonFromMediator();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+    }
+
+    [RelayCommand]
+    private async Task ToggleEtalonConnectionAsync()
+    {
+        if (IsEtalonConnected)
+            await DisconnectEtalonAsync().ConfigureAwait(true);
+        else
+            await ConnectEtalonAsync().ConfigureAwait(true);
+    }
+
+    [RelayCommand]
+    private void OpenEtalonSettings()
+    {
+    }
+
+    [RelayCommand]
+    private async Task EtalonJogAsync(string? deltaStr)
+    {
+        if (!int.TryParse(deltaStr, out int delta)) return;
+        IEtalonProvider? e = _etalon.GetConnectedProvider();
+        if (e is null || !e.IsConnected) return;
+        try { await e.MoveRelativeAsync(delta).ConfigureAwait(true); }
+        catch { }
+    }
+
+    [RelayCommand]
+    private async Task MoveEtalonToTargetAsync()
+    {
+        IEtalonProvider? e = _etalon.GetConnectedProvider();
+        if (e is null || !e.IsConnected) return;
+        int t = Math.Clamp(EtalonTargetPosition, 0, e.MaxPosition);
+        try { await e.MoveAsync(t).ConfigureAwait(true); }
+        catch { }
+    }
+
+    private CancellationTokenSource? _autoTuneCts;
+
+    [RelayCommand]
+    private async Task EtalonAutoTuneAsync()
+    {
+        if (EtalonAutoTuneRunning)
+        {
+            _autoTuneCts?.Cancel();
+            return;
+        }
+
+        IEtalonProvider? et = _etalon.GetConnectedProvider();
+        ICameraProvider? cam = _camera.GetConnectedProvider();
+        if (et is null || !et.IsConnected)
+        {
+            MessageBox.Show("Etalon tuner is not connected.", "Auto-Tune", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+        if (cam is null || !cam.IsConnected)
+        {
+            MessageBox.Show("Camera is not connected. Auto-tune needs camera frames to measure contrast.", "Auto-Tune", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        _autoTuneCts = new CancellationTokenSource();
+        var ct = _autoTuneCts.Token;
+        EtalonAutoTuneRunning = true;
+
+        int scanStart = EtalonScanStart;
+        int scanEnd = EtalonScanEnd;
+        int step = Math.Max(1, EtalonScanStep);
+        if (scanEnd < scanStart) (scanStart, scanEnd) = (scanEnd, scanStart);
+
+        try
+        {
+            double bestScore = double.MinValue;
+            int bestPos = scanStart;
+            int totalSteps = (scanEnd - scanStart) / step + 1;
+            int current = 0;
+
+            for (int pos = scanStart; pos <= scanEnd; pos += step)
+            {
+                ct.ThrowIfCancellationRequested();
+                current++;
+                EtalonAutoTuneStatus = $"Scanning {current}/{totalSteps} — position {pos}";
+                await et.MoveAsync(pos).ConfigureAwait(true);
+                await Task.Delay(200, ct).ConfigureAwait(true);
+
+                var frame = await WaitForFrameAsync(ct).ConfigureAwait(true);
+                double score = frame is not null ? MeasureFrameContrast(frame) : 0;
+                if (score > bestScore)
+                {
+                    bestScore = score;
+                    bestPos = pos;
+                }
+            }
+
+            EtalonAutoTuneStatus = $"Best position: {bestPos} (score: {bestScore:F2}), moving…";
+            await et.MoveAsync(bestPos).ConfigureAwait(true);
+            EtalonAutoTuneStatus = $"Done — position {bestPos}";
+        }
+        catch (OperationCanceledException)
+        {
+            EtalonAutoTuneStatus = "Auto-tune cancelled";
+        }
+        catch (Exception ex)
+        {
+            EtalonAutoTuneStatus = $"Error: {ex.Message}";
+        }
+        finally
+        {
+            EtalonAutoTuneRunning = false;
+            _autoTuneCts?.Dispose();
+            _autoTuneCts = null;
+        }
+    }
+
+    private async Task<FrameData?> WaitForFrameAsync(CancellationToken ct)
+    {
+        var tcs = new TaskCompletionSource<FrameData>();
+        void Handler(object? s, FrameData f) => tcs.TrySetResult(f);
+        _camera.FrameReceived += Handler;
+        try
+        {
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            cts.CancelAfter(TimeSpan.FromSeconds(5));
+            var completedTask = await Task.WhenAny(tcs.Task, Task.Delay(-1, cts.Token)).ConfigureAwait(false);
+            return completedTask == tcs.Task ? tcs.Task.Result : null;
+        }
+        catch { return null; }
+        finally { _camera.FrameReceived -= Handler; }
+    }
+
+    /// <summary>
+    /// Brenner gradient contrast metric — higher values indicate a sharper / better-tuned image.
+    /// </summary>
+    private static double MeasureFrameContrast(FrameData frame)
+    {
+        if (frame.Data.Length == 0) return 0;
+        int width = frame.Width;
+        int height = frame.Height;
+        var data = frame.Data;
+        double sum = 0;
+        int count = 0;
+
+        for (int y = 0; y < height; y++)
+        {
+            for (int x = 0; x < width - 2; x++)
+            {
+                int idx = y * width + x;
+                if (idx + 2 >= data.Length) break;
+                double diff = data[idx + 2] - data[idx];
+                sum += diff * diff;
+                count++;
+            }
+        }
+
+        return count > 0 ? sum / count : 0;
+    }
+
+    // ---- Refresh All ----
+
     [RelayCommand]
     private async Task RefreshAllAsync()
     {
@@ -846,5 +1175,12 @@ public sealed partial class EquipmentViewModel : ObservableObject
         await RefreshMountsAsync().ConfigureAwait(true);
         await RefreshFocusersAsync().ConfigureAwait(true);
         await RefreshFilterWheelsAsync().ConfigureAwait(true);
+        await RefreshEtalonsAsync().ConfigureAwait(true);
+    }
+
+    private static void SaveProfileQuiet()
+    {
+        try { ProfileManager.Instance.Save(); }
+        catch { }
     }
 }

@@ -7,6 +7,8 @@ public class UserProfile
     public string OutputDirectory { get; set; } =
         Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\NINA-PL";
 
+    public string Language { get; set; } = "en";
+
     public string LastCameraId { get; set; } = "";
 
     public string LastMountId { get; set; } = "";
@@ -14,6 +16,8 @@ public class UserProfile
     public string LastFocuserId { get; set; } = "";
 
     public string LastFilterWheelId { get; set; } = "";
+
+    public string LastEtalonId { get; set; } = "";
 
     public double Latitude { get; set; }
 

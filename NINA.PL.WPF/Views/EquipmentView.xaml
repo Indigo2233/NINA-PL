@@ -412,6 +412,118 @@
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
+            <TabItem Header="{DynamicResource Eq.Etalon}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,8,0,0">
+                    <StackPanel>
+                        <Border Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="3" Padding="16">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <ComboBox ItemsSource="{Binding AvailableEtalons}" SelectedItem="{Binding SelectedEtalon}"
+                                          DisplayMemberPath="Name" Margin="0,0,8,0"/>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                    <Button Content="{DynamicResource Eq.Settings}" Command="{Binding OpenEtalonSettingsCommand}" Margin="0,0,8,0"/>
+                                    <Button Content="{DynamicResource Eq.Refresh}" Command="{Binding RefreshEtalonsCommand}" Margin="0,0,8,0"/>
+                                    <Button Command="{Binding ToggleEtalonConnectionCommand}">
+                                        <Button.Style>
+                                            <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsEtalonConnected}" Value="True">
+                                                        <Setter Property="Content" Value="Disconnect"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsEtalonConnected}" Value="False">
+                                                        <Setter Property="Content" Value="Connect"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Button.Style>
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                        <Border Margin="0,16,0,0" Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="3" Padding="16">
+                            <StackPanel>
+                                <TextBlock Text="{Binding EtalonStatus}" Foreground="{StaticResource Brush.TextSecondary}" Margin="0,0,0,12"/>
+                                <UniformGrid Columns="3" Margin="0,0,0,16">
+                                    <StackPanel Margin="0,0,16,0">
+                                        <TextBlock Text="{DynamicResource Et.Position}" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                        <TextBlock FontSize="18">
+                                            <Run Text="{Binding EtalonPosition}"/>
+                                            <Run Text="/" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                            <Run Text="{Binding EtalonMaxPosition}" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                        </TextBlock>
+                                    </StackPanel>
+                                    <StackPanel Margin="0,0,16,0">
+                                        <TextBlock Text="{DynamicResource Et.Temperature}" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                        <TextBlock Text="{Binding EtalonTemperature, StringFormat=F2}" FontSize="18"/>
+                                    </StackPanel>
+                                    <StackPanel>
+                                        <TextBlock Text="{DynamicResource Et.Moving}" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                        <TextBlock Text="{Binding EtalonIsMoving}" FontSize="18"/>
+                                    </StackPanel>
+                                </UniformGrid>
+
+                                <TextBlock Text="{DynamicResource Et.ManualMove}" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource Brush.Primary}" Margin="0,0,0,8"/>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                    <Button Content="&lt;&lt;" Command="{Binding EtalonJogCommand}" CommandParameter="-500" Width="44" Margin="0,0,8,0"/>
+                                    <Button Content="&lt;" Command="{Binding EtalonJogCommand}" CommandParameter="-50" Width="44" Margin="0,0,8,0"/>
+                                    <Border Background="{StaticResource Brush.InputBg}" CornerRadius="3" Padding="12,8" MinWidth="72" Margin="0,0,8,0" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding EtalonPosition}" HorizontalAlignment="Center" FontWeight="SemiBold"/>
+                                    </Border>
+                                    <Button Content="&gt;" Command="{Binding EtalonJogCommand}" CommandParameter="50" Width="44" Margin="0,0,8,0"/>
+                                    <Button Content="&gt;&gt;" Command="{Binding EtalonJogCommand}" CommandParameter="500" Width="44"/>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Margin="0,16,0,0" VerticalAlignment="Center">
+                                    <TextBlock Text="{DynamicResource Et.Target}" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                    <TextBox Width="100" Text="{Binding EtalonTargetPosition, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,8,0"/>
+                                    <Button Content="{DynamicResource Et.Go}" Command="{Binding MoveEtalonToTargetCommand}"/>
+                                </StackPanel>
+
+                                <!-- Auto-Tune -->
+                                <Border Margin="0,16,0,0" BorderBrush="{StaticResource Brush.Border}" BorderThickness="0,1,0,0" Padding="0,12,0,0">
+                                    <StackPanel>
+                                        <TextBlock Text="{DynamicResource Et.AutoTune}" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource Brush.Primary}" Margin="0,0,0,8"/>
+                                        <Grid Margin="0,0,0,8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="80"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="80"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="80"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="{DynamicResource Et.Start}" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                            <TextBox Grid.Column="1" Text="{Binding EtalonScanStart, UpdateSourceTrigger=LostFocus}" VerticalAlignment="Center"/>
+                                            <TextBlock Grid.Column="2" Text="{DynamicResource Et.End}" VerticalAlignment="Center" Margin="12,0,6,0" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                            <TextBox Grid.Column="3" Text="{Binding EtalonScanEnd, UpdateSourceTrigger=LostFocus}" VerticalAlignment="Center"/>
+                                            <TextBlock Grid.Column="4" Text="{DynamicResource Et.ScanStep}" VerticalAlignment="Center" Margin="12,0,6,0" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                            <TextBox Grid.Column="5" Text="{Binding EtalonScanStep, UpdateSourceTrigger=LostFocus}" VerticalAlignment="Center"/>
+                                        </Grid>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Button Command="{Binding EtalonAutoTuneCommand}" Padding="16,8">
+                                                <Button.Style>
+                                                    <Style TargetType="Button" BasedOn="{StaticResource AccentActionButtonStyle}">
+                                                        <Setter Property="Content" Value="{DynamicResource Et.AutoTune}"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding EtalonAutoTuneRunning}" Value="True">
+                                                                <Setter Property="Content" Value="{DynamicResource Et.StopTune}"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+                                            <TextBlock Text="{Binding EtalonAutoTuneStatus}" VerticalAlignment="Center" Margin="12,0,0,0" Foreground="{StaticResource Brush.TextSecondary}" FontSize="11"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
         </TabControl>
     </Grid>
 </UserControl>

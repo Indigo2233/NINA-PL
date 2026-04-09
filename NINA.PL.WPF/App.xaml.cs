@@ -15,8 +15,10 @@ using NINA.PL.Equipment.Camera.Sdk;
 using NINA.PL.Equipment.Mount;
 using NINA.PL.Equipment.Focuser;
 using NINA.PL.Equipment.FilterWheel;
+using NINA.PL.Equipment.Etalon;
 using NINA.PL.Guider;
 using NINA.PL.LiveStack;
+using NINA.PL.Profile;
 using NINA.PL.WPF.ViewModels;
 using NINA.PL.WPF.Views;
 namespace NINA.PL.WPF;
@@ -29,7 +31,10 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
-        Localization.LocalizationManager.SetLanguage("en");
+        LoadOrCreateProfile();
+        var savedLang = ProfileManager.Instance.ActiveProfile.Language;
+        Localization.LocalizationManager.SetLanguage(
+            string.IsNullOrWhiteSpace(savedLang) ? "en" : savedLang);
 
         DispatcherUnhandledException += (_, args) =>
         {
@@ -62,6 +67,7 @@ public partial class App : Application
         services.AddSingleton<AscomMountProvider>();
         services.AddSingleton<AscomFocuserProvider>();
         services.AddSingleton<AscomFilterWheelProvider>();
+        services.AddSingleton<AscomEtalonProvider>();
         services.AddSingleton(provider =>
         {
             var mediator = new CameraMediator();
@@ -87,6 +93,12 @@ public partial class App : Application
             mediator.RegisterProvider(provider.GetRequiredService<AscomFilterWheelProvider>());
             return mediator;
         });
+        services.AddSingleton(provider =>
+        {
+            var mediator = new EtalonMediator();
+            mediator.RegisterProvider(provider.GetRequiredService<AscomEtalonProvider>());
+            return mediator;
+        });
         services.AddSingleton<FlatDeviceMediator>();
         services.AddSingleton<SwitchMediator>();
         services.AddSingleton<RotatorMediator>();
@@ -95,7 +107,12 @@ public partial class App : Application
         services.AddSingleton<PlanetaryGuider>();
         services.AddSingleton<LiveStackEngine>();
 
-        services.AddSingleton<EquipmentViewModel>();
+        services.AddSingleton(sp => new EquipmentViewModel(
+            sp.GetRequiredService<CameraMediator>(),
+            sp.GetRequiredService<MountMediator>(),
+            sp.GetRequiredService<FocuserMediator>(),
+            sp.GetRequiredService<FilterWheelMediator>(),
+            sp.GetRequiredService<EtalonMediator>()));
         services.AddSingleton(sp => new CaptureViewModel(
             sp.GetRequiredService<CameraMediator>(),
             sp.GetRequiredService<FilterWheelMediator>(),
@@ -124,6 +141,9 @@ public partial class App : Application
         var loggerFactory = _serviceProvider.GetRequiredService<ILoggerFactory>();
         CoreLogger.Initialize(loggerFactory);
 
+        var settings = _serviceProvider.GetRequiredService<SettingsPanelViewModel>();
+        settings.RestoreFromProfile();
+
         var mainWindow = _serviceProvider.GetRequiredService<MainWindow>();
         mainWindow.Show();
         }
@@ -148,6 +168,7 @@ public partial class App : Application
             _serviceProvider.GetService<MountMediator>()?.Dispose();
             _serviceProvider.GetService<FocuserMediator>()?.Dispose();
             _serviceProvider.GetService<FilterWheelMediator>()?.Dispose();
+            _serviceProvider.GetService<EtalonMediator>()?.Dispose();
             _serviceProvider.GetService<FlatDeviceMediator>()?.Dispose();
             _serviceProvider.GetService<SwitchMediator>()?.Dispose();
             _serviceProvider.GetService<RotatorMediator>()?.Dispose();
@@ -158,6 +179,24 @@ public partial class App : Application
         }
 
         base.OnExit(e);
+    }
+
+    private static void LoadOrCreateProfile()
+    {
+        try
+        {
+            var dir = ProfileManager.GetProfilesDirectory();
+            Directory.CreateDirectory(dir);
+            var path = ProfileManager.GetDefaultPath();
+            if (File.Exists(path))
+                ProfileManager.Instance.Load(path);
+            else
+                ProfileManager.Instance.CreateDefault();
+        }
+        catch
+        {
+            ProfileManager.Instance.CreateDefault();
+        }
     }
 
     private static void RegisterNativeCameraBackends()
