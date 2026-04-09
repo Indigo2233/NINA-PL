@@ -53,9 +53,77 @@
                             <StackPanel>
                                 <TextBlock Text="{Binding CameraStatus}" Foreground="{StaticResource Brush.TextSecondary}" TextWrapping="Wrap" Margin="0,0,0,12"/>
                                 <TextBlock Text="Sensor &amp; color" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource Brush.Primary}" Margin="0,0,0,8"/>
-                                <TextBlock Text="{Binding CameraSensorSummary}" TextWrapping="Wrap" Margin="0,0,0,8"/>
+                                <TextBlock Text="{Binding CameraSensorSummary}" TextWrapping="Wrap" Margin="0,0,0,4"/>
                                 <TextBlock Text="Supported formats" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource Brush.Primary}" Margin="0,8,0,8"/>
                                 <TextBlock Text="{Binding CameraFormatsSummary}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Camera Controls -->
+                        <Border Margin="0,12,0,0" Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="3" Padding="16"
+                                Visibility="{Binding IsCameraConnected, Converter={StaticResource BoolToVis}}">
+                            <StackPanel>
+                                <TextBlock Text="Camera Controls" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource Brush.Primary}" Margin="0,0,0,12"/>
+
+                                <!-- Gain -->
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="90"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="70"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Gain" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                    <Slider Grid.Column="1" Minimum="{Binding CameraGainMin}" Maximum="{Binding CameraGainMax}"
+                                            Value="{Binding CameraGain}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <TextBox Grid.Column="2" Text="{Binding CameraGain, StringFormat=F0, UpdateSourceTrigger=PropertyChanged}"
+                                             VerticalAlignment="Center"/>
+                                    <Button Grid.Column="3" Content="Set" Command="{Binding ApplyCameraGainCommand}" Padding="8,4" Margin="4,0,0,0"/>
+                                </Grid>
+
+                                <!-- Exposure -->
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="90"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="70"/>
+                                        <ColumnDefinition Width="30"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Exposure (µs)" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                    <Slider Grid.Column="1" Minimum="{Binding CameraExposureMin}" Maximum="{Binding CameraExposureMax}"
+                                            Value="{Binding CameraExposureUs}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <TextBox Grid.Column="2" Text="{Binding CameraExposureUs, StringFormat=F0, UpdateSourceTrigger=PropertyChanged}"
+                                             VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="3" Text="µs" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}" Margin="4,0"/>
+                                    <Button Grid.Column="4" Content="Set" Command="{Binding ApplyCameraExposureCommand}" Padding="8,4"/>
+                                </Grid>
+
+                                <!-- Binning -->
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="90"/>
+                                        <ColumnDefinition Width="70"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Binning" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                    <TextBox Grid.Column="1" Text="{Binding CameraBinning, UpdateSourceTrigger=PropertyChanged}"
+                                             VerticalAlignment="Center"/>
+                                    <Button Grid.Column="2" Content="Set" Command="{Binding ApplyCameraBinningCommand}" Padding="8,4" Margin="4,0,0,0"/>
+                                </Grid>
+
+                                <!-- Pixel Format -->
+                                <Grid Margin="0,0,0,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="90"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Pixel Format" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                    <ComboBox Grid.Column="1" ItemsSource="{Binding CameraPixelFormats}"
+                                              SelectedItem="{Binding CameraSelectedPixelFormat}" Margin="0,0,8,0"/>
+                                    <Button Grid.Column="2" Content="Set" Command="{Binding ApplyCameraPixelFormatCommand}" Padding="8,4"/>
+                                </Grid>
                             </StackPanel>
                         </Border>
                     </StackPanel>

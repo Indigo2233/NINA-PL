@@ -68,6 +68,51 @@ public sealed partial class EquipmentViewModel : ObservableObject
     private string cameraFormatsSummary = "—";
 
     [ObservableProperty]
+    private double cameraGain;
+
+    [ObservableProperty]
+    private double cameraGainMin;
+
+    [ObservableProperty]
+    private double cameraGainMax = 100;
+
+    [ObservableProperty]
+    private double cameraExposureUs = 10000;
+
+    [ObservableProperty]
+    private double cameraExposureMin = 1;
+
+    [ObservableProperty]
+    private double cameraExposureMax = 60_000_000;
+
+    [ObservableProperty]
+    private int cameraBinning = 1;
+
+    [ObservableProperty]
+    private int cameraMaxBin = 1;
+
+    [ObservableProperty]
+    private ObservableCollection<string> cameraPixelFormats = new();
+
+    [ObservableProperty]
+    private string? cameraSelectedPixelFormat;
+
+    [ObservableProperty]
+    private double cameraTemperature = double.NaN;
+
+    [ObservableProperty]
+    private bool cameraCoolerOn;
+
+    [ObservableProperty]
+    private double cameraCoolerTarget = -10;
+
+    [ObservableProperty]
+    private double cameraCoolerPower = double.NaN;
+
+    [ObservableProperty]
+    private bool cameraHasCooler;
+
+    [ObservableProperty]
     private ObservableCollection<MountDeviceInfo> availableMounts = new();
 
     [ObservableProperty]
@@ -224,20 +269,40 @@ public sealed partial class EquipmentViewModel : ObservableObject
         {
             CameraSensorSummary = "—";
             CameraFormatsSummary = "—";
+            CameraHasCooler = false;
             return;
         }
 
         string color = cam.IsColor ? "Color" : "Mono";
         CameraSensorSummary =
             $"{cam.ModelName} · {cam.SensorWidth}×{cam.SensorHeight} px · {cam.PixelSizeUm:F2} µm · {color} · Bayer: {cam.BayerPattern}";
+
+        CameraGainMin = cam.GainMin;
+        CameraGainMax = cam.GainMax > 0 ? cam.GainMax : 100;
+        CameraExposureMin = cam.ExposureMin;
+        CameraExposureMax = cam.ExposureMax > 0 ? cam.ExposureMax : 60_000_000;
+        CameraMaxBin = Math.Max(cam.MaxBinX, 1);
+
         try
         {
-            IReadOnlyList<string> formats = cam.GetPixelFormats();
+            var formats = cam.GetPixelFormats();
+            CameraPixelFormats = new ObservableCollection<string>(formats);
             CameraFormatsSummary = formats.Count == 0 ? "—" : string.Join(", ", formats);
+            if (CameraSelectedPixelFormat is null && formats.Count > 0)
+                CameraSelectedPixelFormat = formats[0];
         }
         catch
         {
             CameraFormatsSummary = "—";
+        }
+
+        try
+        {
+            CameraHasCooler = cam is NINA.PL.Equipment.Camera.AscomCameraProvider;
+        }
+        catch
+        {
+            CameraHasCooler = false;
         }
     }
 
@@ -371,7 +436,31 @@ public sealed partial class EquipmentViewModel : ObservableObject
     [RelayCommand]
     private void OpenCameraSettings()
     {
-        // Reserved for driver-specific settings UI.
+    }
+
+    [RelayCommand]
+    private void ApplyCameraGain()
+    {
+        _camera.GetConnectedProvider()?.SetGain(CameraGain);
+    }
+
+    [RelayCommand]
+    private void ApplyCameraExposure()
+    {
+        _camera.GetConnectedProvider()?.SetExposure(CameraExposureUs);
+    }
+
+    [RelayCommand]
+    private void ApplyCameraBinning()
+    {
+        _camera.GetConnectedProvider()?.SetBinning(CameraBinning, CameraBinning);
+    }
+
+    [RelayCommand]
+    private void ApplyCameraPixelFormat()
+    {
+        if (CameraSelectedPixelFormat is not null)
+            _camera.GetConnectedProvider()?.SetPixelFormat(CameraSelectedPixelFormat);
     }
 
     [RelayCommand]
