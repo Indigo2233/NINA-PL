@@ -154,6 +154,12 @@ public sealed partial class EquipmentViewModel : ObservableObject
     private string mountSelectedSlewRate = "1x";
 
     [ObservableProperty]
+    private ObservableCollection<string> mountTrackingRates = new() { "Sidereal", "Solar", "Lunar", "King" };
+
+    [ObservableProperty]
+    private string mountSelectedTrackingRate = "Sidereal";
+
+    [ObservableProperty]
     private ObservableCollection<FocuserDeviceInfo> availableFocusers = new();
 
     [ObservableProperty]

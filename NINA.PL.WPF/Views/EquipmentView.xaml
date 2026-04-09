@@ -161,83 +161,101 @@
                                 </StackPanel>
                             </Grid>
                         </Border>
-                        <Border Margin="0,16,0,0" Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="3" Padding="16">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-                                <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="{Binding MountStatus}" Foreground="{StaticResource Brush.TextSecondary}" Margin="0,0,0,16"/>
-                                <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,16,8">
-                                    <TextBlock Text="{DynamicResource Mt.RA}" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}"/>
-                                    <TextBlock Text="{Binding MountRightAscensionHours, StringFormat=F4}" FontSize="16"/>
-                                </StackPanel>
-                                <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,0,0,8">
-                                    <TextBlock Text="{DynamicResource Mt.Dec}" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}"/>
-                                    <TextBlock Text="{Binding MountDeclinationDegrees, StringFormat=F4}" FontSize="16"/>
-                                </StackPanel>
-                                <StackPanel Grid.Row="2" Grid.Column="0" Margin="0,0,16,0">
-                                    <TextBlock Text="{DynamicResource Mt.AltAz}" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}"/>
-                                    <TextBlock FontSize="14">
-                                        <Run Text="{Binding MountAltitudeDegrees, StringFormat=F2}"/>
-                                        <Run Text=" / "/>
-                                        <Run Text="{Binding MountAzimuthDegrees, StringFormat=F2}"/>
-                                    </TextBlock>
-                                </StackPanel>
-                                <StackPanel Grid.Row="2" Grid.Column="1">
-                                    <TextBlock Text="{DynamicResource Mt.Tracking}" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}"/>
-                                    <TextBlock Text="{Binding MountIsTracking}" FontSize="14"/>
-                                </StackPanel>
-                            </Grid>
-                        </Border>
-
-                        <!-- Mount Controls -->
+                        <!-- Mount Info + Controls (horizontal layout) -->
                         <Border Margin="0,12,0,0" Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="3" Padding="16"
                                 Visibility="{Binding IsMountConnected, Converter={StaticResource BoolToVis}}">
                             <Grid>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
 
-                                <!-- Left: Directional Pad -->
-                                <StackPanel VerticalAlignment="Top" Margin="0,0,16,0">
-                                    <TextBlock Text="{DynamicResource Mt.ManualSlew}" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource Brush.Primary}" Margin="0,0,0,6" HorizontalAlignment="Center"/>
-                                    <Grid HorizontalAlignment="Center">
+                                <!-- Left: Coordinate Info -->
+                                <StackPanel VerticalAlignment="Top">
+                                    <TextBlock Text="{Binding MountStatus}" Foreground="{StaticResource Brush.TextSecondary}" FontSize="11" Margin="0,0,0,10"/>
+                                    <Grid>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="40"/>
-                                            <ColumnDefinition Width="40"/>
-                                            <ColumnDefinition Width="40"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
                                         <Grid.RowDefinitions>
-                                            <RowDefinition Height="40"/>
-                                            <RowDefinition Height="40"/>
-                                            <RowDefinition Height="40"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
                                         </Grid.RowDefinitions>
-                                        <Button Grid.Row="0" Grid.Column="1" Content="N" Command="{Binding MountSlewNorthCommand}" FontWeight="Bold" Margin="1" IsEnabled="{Binding MountAtPark, Converter={StaticResource InverseBool}}"/>
-                                        <Button Grid.Row="1" Grid.Column="0" Content="W" Command="{Binding MountSlewWestCommand}" FontWeight="Bold" Margin="1" IsEnabled="{Binding MountAtPark, Converter={StaticResource InverseBool}}"/>
-                                        <Button Grid.Row="1" Grid.Column="1" Content="■" Command="{Binding MountStopCommand}" FontSize="12" Foreground="{StaticResource Brush.Accent}" Margin="1"/>
-                                        <Button Grid.Row="1" Grid.Column="2" Content="E" Command="{Binding MountSlewEastCommand}" FontWeight="Bold" Margin="1" IsEnabled="{Binding MountAtPark, Converter={StaticResource InverseBool}}"/>
-                                        <Button Grid.Row="2" Grid.Column="1" Content="S" Command="{Binding MountSlewSouthCommand}" FontWeight="Bold" Margin="1" IsEnabled="{Binding MountAtPark, Converter={StaticResource InverseBool}}"/>
+                                        <StackPanel Margin="0,0,12,8">
+                                            <TextBlock Text="{DynamicResource Mt.RA}" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                            <TextBlock Text="{Binding MountRightAscensionHours, StringFormat=F4}" FontSize="18" FontWeight="SemiBold"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" Margin="0,0,0,8">
+                                            <TextBlock Text="{DynamicResource Mt.Dec}" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                            <TextBlock Text="{Binding MountDeclinationDegrees, StringFormat=F4}" FontSize="18" FontWeight="SemiBold"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Row="1" Margin="0,0,12,0">
+                                            <TextBlock Text="{DynamicResource Mt.AltAz}" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                            <TextBlock FontSize="14">
+                                                <Run Text="{Binding MountAltitudeDegrees, StringFormat=F2}"/>
+                                                <Run Text="/" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                                <Run Text="{Binding MountAzimuthDegrees, StringFormat=F2}"/>
+                                            </TextBlock>
+                                        </StackPanel>
+                                        <StackPanel Grid.Row="1" Grid.Column="1">
+                                            <TextBlock Text="{DynamicResource Mt.Tracking}" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                            <TextBlock FontSize="14">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Text" Value="OFF"/>
+                                                        <Setter Property="Foreground" Value="{StaticResource Brush.Accent}"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding MountIsTracking}" Value="True">
+                                                                <Setter Property="Text" Value="ON"/>
+                                                                <Setter Property="Foreground" Value="{StaticResource Brush.Primary}"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                        </StackPanel>
                                     </Grid>
-                                    <Grid Margin="0,8,0,0">
+
+                                    <!-- Tracking Rate -->
+                                    <Grid Margin="0,10,0,0">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Text="{DynamicResource Mt.SlewRate}" FontSize="10" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}" Margin="0,0,6,0"/>
-                                        <ComboBox Grid.Column="1" ItemsSource="{Binding MountSlewRates}" SelectedItem="{Binding MountSelectedSlewRate}" MinWidth="60"/>
+                                        <TextBlock Text="Tracking Rate" FontSize="10" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}" Margin="0,0,8,0"/>
+                                        <ComboBox Grid.Column="1" ItemsSource="{Binding MountTrackingRates}" SelectedItem="{Binding MountSelectedTrackingRate}"
+                                                  IsEnabled="{Binding MountAtPark, Converter={StaticResource InverseBool}}"/>
                                     </Grid>
                                 </StackPanel>
 
-                                <!-- Right: Park / Home / Tracking -->
-                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                    <Button Command="{Binding MountToggleParkCommand}" Padding="16,8" Margin="0,0,0,8" HorizontalAlignment="Stretch">
+                                <!-- Center: Directional Pad -->
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="16,0">
+                                    <TextBlock Text="{DynamicResource Mt.ManualSlew}" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource Brush.Primary}" Margin="0,0,0,4" HorizontalAlignment="Center"/>
+                                    <Grid HorizontalAlignment="Center">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="38"/>
+                                            <ColumnDefinition Width="38"/>
+                                            <ColumnDefinition Width="38"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="38"/>
+                                            <RowDefinition Height="38"/>
+                                            <RowDefinition Height="38"/>
+                                        </Grid.RowDefinitions>
+                                        <Button Grid.Row="0" Grid.Column="1" Content="N" Command="{Binding MountSlewNorthCommand}" FontWeight="Bold" Margin="1" IsEnabled="{Binding MountAtPark, Converter={StaticResource InverseBool}}"/>
+                                        <Button Grid.Row="1" Grid.Column="0" Content="W" Command="{Binding MountSlewWestCommand}" FontWeight="Bold" Margin="1" IsEnabled="{Binding MountAtPark, Converter={StaticResource InverseBool}}"/>
+                                        <Button Grid.Row="1" Grid.Column="1" Content="■" Command="{Binding MountStopCommand}" FontSize="11" Foreground="{StaticResource Brush.Accent}" Margin="1"/>
+                                        <Button Grid.Row="1" Grid.Column="2" Content="E" Command="{Binding MountSlewEastCommand}" FontWeight="Bold" Margin="1" IsEnabled="{Binding MountAtPark, Converter={StaticResource InverseBool}}"/>
+                                        <Button Grid.Row="2" Grid.Column="1" Content="S" Command="{Binding MountSlewSouthCommand}" FontWeight="Bold" Margin="1" IsEnabled="{Binding MountAtPark, Converter={StaticResource InverseBool}}"/>
+                                    </Grid>
+                                    <ComboBox ItemsSource="{Binding MountSlewRates}" SelectedItem="{Binding MountSelectedSlewRate}" Margin="0,4,0,0" MinWidth="80" HorizontalAlignment="Center"/>
+                                </StackPanel>
+
+                                <!-- Right: Actions -->
+                                <StackPanel Grid.Column="2" VerticalAlignment="Center" MinWidth="100">
+                                    <Button Command="{Binding MountToggleParkCommand}" Padding="12,8" Margin="0,0,0,6" HorizontalAlignment="Stretch">
                                         <Button.Style>
                                             <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
                                                 <Setter Property="Content" Value="{DynamicResource Mt.Park}"/>
@@ -249,9 +267,9 @@
                                             </Style>
                                         </Button.Style>
                                     </Button>
-                                    <Button Content="{DynamicResource Mt.Home}" Command="{Binding MountFindHomeCommand}" Padding="16,8" Margin="0,0,0,8" HorizontalAlignment="Stretch"
+                                    <Button Content="{DynamicResource Mt.Home}" Command="{Binding MountFindHomeCommand}" Padding="12,8" Margin="0,0,0,6" HorizontalAlignment="Stretch"
                                             IsEnabled="{Binding MountAtPark, Converter={StaticResource InverseBool}}"/>
-                                    <ToggleButton Content="{DynamicResource Mt.Tracking}" IsChecked="{Binding MountIsTracking}" Command="{Binding MountToggleTrackingCommand}" Padding="16,8" HorizontalAlignment="Stretch"
+                                    <ToggleButton Content="{DynamicResource Mt.Tracking}" IsChecked="{Binding MountIsTracking}" Command="{Binding MountToggleTrackingCommand}" Padding="12,8" HorizontalAlignment="Stretch"
                                                   IsEnabled="{Binding MountAtPark, Converter={StaticResource InverseBool}}"/>
                                 </StackPanel>
                             </Grid>
