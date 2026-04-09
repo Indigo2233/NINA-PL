@@ -38,7 +38,7 @@
                     </Grid>
                 </Viewbox>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="8">
-                    <ToggleButton IsChecked="{Binding ShowCrosshair, Mode=TwoWay}" Content="Crosshair" Margin="0,0,8,0"/>
+                    <ToggleButton IsChecked="{Binding ShowCrosshair, Mode=TwoWay}" Content="{DynamicResource Cap.Crosshair}" Margin="0,0,8,0"/>
                     <Button Content="−" Command="{Binding ZoomOutCommand}" Width="32" Margin="0,0,4,0"/>
                     <Button Content="+" Command="{Binding ZoomInCommand}" Width="32" Margin="0,0,4,0"/>
                     <Button Content="1:1" Command="{Binding ResetZoomCommand}" Padding="10,4"/>
@@ -49,7 +49,7 @@
         <!-- Right stack -->
         <ScrollViewer Grid.Row="0" Grid.Column="1" VerticalScrollBarVisibility="Auto">
             <StackPanel>
-                <GroupBox Header="CAMERA" Margin="0,0,0,16">
+                <GroupBox Header="{DynamicResource Cap.Camera}" Margin="0,0,0,16">
                     <StackPanel>
                         <TextBlock Text="{Binding ConnectedCameraDisplayName}" FontWeight="SemiBold" Margin="0,0,0,4"/>
                         <TextBlock Text="{Binding CameraSensorLine}" Foreground="{StaticResource Brush.TextSecondary}" TextWrapping="Wrap"/>
@@ -57,7 +57,7 @@
                         <Slider Minimum="0" Maximum="1" Value="{Binding ExposureSliderValue, Mode=TwoWay}" TickFrequency="0.01"/>
                         <Label Content="{Binding Gain, StringFormat=Gain: {0:F1}}"/>
                         <Slider Minimum="{Binding GainMin}" Maximum="{Binding GainMax}" Value="{Binding Gain, Mode=TwoWay}" TickFrequency="0.5"/>
-                        <TextBlock Text="ROI" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource Brush.Primary}" Margin="0,12,0,8"/>
+                        <TextBlock Text="{DynamicResource Cap.ROI}" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource Brush.Primary}" Margin="0,12,0,8"/>
                         <UniformGrid Columns="2">
                             <StackPanel Margin="0,0,8,8">
                                 <Label Content="X"/>
@@ -77,13 +77,13 @@
                             </StackPanel>
                         </UniformGrid>
                         <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                            <Button Content="Apply ROI" Command="{Binding ApplyRoiCommand}" Margin="0,0,8,0"/>
-                            <Button Content="Reset ROI" Command="{Binding ResetRoiCommand}"/>
+                            <Button Content="{DynamicResource Cap.ApplyROI}" Command="{Binding ApplyRoiCommand}" Margin="0,0,8,0"/>
+                            <Button Content="{DynamicResource Cap.ResetROI}" Command="{Binding ResetRoiCommand}"/>
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="HISTOGRAM" Margin="0,0,0,16">
+                <GroupBox Header="{DynamicResource Cap.Histogram}" Margin="0,0,0,16">
                     <StackPanel>
                         <Border Height="120" Background="{StaticResource Brush.InputBg}" CornerRadius="3" ClipToBounds="True" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1">
                             <Polyline Points="{Binding HistogramLinePoints}" Stroke="{StaticResource Brush.Primary}" StrokeThickness="1.25" Stretch="Fill"/>
@@ -96,7 +96,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Header="FILTER">
+                <GroupBox Header="{DynamicResource Cap.Filter}">
                     <StackPanel>
                         <TextBlock Text="Current" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}"/>
                         <TextBlock Text="{Binding CurrentFilterQuickName}" FontWeight="SemiBold" Margin="0,0,0,8"/>
@@ -178,8 +178,8 @@
                             </Style>
                         </Border.Style>
                     </Border>
-                    <TextBlock Text="REC" FontSize="9" HorizontalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}" Margin="0,2,0,0"/>
-                    <Button Content="Stop" Command="{Binding StopCaptureCommand}" Margin="0,8,0,0" HorizontalAlignment="Center" MinWidth="72"/>
+                    <TextBlock Text="{DynamicResource Cap.Record}" FontSize="9" HorizontalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}" Margin="0,2,0,0"/>
+                    <Button Content="{DynamicResource Cap.Stop}" Command="{Binding StopCaptureCommand}" Margin="0,8,0,0" HorizontalAlignment="Center" MinWidth="72"/>
                 </StackPanel>
                 <Grid Grid.Column="1">
                     <Grid.RowDefinitions>
@@ -188,11 +188,11 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <WrapPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
-                        <Label Content="Format" VerticalAlignment="Center"/>
+                        <Label Content="{DynamicResource Cap.Format}" VerticalAlignment="Center"/>
                         <ComboBox Width="120" Margin="8,0,16,0" ItemsSource="{Binding CaptureFormats}" SelectedItem="{Binding SelectedFormat, Mode=TwoWay}"/>
-                        <Label Content="Frame limit (0=∞)" VerticalAlignment="Center"/>
+                        <Label Content="{DynamicResource Cap.FrameLimit}" VerticalAlignment="Center"/>
                         <TextBox Width="72" Margin="8,0,16,0" Text="{Binding FrameLimit, UpdateSourceTrigger=PropertyChanged}"/>
-                        <Label Content="Time limit (s)" VerticalAlignment="Center"/>
+                        <Label Content="{DynamicResource Cap.TimeLimit}" VerticalAlignment="Center"/>
                         <TextBox Width="72" Margin="8,0,0,0" Text="{Binding TimeLimitSeconds, UpdateSourceTrigger=PropertyChanged}"/>
                     </WrapPanel>
                     <Grid Grid.Row="1" Margin="0,0,0,8">
@@ -201,12 +201,14 @@
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Folder:" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}" Margin="0,0,8,0"/>
+                            <TextBlock VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}" Margin="0,0,8,0">
+                                <Run Text="{DynamicResource Cap.Folder}"/><Run Text=":"/>
+                            </TextBlock>
                             <TextBlock Text="{Binding OutputDirectory}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" MaxWidth="400"/>
-                            <Button Content="Browse…" Command="{Binding BrowseOutputCommand}" Margin="12,0,0,0"/>
+                            <Button Content="{DynamicResource Cap.Browse}" Command="{Binding BrowseOutputCommand}" Margin="12,0,0,0"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Orientation="Horizontal">
-                            <Label Content="Prefix" VerticalAlignment="Center"/>
+                            <Label Content="{DynamicResource Cap.Prefix}" VerticalAlignment="Center"/>
                             <TextBox Width="160" Margin="8,0,0,0" Text="{Binding FilePrefix, UpdateSourceTrigger=PropertyChanged}"/>
                         </StackPanel>
                     </Grid>

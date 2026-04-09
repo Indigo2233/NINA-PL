@@ -66,4 +66,21 @@
     <sys:String x:Key="Set.Location">Observer location</sys:String>
     <sys:String x:Key="Set.Latitude">Latitude (°)</sys:String>
     <sys:String x:Key="Set.Longitude">Longitude (°)</sys:String>
+
+    <!-- Capture -->
+    <sys:String x:Key="Cap.Camera">CAMERA</sys:String>
+    <sys:String x:Key="Cap.ROI">ROI</sys:String>
+    <sys:String x:Key="Cap.Histogram">HISTOGRAM</sys:String>
+    <sys:String x:Key="Cap.Filter">FILTER</sys:String>
+    <sys:String x:Key="Cap.Format">Format</sys:String>
+    <sys:String x:Key="Cap.FrameLimit">Frame limit (0=∞)</sys:String>
+    <sys:String x:Key="Cap.TimeLimit">Time limit (s)</sys:String>
+    <sys:String x:Key="Cap.Folder">Folder</sys:String>
+    <sys:String x:Key="Cap.Browse">Browse…</sys:String>
+    <sys:String x:Key="Cap.Prefix">Prefix</sys:String>
+    <sys:String x:Key="Cap.Record">Record</sys:String>
+    <sys:String x:Key="Cap.Stop">Stop</sys:String>
+    <sys:String x:Key="Cap.ApplyROI">Apply ROI</sys:String>
+    <sys:String x:Key="Cap.ResetROI">Reset ROI</sys:String>
+    <sys:String x:Key="Cap.Crosshair">Crosshair</sys:String>
 </ResourceDictionary>

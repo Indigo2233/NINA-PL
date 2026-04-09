@@ -142,7 +142,7 @@
                         </Button.Style>
                         <StackPanel>
                             <TextBlock Text="⚙" FontSize="16" HorizontalAlignment="Center"/>
-                            <TextBlock Text="Equip" TextWrapping="Wrap" TextAlignment="Center" Margin="0,4,0,0"/>
+                            <TextBlock Text="{DynamicResource Nav.Equipment}" TextWrapping="Wrap" TextAlignment="Center" Margin="0,4,0,0"/>
                         </StackPanel>
                     </Button>
                     <Button Command="{Binding NavigateCommand}" CommandParameter="{x:Static vm:SidebarSection.Capture}" Margin="0,4,0,0">
@@ -167,7 +167,7 @@
                         </Button.Style>
                         <StackPanel>
                             <TextBlock Text="📷" FontSize="16" HorizontalAlignment="Center"/>
-                            <TextBlock Text="Capture" TextWrapping="Wrap" TextAlignment="Center" Margin="0,4,0,0" FontSize="10"/>
+                            <TextBlock Text="{DynamicResource Nav.Capture}" TextWrapping="Wrap" TextAlignment="Center" Margin="0,4,0,0" FontSize="10"/>
                         </StackPanel>
                     </Button>
                     <Button Command="{Binding NavigateCommand}" CommandParameter="{x:Static vm:SidebarSection.Focus}" Margin="0,4,0,0">
@@ -192,7 +192,7 @@
                         </Button.Style>
                         <StackPanel>
                             <TextBlock Text="🎯" FontSize="16" HorizontalAlignment="Center"/>
-                            <TextBlock Text="Focus" TextWrapping="Wrap" TextAlignment="Center" Margin="0,4,0,0"/>
+                            <TextBlock Text="{DynamicResource Nav.Focus}" TextWrapping="Wrap" TextAlignment="Center" Margin="0,4,0,0"/>
                         </StackPanel>
                     </Button>
                     <Button Command="{Binding NavigateCommand}" CommandParameter="{x:Static vm:SidebarSection.Guider}" Margin="0,4,0,0">
@@ -217,7 +217,7 @@
                         </Button.Style>
                         <StackPanel>
                             <TextBlock Text="🔭" FontSize="16" HorizontalAlignment="Center"/>
-                            <TextBlock Text="Guider" TextWrapping="Wrap" TextAlignment="Center" Margin="0,4,0,0" FontSize="10"/>
+                            <TextBlock Text="{DynamicResource Nav.Guider}" TextWrapping="Wrap" TextAlignment="Center" Margin="0,4,0,0" FontSize="10"/>
                         </StackPanel>
                     </Button>
                     <Button Command="{Binding NavigateCommand}" CommandParameter="{x:Static vm:SidebarSection.LiveStack}" Margin="0,4,0,0">
@@ -242,7 +242,7 @@
                         </Button.Style>
                         <StackPanel>
                             <TextBlock Text="📚" FontSize="16" HorizontalAlignment="Center"/>
-                            <TextBlock Text="Stack" TextWrapping="Wrap" TextAlignment="Center" Margin="0,4,0,0" FontSize="10"/>
+                            <TextBlock Text="{DynamicResource Nav.Stack}" TextWrapping="Wrap" TextAlignment="Center" Margin="0,4,0,0" FontSize="10"/>
                         </StackPanel>
                     </Button>
                     <Separator Margin="6,16" Background="{StaticResource Brush.BorderSubtle}"/>
@@ -268,7 +268,7 @@
                         </Button.Style>
                         <StackPanel>
                             <TextBlock Text="📋" FontSize="16" HorizontalAlignment="Center"/>
-                            <TextBlock Text="Seq" TextWrapping="Wrap" TextAlignment="Center" Margin="0,4,0,0"/>
+                            <TextBlock Text="{DynamicResource Nav.Sequencer}" TextWrapping="Wrap" TextAlignment="Center" Margin="0,4,0,0"/>
                         </StackPanel>
                     </Button>
                     <Button Command="{Binding NavigateCommand}" CommandParameter="{x:Static vm:SidebarSection.Settings}" Margin="0,4,0,0">
@@ -293,7 +293,7 @@
                         </Button.Style>
                         <StackPanel>
                             <TextBlock Text="⚡" FontSize="16" HorizontalAlignment="Center"/>
-                            <TextBlock Text="Set" TextWrapping="Wrap" TextAlignment="Center" Margin="0,4,0,0"/>
+                            <TextBlock Text="{DynamicResource Nav.Settings}" TextWrapping="Wrap" TextAlignment="Center" Margin="0,4,0,0"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>

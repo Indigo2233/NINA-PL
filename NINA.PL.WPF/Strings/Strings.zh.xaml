@@ -66,4 +66,21 @@
     <sys:String x:Key="Set.Location">观测位置</sys:String>
     <sys:String x:Key="Set.Latitude">纬度 (°)</sys:String>
     <sys:String x:Key="Set.Longitude">经度 (°)</sys:String>
+
+    <!-- Capture -->
+    <sys:String x:Key="Cap.Camera">相机</sys:String>
+    <sys:String x:Key="Cap.ROI">感兴趣区域</sys:String>
+    <sys:String x:Key="Cap.Histogram">直方图</sys:String>
+    <sys:String x:Key="Cap.Filter">滤镜</sys:String>
+    <sys:String x:Key="Cap.Format">格式</sys:String>
+    <sys:String x:Key="Cap.FrameLimit">帧数限制 (0=∞)</sys:String>
+    <sys:String x:Key="Cap.TimeLimit">时间限制 (秒)</sys:String>
+    <sys:String x:Key="Cap.Folder">文件夹</sys:String>
+    <sys:String x:Key="Cap.Browse">浏览…</sys:String>
+    <sys:String x:Key="Cap.Prefix">前缀</sys:String>
+    <sys:String x:Key="Cap.Record">录制</sys:String>
+    <sys:String x:Key="Cap.Stop">停止</sys:String>
+    <sys:String x:Key="Cap.ApplyROI">应用 ROI</sys:String>
+    <sys:String x:Key="Cap.ResetROI">重置 ROI</sys:String>
+    <sys:String x:Key="Cap.Crosshair">十字准线</sys:String>
 </ResourceDictionary>
