@@ -37,6 +37,15 @@ public sealed class AlpacaMountProvider : IMountProvider
         }
     }
 
+    public bool AtPark
+    {
+        get
+        {
+            try { return ReadBool("atpark"); }
+            catch { return false; }
+        }
+    }
+
     public bool IsTracking
     {
         get

@@ -145,6 +145,9 @@ public sealed partial class EquipmentViewModel : ObservableObject
     private bool mountIsTracking;
 
     [ObservableProperty]
+    private bool mountAtPark;
+
+    [ObservableProperty]
     private ObservableCollection<string> mountSlewRates = new() { "1x" };
 
     [ObservableProperty]
@@ -353,6 +356,7 @@ public sealed partial class EquipmentViewModel : ObservableObject
         MountDeclinationDegrees = _mount.Declination;
         MountAltitudeDegrees = _mount.Altitude;
         MountAzimuthDegrees = _mount.Azimuth;
+        MountAtPark = _mount.AtPark;
         MountIsTracking = _mount.IsTracking;
     }
 
@@ -629,24 +633,15 @@ public sealed partial class EquipmentViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task MountParkAsync()
+    private async Task MountToggleParkAsync()
     {
         try
         {
-            await _mount.ParkAsync().ConfigureAwait(true);
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show(ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-        }
-    }
-
-    [RelayCommand]
-    private async Task MountUnparkAsync()
-    {
-        try
-        {
-            await _mount.UnparkAsync().ConfigureAwait(true);
+            if (MountAtPark)
+                await _mount.UnparkAsync().ConfigureAwait(true);
+            else
+                await _mount.ParkAsync().ConfigureAwait(true);
+            SyncMountFromProviderProps();
         }
         catch (Exception ex)
         {

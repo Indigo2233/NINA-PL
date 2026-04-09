@@ -15,6 +15,8 @@ public interface IMountProvider : IDisposable
 
     bool IsTracking { get; }
 
+    bool AtPark { get; }
+
     double RightAscension { get; }
 
     double Declination { get; }

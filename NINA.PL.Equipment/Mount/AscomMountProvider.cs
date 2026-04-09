@@ -37,6 +37,26 @@ public sealed class AscomMountProvider : IMountProvider
         }
     }
 
+    public bool AtPark
+    {
+        get
+        {
+            lock (_sync)
+            {
+                if (_telescope is null)
+                    return false;
+                try
+                {
+                    return (bool)_telescope.AtPark;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
+    }
+
     public bool IsTracking
     {
         get

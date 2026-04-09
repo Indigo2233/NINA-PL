@@ -30,6 +30,9 @@ public partial class MountMediator : ObservableObject, IDisposable
     private bool isTracking;
 
     [ObservableProperty]
+    private bool atPark;
+
+    [ObservableProperty]
     private double rightAscension;
 
     [ObservableProperty]
@@ -167,6 +170,7 @@ public partial class MountMediator : ObservableObject, IDisposable
         }
 
         IsTracking = m.IsTracking;
+        AtPark = m.AtPark;
         RightAscension = m.RightAscension;
         Declination = m.Declination;
         Altitude = m.Altitude;
@@ -314,6 +318,7 @@ public partial class MountMediator : ObservableObject, IDisposable
         ConnectedDeviceId = null;
         ConnectedDeviceName = null;
         IsTracking = false;
+        AtPark = false;
         RightAscension = 0;
         Declination = 0;
         Altitude = 0;

@@ -12,13 +12,13 @@
         </Grid.RowDefinitions>
 
         <DockPanel Grid.Row="0" LastChildFill="False" Margin="0,0,0,16">
-            <TextBlock DockPanel.Dock="Left" Text="EQUIPMENT" FontSize="11" FontWeight="SemiBold"
+            <TextBlock DockPanel.Dock="Left" Text="{DynamicResource Eq.Title}" FontSize="11" FontWeight="SemiBold"
                        Foreground="{StaticResource Brush.Primary}" VerticalAlignment="Center"/>
-            <Button DockPanel.Dock="Right" Content="Refresh all" Command="{Binding RefreshAllCommand}" Style="{StaticResource AccentActionButtonStyle}" Padding="16,8"/>
+            <Button DockPanel.Dock="Right" Content="{DynamicResource Eq.RefreshAll}" Command="{Binding RefreshAllCommand}" Style="{StaticResource AccentActionButtonStyle}" Padding="16,8"/>
         </DockPanel>
 
         <TabControl Grid.Row="1">
-            <TabItem Header="CAMERA">
+            <TabItem Header="{DynamicResource Eq.Camera}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,8,0,0">
                     <StackPanel>
                         <Border Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="3" Padding="16">
@@ -30,8 +30,8 @@
                                 <ComboBox Grid.Column="0" ItemsSource="{Binding AvailableCameras}" SelectedItem="{Binding SelectedCamera}"
                                           DisplayMemberPath="Name" Margin="0,0,8,0"/>
                                 <StackPanel Grid.Column="1" Orientation="Horizontal">
-                                    <Button Content="Settings" Command="{Binding OpenCameraSettingsCommand}" Margin="0,0,8,0"/>
-                                    <Button Content="Refresh" Command="{Binding RefreshCamerasCommand}" Margin="0,0,8,0"/>
+                                    <Button Content="{DynamicResource Eq.Settings}" Command="{Binding OpenCameraSettingsCommand}" Margin="0,0,8,0"/>
+                                    <Button Content="{DynamicResource Eq.Refresh}" Command="{Binding RefreshCamerasCommand}" Margin="0,0,8,0"/>
                                     <Button Command="{Binding ToggleCameraConnectionCommand}">
                                         <Button.Style>
                                             <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
@@ -52,9 +52,9 @@
                         <Border Margin="0,16,0,0" Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="3" Padding="16">
                             <StackPanel>
                                 <TextBlock Text="{Binding CameraStatus}" Foreground="{StaticResource Brush.TextSecondary}" TextWrapping="Wrap" Margin="0,0,0,12"/>
-                                <TextBlock Text="Sensor &amp; color" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource Brush.Primary}" Margin="0,0,0,8"/>
+                                <TextBlock Text="{DynamicResource Cam.SensorColor}" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource Brush.Primary}" Margin="0,0,0,8"/>
                                 <TextBlock Text="{Binding CameraSensorSummary}" TextWrapping="Wrap" Margin="0,0,0,4"/>
-                                <TextBlock Text="Supported formats" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource Brush.Primary}" Margin="0,8,0,8"/>
+                                <TextBlock Text="{DynamicResource Cam.Formats}" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource Brush.Primary}" Margin="0,8,0,8"/>
                                 <TextBlock Text="{Binding CameraFormatsSummary}" TextWrapping="Wrap"/>
                             </StackPanel>
                         </Border>
@@ -63,7 +63,7 @@
                         <Border Margin="0,12,0,0" Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="3" Padding="16"
                                 Visibility="{Binding IsCameraConnected, Converter={StaticResource BoolToVis}}">
                             <StackPanel>
-                                <TextBlock Text="Camera Controls" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource Brush.Primary}" Margin="0,0,0,12"/>
+                                <TextBlock Text="{DynamicResource Cam.Controls}" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource Brush.Primary}" Margin="0,0,0,12"/>
 
                                 <!-- Gain -->
                                 <Grid Margin="0,0,0,8">
@@ -72,7 +72,7 @@
                                         <ColumnDefinition Width="100"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Gain" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                    <TextBlock Text="{DynamicResource Cam.Gain}" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}"/>
                                     <TextBox Grid.Column="1" Text="{Binding CameraGain, UpdateSourceTrigger=LostFocus}" VerticalAlignment="Center"/>
                                     <TextBlock Grid.Column="2" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}" Margin="8,0" FontSize="11">
                                         <TextBlock.Text>
@@ -91,7 +91,7 @@
                                         <ColumnDefinition Width="100"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Exposure (µs)" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                    <TextBlock Text="{DynamicResource Cam.Exposure}" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}"/>
                                     <TextBox Grid.Column="1" Text="{Binding CameraExposureUs, UpdateSourceTrigger=LostFocus}" VerticalAlignment="Center"/>
                                     <TextBlock Grid.Column="2" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}" Margin="8,0" FontSize="11">
                                         <TextBlock.Text>
@@ -109,7 +109,7 @@
                                         <ColumnDefinition Width="100"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Binning" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                    <TextBlock Text="{DynamicResource Cam.Binning}" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}"/>
                                     <ComboBox Grid.Column="1" ItemsSource="{Binding CameraBinOptions}"
                                               SelectedItem="{Binding CameraBinning}"/>
                                 </Grid>
@@ -120,7 +120,7 @@
                                         <ColumnDefinition Width="100"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Pixel Format" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                    <TextBlock Text="{DynamicResource Cam.PixelFormat}" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}"/>
                                     <ComboBox Grid.Column="1" ItemsSource="{Binding CameraPixelFormats}"
                                               SelectedItem="{Binding CameraSelectedPixelFormat}"/>
                                 </Grid>
@@ -130,7 +130,7 @@
                 </ScrollViewer>
             </TabItem>
 
-            <TabItem Header="MOUNT">
+            <TabItem Header="{DynamicResource Eq.Mount}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,8,0,0">
                     <StackPanel>
                         <Border Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="3" Padding="16">
@@ -142,8 +142,8 @@
                                 <ComboBox ItemsSource="{Binding AvailableMounts}" SelectedItem="{Binding SelectedMount}"
                                           DisplayMemberPath="Name" Margin="0,0,8,0"/>
                                 <StackPanel Grid.Column="1" Orientation="Horizontal">
-                                    <Button Content="Settings" Command="{Binding OpenMountSettingsCommand}" Margin="0,0,8,0"/>
-                                    <Button Content="Refresh" Command="{Binding RefreshMountsCommand}" Margin="0,0,8,0"/>
+                                    <Button Content="{DynamicResource Eq.Settings}" Command="{Binding OpenMountSettingsCommand}" Margin="0,0,8,0"/>
+                                    <Button Content="{DynamicResource Eq.Refresh}" Command="{Binding RefreshMountsCommand}" Margin="0,0,8,0"/>
                                     <Button Command="{Binding ToggleMountConnectionCommand}">
                                         <Button.Style>
                                             <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
@@ -174,15 +174,15 @@
                                 </Grid.RowDefinitions>
                                 <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="{Binding MountStatus}" Foreground="{StaticResource Brush.TextSecondary}" Margin="0,0,0,16"/>
                                 <StackPanel Grid.Row="1" Grid.Column="0" Margin="0,0,16,8">
-                                    <TextBlock Text="Right ascension (h)" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                    <TextBlock Text="{DynamicResource Mt.RA}" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}"/>
                                     <TextBlock Text="{Binding MountRightAscensionHours, StringFormat=F4}" FontSize="16"/>
                                 </StackPanel>
                                 <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,0,0,8">
-                                    <TextBlock Text="Declination (°)" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                    <TextBlock Text="{DynamicResource Mt.Dec}" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}"/>
                                     <TextBlock Text="{Binding MountDeclinationDegrees, StringFormat=F4}" FontSize="16"/>
                                 </StackPanel>
                                 <StackPanel Grid.Row="2" Grid.Column="0" Margin="0,0,16,0">
-                                    <TextBlock Text="Altitude / Azimuth (°)" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                    <TextBlock Text="{DynamicResource Mt.AltAz}" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}"/>
                                     <TextBlock FontSize="14">
                                         <Run Text="{Binding MountAltitudeDegrees, StringFormat=F2}"/>
                                         <Run Text=" / "/>
@@ -190,7 +190,7 @@
                                     </TextBlock>
                                 </StackPanel>
                                 <StackPanel Grid.Row="2" Grid.Column="1">
-                                    <TextBlock Text="Tracking" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                    <TextBlock Text="{DynamicResource Mt.Tracking}" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}"/>
                                     <TextBlock Text="{Binding MountIsTracking}" FontSize="14"/>
                                 </StackPanel>
                             </Grid>
@@ -199,58 +199,68 @@
                         <!-- Mount Controls -->
                         <Border Margin="0,12,0,0" Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="3" Padding="16"
                                 Visibility="{Binding IsMountConnected, Converter={StaticResource BoolToVis}}">
-                            <StackPanel>
-                                <TextBlock Text="Manual Slew" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource Brush.Primary}" Margin="0,0,0,8"/>
-                                <Grid HorizontalAlignment="Center" Margin="0,0,0,8">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="36"/>
-                                        <ColumnDefinition Width="36"/>
-                                        <ColumnDefinition Width="36"/>
-                                    </Grid.ColumnDefinitions>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="36"/>
-                                        <RowDefinition Height="36"/>
-                                        <RowDefinition Height="36"/>
-                                    </Grid.RowDefinitions>
-                                    <Button Grid.Row="0" Grid.Column="1" Content="N" Command="{Binding MountSlewNorthCommand}" FontWeight="Bold" Margin="1" Width="36" Height="36" IsEnabled="{Binding IsMountConnected}"/>
-                                    <Button Grid.Row="1" Grid.Column="0" Content="W" Command="{Binding MountSlewWestCommand}" FontWeight="Bold" Margin="1" Width="36" Height="36" IsEnabled="{Binding IsMountConnected}"/>
-                                    <Button Grid.Row="1" Grid.Column="1" Content="■" Command="{Binding MountStopCommand}" FontSize="10" Foreground="{StaticResource Brush.Accent}" Margin="1" Width="36" Height="36" IsEnabled="{Binding IsMountConnected}"/>
-                                    <Button Grid.Row="1" Grid.Column="2" Content="E" Command="{Binding MountSlewEastCommand}" FontWeight="Bold" Margin="1" Width="36" Height="36" IsEnabled="{Binding IsMountConnected}"/>
-                                    <Button Grid.Row="2" Grid.Column="1" Content="S" Command="{Binding MountSlewSouthCommand}" FontWeight="Bold" Margin="1" Width="36" Height="36" IsEnabled="{Binding IsMountConnected}"/>
-                                </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
 
-                                <Grid Margin="0,0,0,4">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="80"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Slew Rate" FontSize="10" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}"/>
-                                    <ComboBox Grid.Column="1" ItemsSource="{Binding MountSlewRates}" SelectedItem="{Binding MountSelectedSlewRate}" IsEnabled="{Binding IsMountConnected}"/>
-                                </Grid>
+                                <!-- Left: Directional Pad -->
+                                <StackPanel VerticalAlignment="Top" Margin="0,0,16,0">
+                                    <TextBlock Text="{DynamicResource Mt.ManualSlew}" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource Brush.Primary}" Margin="0,0,0,6" HorizontalAlignment="Center"/>
+                                    <Grid HorizontalAlignment="Center">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="40"/>
+                                            <ColumnDefinition Width="40"/>
+                                            <ColumnDefinition Width="40"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="40"/>
+                                            <RowDefinition Height="40"/>
+                                            <RowDefinition Height="40"/>
+                                        </Grid.RowDefinitions>
+                                        <Button Grid.Row="0" Grid.Column="1" Content="N" Command="{Binding MountSlewNorthCommand}" FontWeight="Bold" Margin="1" IsEnabled="{Binding MountAtPark, Converter={StaticResource InverseBool}}"/>
+                                        <Button Grid.Row="1" Grid.Column="0" Content="W" Command="{Binding MountSlewWestCommand}" FontWeight="Bold" Margin="1" IsEnabled="{Binding MountAtPark, Converter={StaticResource InverseBool}}"/>
+                                        <Button Grid.Row="1" Grid.Column="1" Content="■" Command="{Binding MountStopCommand}" FontSize="12" Foreground="{StaticResource Brush.Accent}" Margin="1"/>
+                                        <Button Grid.Row="1" Grid.Column="2" Content="E" Command="{Binding MountSlewEastCommand}" FontWeight="Bold" Margin="1" IsEnabled="{Binding MountAtPark, Converter={StaticResource InverseBool}}"/>
+                                        <Button Grid.Row="2" Grid.Column="1" Content="S" Command="{Binding MountSlewSouthCommand}" FontWeight="Bold" Margin="1" IsEnabled="{Binding MountAtPark, Converter={StaticResource InverseBool}}"/>
+                                    </Grid>
+                                    <Grid Margin="0,8,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{DynamicResource Mt.SlewRate}" FontSize="10" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}" Margin="0,0,6,0"/>
+                                        <ComboBox Grid.Column="1" ItemsSource="{Binding MountSlewRates}" SelectedItem="{Binding MountSelectedSlewRate}" MinWidth="60"/>
+                                    </Grid>
+                                </StackPanel>
 
-                                <WrapPanel Orientation="Horizontal" Margin="0,8,0,0">
-                                    <Button Command="{Binding MountParkCommand}" Margin="0,0,8,4" Padding="12,6" IsEnabled="{Binding IsMountConnected}">
+                                <!-- Right: Park / Home / Tracking -->
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <Button Command="{Binding MountToggleParkCommand}" Padding="16,8" Margin="0,0,0,8" HorizontalAlignment="Stretch">
                                         <Button.Style>
                                             <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-                                                <Setter Property="Content" Value="Park"/>
+                                                <Setter Property="Content" Value="{DynamicResource Mt.Park}"/>
                                                 <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding MountIsTracking}" Value="False">
-                                                        <Setter Property="Content" Value="Unpark"/>
+                                                    <DataTrigger Binding="{Binding MountAtPark}" Value="True">
+                                                        <Setter Property="Content" Value="{DynamicResource Mt.Unpark}"/>
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
                                         </Button.Style>
                                     </Button>
-                                    <Button Content="Home" Command="{Binding MountFindHomeCommand}" Margin="0,0,8,4" Padding="12,6" IsEnabled="{Binding IsMountConnected}"/>
-                                    <ToggleButton Content="Tracking" IsChecked="{Binding MountIsTracking}" Command="{Binding MountToggleTrackingCommand}" Margin="0,0,8,4" Padding="12,6" IsEnabled="{Binding IsMountConnected}"/>
-                                </WrapPanel>
-                            </StackPanel>
+                                    <Button Content="{DynamicResource Mt.Home}" Command="{Binding MountFindHomeCommand}" Padding="16,8" Margin="0,0,0,8" HorizontalAlignment="Stretch"
+                                            IsEnabled="{Binding MountAtPark, Converter={StaticResource InverseBool}}"/>
+                                    <ToggleButton Content="{DynamicResource Mt.Tracking}" IsChecked="{Binding MountIsTracking}" Command="{Binding MountToggleTrackingCommand}" Padding="16,8" HorizontalAlignment="Stretch"
+                                                  IsEnabled="{Binding MountAtPark, Converter={StaticResource InverseBool}}"/>
+                                </StackPanel>
+                            </Grid>
                         </Border>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
 
-            <TabItem Header="FOCUSER">
+            <TabItem Header="{DynamicResource Eq.Focuser}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,8,0,0">
                     <StackPanel>
                         <Border Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="3" Padding="16">
@@ -262,8 +272,8 @@
                                 <ComboBox ItemsSource="{Binding AvailableFocusers}" SelectedItem="{Binding SelectedFocuser}"
                                           DisplayMemberPath="Name" Margin="0,0,8,0"/>
                                 <StackPanel Grid.Column="1" Orientation="Horizontal">
-                                    <Button Content="Settings" Command="{Binding OpenFocuserSettingsCommand}" Margin="0,0,8,0"/>
-                                    <Button Content="Refresh" Command="{Binding RefreshFocusersCommand}" Margin="0,0,8,0"/>
+                                    <Button Content="{DynamicResource Eq.Settings}" Command="{Binding OpenFocuserSettingsCommand}" Margin="0,0,8,0"/>
+                                    <Button Content="{DynamicResource Eq.Refresh}" Command="{Binding RefreshFocusersCommand}" Margin="0,0,8,0"/>
                                     <Button Command="{Binding ToggleFocuserConnectionCommand}">
                                         <Button.Style>
                                             <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
@@ -286,7 +296,7 @@
                                 <TextBlock Text="{Binding FocuserStatus}" Foreground="{StaticResource Brush.TextSecondary}" Margin="0,0,0,12"/>
                                 <UniformGrid Columns="3" Margin="0,0,0,16">
                                     <StackPanel Margin="0,0,16,0">
-                                        <TextBlock Text="Position" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                        <TextBlock Text="{DynamicResource Foc.Position}" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}"/>
                                         <TextBlock FontSize="18">
                                             <Run Text="{Binding FocuserPosition}"/>
                                             <Run Text="/" Foreground="{StaticResource Brush.TextSecondary}"/>
@@ -294,15 +304,15 @@
                                         </TextBlock>
                                     </StackPanel>
                                     <StackPanel Margin="0,0,16,0">
-                                        <TextBlock Text="Temperature (°C)" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                        <TextBlock Text="{DynamicResource Foc.Temperature}" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}"/>
                                         <TextBlock Text="{Binding FocuserTemperature, StringFormat=F2}" FontSize="18"/>
                                     </StackPanel>
                                     <StackPanel>
-                                        <TextBlock Text="Moving" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                        <TextBlock Text="{DynamicResource Foc.Moving}" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}"/>
                                         <TextBlock Text="{Binding FocuserIsMoving}" FontSize="18"/>
                                     </StackPanel>
                                 </UniformGrid>
-                                <TextBlock Text="Manual move" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource Brush.Primary}" Margin="0,0,0,8"/>
+                                <TextBlock Text="{DynamicResource Foc.ManualMove}" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource Brush.Primary}" Margin="0,0,0,8"/>
                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
                                     <Button Content="&lt;&lt;" Command="{Binding FocuserJogCommand}" CommandParameter="-500" Width="44" Margin="0,0,8,0"/>
                                     <Button Content="&lt;" Command="{Binding FocuserJogCommand}" CommandParameter="-50" Width="44" Margin="0,0,8,0"/>
@@ -313,9 +323,9 @@
                                     <Button Content="&gt;&gt;" Command="{Binding FocuserJogCommand}" CommandParameter="500" Width="44"/>
                                 </StackPanel>
                                 <StackPanel Orientation="Horizontal" Margin="0,16,0,0" VerticalAlignment="Center">
-                                    <TextBlock Text="Target" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                    <TextBlock Text="{DynamicResource Foc.Target}" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="{StaticResource Brush.TextSecondary}"/>
                                     <TextBox Width="100" Text="{Binding FocuserTargetPosition, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,8,0"/>
-                                    <Button Content="Go" Command="{Binding MoveFocuserToTargetCommand}"/>
+                                    <Button Content="{DynamicResource Foc.Go}" Command="{Binding MoveFocuserToTargetCommand}"/>
                                 </StackPanel>
                             </StackPanel>
                         </Border>
@@ -323,7 +333,7 @@
                 </ScrollViewer>
             </TabItem>
 
-            <TabItem Header="FILTER WHEEL">
+            <TabItem Header="{DynamicResource Eq.FilterWheel}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,8,0,0">
                     <StackPanel>
                         <Border Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="3" Padding="16">
@@ -335,8 +345,8 @@
                                 <ComboBox ItemsSource="{Binding AvailableFilterWheels}" SelectedItem="{Binding SelectedFilterWheel}"
                                           DisplayMemberPath="Name" Margin="0,0,8,0"/>
                                 <StackPanel Grid.Column="1" Orientation="Horizontal">
-                                    <Button Content="Settings" Command="{Binding OpenFilterWheelSettingsCommand}" Margin="0,0,8,0"/>
-                                    <Button Content="Refresh" Command="{Binding RefreshFilterWheelsCommand}" Margin="0,0,8,0"/>
+                                    <Button Content="{DynamicResource Eq.Settings}" Command="{Binding OpenFilterWheelSettingsCommand}" Margin="0,0,8,0"/>
+                                    <Button Content="{DynamicResource Eq.Refresh}" Command="{Binding RefreshFilterWheelsCommand}" Margin="0,0,8,0"/>
                                     <Button Command="{Binding ToggleFilterWheelConnectionCommand}">
                                         <Button.Style>
                                             <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
@@ -357,7 +367,7 @@
                         <Border Margin="0,16,0,0" Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="3" Padding="16">
                             <StackPanel>
                                 <TextBlock Text="{Binding FilterWheelStatus}" Foreground="{StaticResource Brush.TextSecondary}" Margin="0,0,0,12"/>
-                                <TextBlock Text="Current filter" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource Brush.Primary}" Margin="0,0,0,8"/>
+                                <TextBlock Text="{DynamicResource Fw.CurrentFilter}" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource Brush.Primary}" Margin="0,0,0,8"/>
                                 <TextBlock Text="{Binding CurrentFilterName}" FontSize="18" Margin="0,0,0,16"/>
                                 <ItemsControl ItemsSource="{Binding FilterSlots}" Margin="0,4,0,0" MaxHeight="320">
                                     <ItemsControl.ItemTemplate>
@@ -371,7 +381,7 @@
                                                     </Grid.ColumnDefinitions>
                                                     <TextBlock Text="{Binding Index}" Foreground="{DynamicResource Brush.TextSecondary}" VerticalAlignment="Center"/>
                                                     <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center"/>
-                                                    <Button Grid.Column="2" Content="Select" Padding="8,2"
+                                                    <Button Grid.Column="2" Content="{DynamicResource Fw.Select}" Padding="8,2"
                                                             Command="{Binding DataContext.SelectFilterSlotCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                             CommandParameter="{Binding Index}"/>
                                                 </Grid>
