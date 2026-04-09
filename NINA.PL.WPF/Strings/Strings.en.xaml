@@ -98,4 +98,5 @@
     <sys:String x:Key="Cap.ApplyROI">Apply ROI</sys:String>
     <sys:String x:Key="Cap.ResetROI">Reset ROI</sys:String>
     <sys:String x:Key="Cap.Crosshair">Crosshair</sys:String>
+    <sys:String x:Key="Cap.LiveView">Live View</sys:String>
 </ResourceDictionary>

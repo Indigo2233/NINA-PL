@@ -98,4 +98,5 @@
     <sys:String x:Key="Cap.ApplyROI">应用 ROI</sys:String>
     <sys:String x:Key="Cap.ResetROI">重置 ROI</sys:String>
     <sys:String x:Key="Cap.Crosshair">十字准线</sys:String>
+    <sys:String x:Key="Cap.LiveView">实时预览</sys:String>
 </ResourceDictionary>

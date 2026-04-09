@@ -53,6 +53,9 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
 
         RefreshCameraDisplayName();
         RebuildFilterQuickList();
+
+        if (_camera.IsConnected)
+            _ = StartLiveViewInternalAsync();
     }
 
     [ObservableProperty]
@@ -151,6 +154,9 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
 
     [ObservableProperty]
     private double liveImageZoom = 1.0;
+
+    [ObservableProperty]
+    private bool isLiveViewActive;
 
     partial void OnFrameLimitChanged(int value)
     {
@@ -290,6 +296,11 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
             {
                 RefreshCameraDisplayName();
                 RebuildFilterQuickList();
+
+                if (_camera.IsConnected && !IsLiveViewActive)
+                    _ = StartLiveViewInternalAsync();
+                else if (!_camera.IsConnected && IsLiveViewActive)
+                    _ = StopLiveViewInternalAsync();
             });
         }
     }
@@ -517,6 +528,49 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
         }
 
         RebuildFilterQuickList();
+    }
+
+    [RelayCommand]
+    private async Task ToggleLiveViewAsync()
+    {
+        if (IsLiveViewActive)
+            await StopLiveViewInternalAsync().ConfigureAwait(true);
+        else
+            await StartLiveViewInternalAsync().ConfigureAwait(true);
+    }
+
+    private async Task StartLiveViewInternalAsync()
+    {
+        ICameraProvider? cam = _camera.GetConnectedProvider();
+        if (cam is null || !cam.IsConnected) return;
+        try
+        {
+            ApplyCameraExposureGain();
+            await cam.StartCaptureAsync().ConfigureAwait(true);
+            IsLiveViewActive = true;
+        }
+        catch (Exception ex)
+        {
+            Logger.Warn(ex, "Failed to start live view.");
+        }
+    }
+
+    private async Task StopLiveViewInternalAsync()
+    {
+        ICameraProvider? cam = _camera.GetConnectedProvider();
+        if (cam is null) return;
+        try
+        {
+            await cam.StopCaptureAsync().ConfigureAwait(true);
+        }
+        catch (Exception ex)
+        {
+            Logger.Warn(ex, "Failed to stop live view.");
+        }
+        finally
+        {
+            IsLiveViewActive = false;
+        }
     }
 
     public void Dispose()

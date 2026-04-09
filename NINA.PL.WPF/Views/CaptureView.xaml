@@ -138,7 +138,18 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <StackPanel Grid.Column="0" Orientation="Vertical" HorizontalAlignment="Center" Margin="0,0,24,0">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,24,0">
+                    <!-- Live View toggle -->
+                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,0,16,0">
+                        <ToggleButton Width="56" Height="56" IsChecked="{Binding IsLiveViewActive, Mode=OneWay}" Command="{Binding ToggleLiveViewCommand}"
+                                      ToolTip="Live View" Padding="0">
+                            <TextBlock Text="▶" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </ToggleButton>
+                        <TextBlock Text="{DynamicResource Cap.LiveView}" FontSize="9" HorizontalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}" Margin="0,4,0,0"/>
+                    </StackPanel>
+
+                    <!-- Record button -->
+                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
                     <Button Width="80" Height="80" Command="{Binding StartCaptureCommand}" IsEnabled="{Binding IsCapturing, Converter={StaticResource InverseBool}}">
                         <Button.Style>
                             <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
@@ -180,6 +191,7 @@
                     </Border>
                     <TextBlock Text="{DynamicResource Cap.Record}" FontSize="9" HorizontalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}" Margin="0,2,0,0"/>
                     <Button Content="{DynamicResource Cap.Stop}" Command="{Binding StopCaptureCommand}" Margin="0,8,0,0" HorizontalAlignment="Center" MinWidth="72"/>
+                    </StackPanel>
                 </StackPanel>
                 <Grid Grid.Column="1">
                     <Grid.RowDefinitions>
