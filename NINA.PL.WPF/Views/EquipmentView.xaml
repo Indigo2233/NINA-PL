@@ -68,61 +68,63 @@
                                 <!-- Gain -->
                                 <Grid Margin="0,0,0,8">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="90"/>
+                                        <ColumnDefinition Width="100"/>
+                                        <ColumnDefinition Width="100"/>
                                         <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="70"/>
-                                        <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Text="Gain" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}"/>
-                                    <Slider Grid.Column="1" Minimum="{Binding CameraGainMin}" Maximum="{Binding CameraGainMax}"
-                                            Value="{Binding CameraGain}" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                    <TextBox Grid.Column="2" Text="{Binding CameraGain, StringFormat=F0, UpdateSourceTrigger=PropertyChanged}"
-                                             VerticalAlignment="Center"/>
-                                    <Button Grid.Column="3" Content="Set" Command="{Binding ApplyCameraGainCommand}" Padding="8,4" Margin="4,0,0,0"/>
+                                    <TextBox Grid.Column="1" Text="{Binding CameraGain, UpdateSourceTrigger=LostFocus}" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}" Margin="8,0" FontSize="11">
+                                        <TextBlock.Text>
+                                            <MultiBinding StringFormat="({0:F0} – {1:F0})">
+                                                <Binding Path="CameraGainMin"/>
+                                                <Binding Path="CameraGainMax"/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
                                 </Grid>
 
                                 <!-- Exposure -->
                                 <Grid Margin="0,0,0,8">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="90"/>
+                                        <ColumnDefinition Width="100"/>
+                                        <ColumnDefinition Width="100"/>
                                         <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="70"/>
-                                        <ColumnDefinition Width="30"/>
-                                        <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Text="Exposure (µs)" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}"/>
-                                    <Slider Grid.Column="1" Minimum="{Binding CameraExposureMin}" Maximum="{Binding CameraExposureMax}"
-                                            Value="{Binding CameraExposureUs}" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                    <TextBox Grid.Column="2" Text="{Binding CameraExposureUs, StringFormat=F0, UpdateSourceTrigger=PropertyChanged}"
-                                             VerticalAlignment="Center"/>
-                                    <TextBlock Grid.Column="3" Text="µs" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}" Margin="4,0"/>
-                                    <Button Grid.Column="4" Content="Set" Command="{Binding ApplyCameraExposureCommand}" Padding="8,4"/>
+                                    <TextBox Grid.Column="1" Text="{Binding CameraExposureUs, UpdateSourceTrigger=LostFocus}" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}" Margin="8,0" FontSize="11">
+                                        <TextBlock.Text>
+                                            <MultiBinding StringFormat="({0:F0} – {1:F0})">
+                                                <Binding Path="CameraExposureMin"/>
+                                                <Binding Path="CameraExposureMax"/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
                                 </Grid>
 
                                 <!-- Binning -->
                                 <Grid Margin="0,0,0,8">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="90"/>
-                                        <ColumnDefinition Width="70"/>
-                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="100"/>
+                                        <ColumnDefinition Width="100"/>
+                                        <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Text="Binning" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}"/>
-                                    <TextBox Grid.Column="1" Text="{Binding CameraBinning, UpdateSourceTrigger=PropertyChanged}"
-                                             VerticalAlignment="Center"/>
-                                    <Button Grid.Column="2" Content="Set" Command="{Binding ApplyCameraBinningCommand}" Padding="8,4" Margin="4,0,0,0"/>
+                                    <TextBox Grid.Column="1" Text="{Binding CameraBinning, UpdateSourceTrigger=LostFocus}" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2" Text="{Binding CameraMaxBin, StringFormat='(max {0})'}" VerticalAlignment="Center"
+                                               Foreground="{StaticResource Brush.TextSecondary}" Margin="8,0" FontSize="11"/>
                                 </Grid>
 
                                 <!-- Pixel Format -->
                                 <Grid Margin="0,0,0,4">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="90"/>
+                                        <ColumnDefinition Width="100"/>
                                         <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Text="Pixel Format" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}"/>
                                     <ComboBox Grid.Column="1" ItemsSource="{Binding CameraPixelFormats}"
-                                              SelectedItem="{Binding CameraSelectedPixelFormat}" Margin="0,0,8,0"/>
-                                    <Button Grid.Column="2" Content="Set" Command="{Binding ApplyCameraPixelFormatCommand}" Padding="8,4"/>
+                                              SelectedItem="{Binding CameraSelectedPixelFormat}"/>
                                 </Grid>
                             </StackPanel>
                         </Border>

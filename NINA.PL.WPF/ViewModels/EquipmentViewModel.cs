@@ -438,29 +438,26 @@ public sealed partial class EquipmentViewModel : ObservableObject
     {
     }
 
-    [RelayCommand]
-    private void ApplyCameraGain()
+    partial void OnCameraGainChanged(double value)
     {
-        _camera.GetConnectedProvider()?.SetGain(CameraGain);
+        _camera.GetConnectedProvider()?.SetGain(value);
     }
 
-    [RelayCommand]
-    private void ApplyCameraExposure()
+    partial void OnCameraExposureUsChanged(double value)
     {
-        _camera.GetConnectedProvider()?.SetExposure(CameraExposureUs);
+        _camera.GetConnectedProvider()?.SetExposure(value);
     }
 
-    [RelayCommand]
-    private void ApplyCameraBinning()
+    partial void OnCameraBinningChanged(int value)
     {
-        _camera.GetConnectedProvider()?.SetBinning(CameraBinning, CameraBinning);
+        if (value >= 1)
+            _camera.GetConnectedProvider()?.SetBinning(value, value);
     }
 
-    [RelayCommand]
-    private void ApplyCameraPixelFormat()
+    partial void OnCameraSelectedPixelFormatChanged(string? value)
     {
-        if (CameraSelectedPixelFormat is not null)
-            _camera.GetConnectedProvider()?.SetPixelFormat(CameraSelectedPixelFormat);
+        if (value is not null)
+            _camera.GetConnectedProvider()?.SetPixelFormat(value);
     }
 
     [RelayCommand]
