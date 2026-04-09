@@ -15,4 +15,6 @@ public sealed class CameraDeviceInfo
     public string DriverType { get; init; } = string.Empty;
 
     public string Description { get; init; } = string.Empty;
+
+    public override string ToString() => Name;
 }

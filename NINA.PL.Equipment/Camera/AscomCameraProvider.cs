@@ -224,19 +224,38 @@ public sealed class AscomCameraProvider : ICameraProvider
             }
             else if (raw is IEnumerable enumerable)
             {
-                foreach (var item in enumerable)
+                foreach (dynamic item in enumerable)
                 {
-                    var s = item?.ToString();
-                    if (string.IsNullOrWhiteSpace(s))
-                        continue;
-                    list.Add(new CameraDeviceInfo
+                    try
                     {
-                        Id = DeviceIdPrefix + s,
-                        Name = s,
-                        SerialNumber = string.Empty,
-                        DriverType = DriverType,
-                        Description = "ASCOM Camera"
-                    });
+                        string key = item.Key?.ToString() ?? string.Empty;
+                        string val = item.Value?.ToString() ?? key;
+                        if (string.IsNullOrWhiteSpace(key))
+                            continue;
+                        list.Add(new CameraDeviceInfo
+                        {
+                            Id = DeviceIdPrefix + key,
+                            Name = string.IsNullOrWhiteSpace(val) ? key : val,
+                            SerialNumber = string.Empty,
+                            DriverType = DriverType,
+                            Description = key
+                        });
+                    }
+                    catch
+                    {
+                        var s = item?.ToString() ?? string.Empty;
+                        if (!string.IsNullOrWhiteSpace(s) && s != "System.__ComObject")
+                        {
+                            list.Add(new CameraDeviceInfo
+                            {
+                                Id = DeviceIdPrefix + s,
+                                Name = s,
+                                SerialNumber = string.Empty,
+                                DriverType = DriverType,
+                                Description = "ASCOM Camera"
+                            });
+                        }
+                    }
                 }
             }
 

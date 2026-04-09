@@ -10,4 +10,6 @@ public sealed class FocuserDeviceInfo
     public required string Name { get; init; }
 
     public string DriverType { get; init; } = string.Empty;
+
+    public string Description { get; init; } = string.Empty;
 }

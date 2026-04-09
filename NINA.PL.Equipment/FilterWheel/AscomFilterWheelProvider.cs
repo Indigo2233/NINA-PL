@@ -100,8 +100,39 @@ public sealed class AscomFilterWheelProvider : IFilterWheelProvider
             }
             else if (raw is IEnumerable enumerable)
             {
-                foreach (var item in enumerable)
-                    AddId(item?.ToString());
+                foreach (dynamic item in enumerable)
+                {
+                    try
+                    {
+                        string key = item.Key?.ToString() ?? string.Empty;
+                        string val = item.Value?.ToString() ?? key;
+                        if (string.IsNullOrWhiteSpace(key))
+                            continue;
+                        list.Add(new FilterWheelDeviceInfo
+                        {
+                            Id = DeviceIdPrefix + key,
+                            Name = string.IsNullOrWhiteSpace(val) ? key : val,
+                            DriverType = DriverType,
+                            Description = key,
+                            FilterNames = []
+                        });
+                    }
+                    catch
+                    {
+                        var s = item?.ToString() ?? string.Empty;
+                        if (!string.IsNullOrWhiteSpace(s) && s != "System.__ComObject")
+                        {
+                            list.Add(new FilterWheelDeviceInfo
+                            {
+                                Id = DeviceIdPrefix + s,
+                                Name = s,
+                                DriverType = DriverType,
+                                Description = "ASCOM device",
+                                FilterNames = []
+                            });
+                        }
+                    }
+                }
             }
 
             Marshal.FinalReleaseComObject(profile);

@@ -13,5 +13,7 @@ public sealed class FilterWheelDeviceInfo
 
     public string DriverType { get; init; } = string.Empty;
 
+    public string Description { get; init; } = string.Empty;
+
     public IReadOnlyList<string> FilterNames { get; init; } = [];
 }
