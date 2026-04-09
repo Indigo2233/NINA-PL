@@ -12,6 +12,9 @@ using NINA.PL.Core;
 using CoreLogger = NINA.PL.Core.Logger;
 using NINA.PL.Equipment.Camera;
 using NINA.PL.Equipment.Camera.Sdk;
+using NINA.PL.Equipment.Mount;
+using NINA.PL.Equipment.Focuser;
+using NINA.PL.Equipment.FilterWheel;
 using NINA.PL.Guider;
 using NINA.PL.LiveStack;
 using NINA.PL.WPF.ViewModels;
@@ -53,15 +56,35 @@ public partial class App : Application
 
         RegisterNativeCameraBackends();
         services.AddSingleton(_ => new NativeCameraProvider(NativeBackendFactory.CreateAllBackends()));
+        services.AddSingleton<AscomCameraProvider>();
+        services.AddSingleton<AscomMountProvider>();
+        services.AddSingleton<AscomFocuserProvider>();
+        services.AddSingleton<AscomFilterWheelProvider>();
         services.AddSingleton(provider =>
         {
             var mediator = new CameraMediator();
             mediator.RegisterProvider(provider.GetRequiredService<NativeCameraProvider>());
+            mediator.RegisterProvider(provider.GetRequiredService<AscomCameraProvider>());
             return mediator;
         });
-        services.AddSingleton<MountMediator>();
-        services.AddSingleton<FocuserMediator>();
-        services.AddSingleton<FilterWheelMediator>();
+        services.AddSingleton(provider =>
+        {
+            var mediator = new MountMediator();
+            mediator.RegisterProvider(provider.GetRequiredService<AscomMountProvider>());
+            return mediator;
+        });
+        services.AddSingleton(provider =>
+        {
+            var mediator = new FocuserMediator();
+            mediator.RegisterProvider(provider.GetRequiredService<AscomFocuserProvider>());
+            return mediator;
+        });
+        services.AddSingleton(provider =>
+        {
+            var mediator = new FilterWheelMediator();
+            mediator.RegisterProvider(provider.GetRequiredService<AscomFilterWheelProvider>());
+            return mediator;
+        });
         services.AddSingleton<FlatDeviceMediator>();
         services.AddSingleton<SwitchMediator>();
         services.AddSingleton<RotatorMediator>();
