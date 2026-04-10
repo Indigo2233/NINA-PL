@@ -26,7 +26,6 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
     private readonly CaptureEngine _capture;
     private readonly Dispatcher _dispatcher;
     private readonly DispatcherTimer _statsTimer;
-    private bool _exposureSliderDrive;
     private int _lastFramePayloadBytes;
     private int _frameRenderBusy;
 
@@ -105,10 +104,6 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     private double exposureMicroseconds = 10_000;
 
-    /// <summary>Normalized 0–1 slider position for logarithmic exposure mapping.</summary>
-    [ObservableProperty]
-    private double exposureSliderValue;
-
     [ObservableProperty]
     private double gain;
 
@@ -123,6 +118,19 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
 
     [ObservableProperty]
     private double gainMax = 100;
+
+    public double ExposureMs
+    {
+        get => ExposureMicroseconds / 1000.0;
+        set
+        {
+            ExposureMicroseconds = value * 1000.0;
+            OnPropertyChanged();
+        }
+    }
+
+    public double ExposureMinMs => ExposureMin / 1000.0;
+    public double ExposureMaxMs => ExposureMax / 1000.0;
 
     [ObservableProperty]
     private int roiOffsetX;
@@ -184,62 +192,17 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
 
     partial void OnExposureMicrosecondsChanged(double value)
     {
-        SyncExposureSliderFromModel();
+        OnPropertyChanged(nameof(ExposureMs));
         ApplyCameraExposureGain();
     }
 
-    partial void OnExposureSliderValueChanged(double value)
-    {
-        if (_exposureSliderDrive)
-            return;
+    partial void OnExposureMinChanged(double value) => OnPropertyChanged(nameof(ExposureMinMs));
 
-        double min = Math.Max(ExposureMin, 1e-3);
-        double max = Math.Max(ExposureMax, min * 1.001);
-        if (max <= min * 1.0001)
-        {
-            ExposureMicroseconds = min;
-            return;
-        }
-
-        double logMin = Math.Log(min);
-        double logMax = Math.Log(max);
-        double exp = Math.Exp(logMin + Math.Clamp(value, 0, 1) * (logMax - logMin));
-        if (Math.Abs(exp - ExposureMicroseconds) > 0.5)
-            ExposureMicroseconds = exp;
-    }
-
-    partial void OnExposureMinChanged(double value) => SyncExposureSliderFromModel();
-
-    partial void OnExposureMaxChanged(double value) => SyncExposureSliderFromModel();
+    partial void OnExposureMaxChanged(double value) => OnPropertyChanged(nameof(ExposureMaxMs));
 
     partial void OnGainChanged(double value)
     {
         ApplyCameraExposureGain();
-    }
-
-    private void SyncExposureSliderFromModel()
-    {
-        double min = Math.Max(ExposureMin, 1e-3);
-        double max = Math.Max(ExposureMax, min * 1.001);
-        _exposureSliderDrive = true;
-        try
-        {
-            if (max <= min * 1.0001)
-            {
-                ExposureSliderValue = 0;
-                return;
-            }
-
-            double v = Math.Clamp(ExposureMicroseconds, min, max);
-            double logMin = Math.Log(min);
-            double logMax = Math.Log(max);
-            double t = (Math.Log(v) - logMin) / (logMax - logMin);
-            ExposureSliderValue = Math.Clamp(t, 0, 1);
-        }
-        finally
-        {
-            _exposureSliderDrive = false;
-        }
     }
 
     private void ApplyCameraExposureGain()
@@ -267,7 +230,6 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
         ExposureMax = cam.ExposureMax;
         GainMin = cam.GainMin;
         GainMax = cam.GainMax;
-        SyncExposureSliderFromModel();
     }
 
     private void RefreshCameraDisplayName()

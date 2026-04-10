@@ -52,11 +52,41 @@
                 <GroupBox Header="{DynamicResource Cap.Camera}" Margin="0,0,0,16">
                     <StackPanel>
                         <TextBlock Text="{Binding ConnectedCameraDisplayName}" FontWeight="SemiBold" Margin="0,0,0,4"/>
-                        <TextBlock Text="{Binding CameraSensorLine}" Foreground="{StaticResource Brush.TextSecondary}" TextWrapping="Wrap"/>
-                        <Label Content="{Binding ExposureMicroseconds, StringFormat=Exposure (µs): {0:F0}}"/>
-                        <Slider Minimum="0" Maximum="1" Value="{Binding ExposureSliderValue, Mode=TwoWay}" TickFrequency="0.01"/>
-                        <Label Content="{Binding Gain, StringFormat=Gain: {0:F1}}"/>
-                        <Slider Minimum="{Binding GainMin}" Maximum="{Binding GainMax}" Value="{Binding Gain, Mode=TwoWay}" TickFrequency="0.5"/>
+                        <TextBlock Text="{Binding CameraSensorLine}" Foreground="{StaticResource Brush.TextSecondary}" TextWrapping="Wrap" Margin="0,0,0,8"/>
+                        <Grid Margin="0,0,0,6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{DynamicResource Cap.ExposureMs}" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}"/>
+                            <TextBox Grid.Column="1" Text="{Binding ExposureMs, UpdateSourceTrigger=LostFocus}" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="2" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}" Margin="8,0" FontSize="11">
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="({0:F1} – {1:F1} ms)">
+                                        <Binding Path="ExposureMinMs"/>
+                                        <Binding Path="ExposureMaxMs"/>
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </Grid>
+                        <Grid Margin="0,0,0,6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{DynamicResource Cam.Gain}" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}"/>
+                            <TextBox Grid.Column="1" Text="{Binding Gain, UpdateSourceTrigger=LostFocus}" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="2" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}" Margin="8,0" FontSize="11">
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="({0:F0} – {1:F0})">
+                                        <Binding Path="GainMin"/>
+                                        <Binding Path="GainMax"/>
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </Grid>
                         <TextBlock Text="{DynamicResource Cap.ROI}" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource Brush.Primary}" Margin="0,12,0,8"/>
                         <UniformGrid Columns="2">
                             <StackPanel Margin="0,0,8,8">
