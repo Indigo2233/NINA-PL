@@ -260,6 +260,14 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
         ExposureMax = cam.ExposureMax;
         GainMin = cam.GainMin;
         GainMax = cam.GainMax;
+
+        if (RoiWidth == 0 || RoiHeight == 0 || (RoiWidth == 640 && RoiHeight == 480 && cam.SensorWidth > 640))
+        {
+            RoiOffsetX = 0;
+            RoiOffsetY = 0;
+            RoiWidth = cam.SensorWidth;
+            RoiHeight = cam.SensorHeight;
+        }
     }
 
     private void RefreshCameraDisplayName()
@@ -287,8 +295,21 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
             {
                 RefreshCameraDisplayName();
                 RebuildFilterQuickList();
+                RefreshCameraLimits();
 
-                if (!_camera.IsConnected && IsLiveViewActive)
+                if (_camera.IsConnected)
+                {
+                    var cam = _camera.GetConnectedProvider();
+                    if (cam is not null)
+                    {
+                        RoiOffsetX = 0;
+                        RoiOffsetY = 0;
+                        RoiWidth = cam.SensorWidth;
+                        RoiHeight = cam.SensorHeight;
+                        try { cam.ResetROI(); } catch { /* ignore */ }
+                    }
+                }
+                else if (IsLiveViewActive)
                     IsLiveViewActive = false;
             });
         }
