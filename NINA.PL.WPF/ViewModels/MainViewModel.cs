@@ -141,7 +141,8 @@ public sealed partial class MainViewModel : ObservableObject
         double fps = _captureEngine.IsCapturing ? Capture.CurrentFps : Capture.LiveFps;
         string fpsPart = $"{fps:F1} FPS";
         string rec = _captureEngine.IsCapturing ? "● REC" : Capture.IsLiveViewActive ? "▶ Live" : "Idle";
+        int frames = _captureEngine.IsCapturing ? Capture.FramesCaptured : Capture.LiveFramesTotal;
         StatusBarText =
-            $"{cam}  |  {fpsPart}  |  Frames: {Capture.FramesCaptured}  |  Dropped: {Capture.FramesDropped}  |  {rec}  |  Mount: {mnt}";
+            $"{cam}  |  {fpsPart}  |  Frames: {frames}  |  Dropped: {Capture.FramesDropped}  |  {rec}  |  Mount: {mnt}";
     }
 }

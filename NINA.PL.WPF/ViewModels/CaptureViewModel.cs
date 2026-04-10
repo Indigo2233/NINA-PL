@@ -31,6 +31,7 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
     private long _lastFrameRenderTicks;
     private int _liveFrameCount;
     private long _liveFpsWindowStart;
+    private long _liveTotalReceived;
 
     public CaptureViewModel(CameraMediator camera, FilterWheelMediator filterWheel, CaptureEngine capture)
     {
@@ -170,6 +171,9 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
 
     [ObservableProperty]
     private double liveFps;
+
+    [ObservableProperty]
+    private int liveFramesTotal;
 
     partial void OnFrameLimitChanged(int value)
     {
@@ -315,7 +319,28 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
     {
         _lastFramePayloadBytes = frame.Data.Length;
 
+        int count = Interlocked.Increment(ref _liveFrameCount);
+        Interlocked.Increment(ref _liveTotalReceived);
+
         long now = DateTime.UtcNow.Ticks;
+        long windowStart = Interlocked.Read(ref _liveFpsWindowStart);
+        if (windowStart == 0)
+            Interlocked.CompareExchange(ref _liveFpsWindowStart, now, 0);
+
+        long elapsed = now - Interlocked.Read(ref _liveFpsWindowStart);
+        if (elapsed > TimeSpan.TicksPerSecond)
+        {
+            double fps = count / (elapsed / (double)TimeSpan.TicksPerSecond);
+            long total = Interlocked.Read(ref _liveTotalReceived);
+            Interlocked.Exchange(ref _liveFrameCount, 0);
+            Interlocked.Exchange(ref _liveFpsWindowStart, now);
+            _dispatcher.BeginInvoke(() =>
+            {
+                LiveFps = fps;
+                LiveFramesTotal = (int)total;
+            });
+        }
+
         long prev = Interlocked.Read(ref _lastFrameRenderTicks);
         if (now - prev < MinFrameIntervalTicks)
             return;
@@ -323,25 +348,12 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
             return;
         Interlocked.Exchange(ref _lastFrameRenderTicks, now);
 
-        int count = Interlocked.Increment(ref _liveFrameCount);
-        long windowStart = Interlocked.Read(ref _liveFpsWindowStart);
-        if (windowStart == 0)
-            Interlocked.CompareExchange(ref _liveFpsWindowStart, now, 0);
-
         _dispatcher.BeginInvoke(() =>
         {
             try
             {
                 LiveImage = MatBitmapHelper.FrameToWriteableBitmap(frame);
                 UpdateHistogram(frame);
-
-                long elapsed = DateTime.UtcNow.Ticks - Interlocked.Read(ref _liveFpsWindowStart);
-                if (elapsed > TimeSpan.TicksPerSecond)
-                {
-                    LiveFps = count / (elapsed / (double)TimeSpan.TicksPerSecond);
-                    Interlocked.Exchange(ref _liveFrameCount, 0);
-                    Interlocked.Exchange(ref _liveFpsWindowStart, DateTime.UtcNow.Ticks);
-                }
             }
             finally
             {
