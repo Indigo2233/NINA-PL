@@ -306,7 +306,7 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
                         RoiOffsetY = 0;
                         RoiWidth = cam.SensorWidth;
                         RoiHeight = cam.SensorHeight;
-                        try { cam.ResetROI(); } catch { /* ignore */ }
+                        Task.Run(() => { try { cam.ResetROI(); } catch { /* ignore */ } });
                     }
                 }
                 else if (IsLiveViewActive)
@@ -530,6 +530,113 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
     private void StopCapture()
     {
         _capture.StopCapture();
+    }
+
+    [RelayCommand]
+    private async Task SnapFitsAsync()
+    {
+        ICameraProvider? cam = _camera.GetConnectedProvider();
+        if (cam is null || !cam.IsConnected)
+        {
+            MessageBox.Show("No camera connected.", "Snap", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        FrameData? frame = null;
+        var tcs = new TaskCompletionSource<FrameData>();
+        void Handler(object? s, FrameData f) => tcs.TrySetResult(f);
+        _camera.FrameReceived += Handler;
+        try
+        {
+            bool wasLive = IsLiveViewActive;
+            if (!wasLive)
+                await StartLiveViewInternalAsync();
+
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            cts.Token.Register(() => tcs.TrySetCanceled());
+            frame = await tcs.Task;
+
+            if (!wasLive)
+                await StopLiveViewInternalAsync();
+        }
+        catch (TaskCanceledException)
+        {
+            MessageBox.Show("Timeout waiting for frame.", "Snap", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+        finally
+        {
+            _camera.FrameReceived -= Handler;
+        }
+
+        if (frame is null) return;
+
+        await Task.Run(() =>
+        {
+            try
+            {
+                string dir = Directory.Exists(OutputDirectory) ? OutputDirectory : Path.GetTempPath();
+                Directory.CreateDirectory(dir);
+                string filename = Path.Combine(dir, $"{FilePrefix}_{DateTime.Now:yyyyMMdd_HHmmss}.fits");
+                using Mat mat = Debayer.ToMat(frame);
+                SaveFits(mat, filename);
+                _dispatcher.BeginInvoke(() =>
+                    MessageBox.Show($"Saved: {filename}", "Snap FITS", MessageBoxButton.OK, MessageBoxImage.Information));
+            }
+            catch (Exception ex)
+            {
+                _dispatcher.BeginInvoke(() =>
+                    MessageBox.Show($"Failed to save FITS: {ex.Message}", "Snap", MessageBoxButton.OK, MessageBoxImage.Error));
+            }
+        });
+    }
+
+    private static void SaveFits(Mat mat, string path)
+    {
+        using var fs = new FileStream(path, FileMode.Create, FileAccess.Write);
+        using var bw = new BinaryWriter(fs);
+
+        int naxis = mat.Channels() == 1 ? 2 : 3;
+        int bitpix = mat.Depth() switch
+        {
+            MatType.CV_8U => 8,
+            MatType.CV_16U => 16,
+            MatType.CV_32F => -32,
+            _ => 8
+        };
+
+        var headers = new List<string>
+        {
+            FitsCard("SIMPLE", "T", "FITS standard"),
+            FitsCard("BITPIX", bitpix.ToString(), "bits per pixel"),
+            FitsCard("NAXIS", naxis.ToString(), "number of axes"),
+            FitsCard("NAXIS1", mat.Width.ToString(), "width"),
+            FitsCard("NAXIS2", mat.Height.ToString(), "height"),
+        };
+        if (naxis == 3)
+            headers.Add(FitsCard("NAXIS3", mat.Channels().ToString(), "channels"));
+        headers.Add("END".PadRight(80));
+
+        foreach (var h in headers)
+            bw.Write(System.Text.Encoding.ASCII.GetBytes(h));
+
+        int headerBytes = headers.Count * 80;
+        int pad = (2880 - headerBytes % 2880) % 2880;
+        if (pad > 0) bw.Write(new byte[pad]);
+
+        int total = mat.Rows * mat.Cols * mat.Channels() * mat.ElemSize() / mat.Channels();
+        byte[] data = new byte[total * mat.Channels()];
+        System.Runtime.InteropServices.Marshal.Copy(mat.Data, data, 0, data.Length);
+        bw.Write(data);
+
+        int dataPad = (2880 - data.Length % 2880) % 2880;
+        if (dataPad > 0) bw.Write(new byte[dataPad]);
+    }
+
+    private static string FitsCard(string key, string value, string comment)
+    {
+        string card = $"{key,-8}= {value,20} / {comment}";
+        return card.PadRight(80)[..80];
     }
 
     [RelayCommand]
