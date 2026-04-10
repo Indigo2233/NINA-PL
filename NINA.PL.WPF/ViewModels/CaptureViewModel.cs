@@ -601,25 +601,31 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
         using var fs = new FileStream(path, FileMode.Create, FileAccess.Write);
         using var bw = new BinaryWriter(fs);
 
-        int channels = mat.Channels();
+        Mat work = mat;
+        Mat? converted = null;
+        if (mat.Depth() == MatType.CV_8U)
+        {
+            converted = new Mat();
+            mat.ConvertTo(converted, mat.Channels() == 1 ? MatType.CV_16UC1 : MatType.CV_16UC3, 256.0);
+            work = converted;
+        }
+
+        int channels = work.Channels();
         int naxis = channels == 1 ? 2 : 3;
-        int depth = mat.Depth();
-        int bitpix = depth == MatType.CV_16U ? 16
-                   : depth == MatType.CV_32F ? -32
-                   : 8;
-        int bytesPerPixel = Math.Abs(bitpix) / 8;
+        int bitpix = 16;
+        int bytesPerPixel = 2;
 
         var headers = new List<string>
         {
             FitsCard("SIMPLE", "T", "conforms to FITS standard"),
             FitsCard("BITPIX", bitpix.ToString(), "bits per data value"),
             FitsCard("NAXIS", naxis.ToString(), "number of axes"),
-            FitsCard("NAXIS1", mat.Width.ToString(), "width"),
-            FitsCard("NAXIS2", mat.Height.ToString(), "height"),
+            FitsCard("NAXIS1", work.Width.ToString(), "width"),
+            FitsCard("NAXIS2", work.Height.ToString(), "height"),
         };
         if (naxis == 3)
             headers.Add(FitsCard("NAXIS3", channels.ToString(), "number of planes"));
-        headers.Add(FitsCard("BZERO", "0", "physical = array * BSCALE + BZERO"));
+        headers.Add(FitsCard("BZERO", "32768", "unsigned 16-bit offset"));
         headers.Add(FitsCard("BSCALE", "1", "default scaling factor"));
         headers.Add("END".PadRight(80));
 
@@ -630,37 +636,45 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
         int padH = (2880 - headerBytes % 2880) % 2880;
         if (padH > 0) bw.Write(new byte[padH]);
 
-        int imgW = mat.Width;
-        int imgH = mat.Height;
+        void WriteRowBigEndian(nint src, int pixelCount)
+        {
+            byte[] row = new byte[pixelCount * 2];
+            System.Runtime.InteropServices.Marshal.Copy(src, row, 0, row.Length);
+            for (int i = 0; i < row.Length; i += 2)
+            {
+                ushort val = (ushort)(row[i] | (row[i + 1] << 8));
+                short signed = (short)(val - 32768);
+                byte hi = (byte)(signed >> 8);
+                byte lo = (byte)(signed & 0xFF);
+                row[i] = hi;
+                row[i + 1] = lo;
+            }
+            bw.Write(row);
+        }
 
+        int imgW = work.Width;
+        int imgH = work.Height;
         if (channels == 1)
         {
-            long step = mat.Step();
+            long step = work.Step();
             for (int y = imgH - 1; y >= 0; y--)
-            {
-                byte[] row = new byte[imgW * bytesPerPixel];
-                System.Runtime.InteropServices.Marshal.Copy(mat.Data + (nint)(y * step), row, 0, row.Length);
-                bw.Write(row);
-            }
+                WriteRowBigEndian(work.Data + (nint)(y * step), imgW);
         }
         else
         {
-            Mat[] planes = Cv2.Split(mat);
+            Mat[] planes = Cv2.Split(work);
             int[] order = channels >= 3 ? [2, 1, 0] : Enumerable.Range(0, channels).ToArray();
             foreach (int ch in order)
             {
                 using var plane = planes[ch];
                 long step = plane.Step();
                 for (int y = imgH - 1; y >= 0; y--)
-                {
-                    byte[] row = new byte[imgW * bytesPerPixel];
-                    System.Runtime.InteropServices.Marshal.Copy(plane.Data + (nint)(y * step), row, 0, row.Length);
-                    bw.Write(row);
-                }
+                    WriteRowBigEndian(plane.Data + (nint)(y * step), imgW);
             }
             foreach (var p in planes) p.Dispose();
         }
 
+        converted?.Dispose();
         long dataBytes = (long)imgW * imgH * channels * bytesPerPixel;
         int padD = (int)((2880 - dataBytes % 2880) % 2880);
         if (padD > 0) bw.Write(new byte[padD]);
