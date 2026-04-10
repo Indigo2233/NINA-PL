@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
+using System.Threading;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -27,6 +28,7 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
     private readonly DispatcherTimer _statsTimer;
     private bool _exposureSliderDrive;
     private int _lastFramePayloadBytes;
+    private int _frameRenderBusy;
 
     public CaptureViewModel(CameraMediator camera, FilterWheelMediator filterWheel, CaptureEngine capture)
     {
@@ -337,12 +339,23 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
     private void OnCameraFrameReceived(object? sender, FrameData frame)
     {
         _lastFramePayloadBytes = frame.Data.Length;
+
+        if (Interlocked.CompareExchange(ref _frameRenderBusy, 1, 0) != 0)
+            return;
+
         _dispatcher.BeginInvoke(() =>
         {
-            LiveImage = MatBitmapHelper.FrameToWriteableBitmap(frame);
-            UpdateHistogram(frame);
-            RefreshCameraLimits();
-            RefreshCameraDisplayName();
+            try
+            {
+                LiveImage = MatBitmapHelper.FrameToWriteableBitmap(frame);
+                UpdateHistogram(frame);
+                RefreshCameraLimits();
+                RefreshCameraDisplayName();
+            }
+            finally
+            {
+                Interlocked.Exchange(ref _frameRenderBusy, 0);
+            }
         });
     }
 
@@ -540,8 +553,12 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
         if (cam is null || !cam.IsConnected) return;
         try
         {
-            ApplyCameraExposureGain();
-            await Task.Run(() => cam.StartCaptureAsync()).ConfigureAwait(true);
+            await Task.Run(async () =>
+            {
+                cam.SetExposure(ExposureMicroseconds);
+                cam.SetGain(Gain);
+                await cam.StartCaptureAsync().ConfigureAwait(false);
+            }).ConfigureAwait(true);
             IsLiveViewActive = true;
         }
         catch (Exception ex)
