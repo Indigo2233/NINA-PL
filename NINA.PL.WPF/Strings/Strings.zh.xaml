@@ -101,4 +101,5 @@
     <sys:String x:Key="Cap.AutoStretch">自动拉伸</sys:String>
     <sys:String x:Key="Cap.Crosshair">十字准线</sys:String>
     <sys:String x:Key="Cap.LiveView">实时预览</sys:String>
+    <sys:String x:Key="Cap.ImageTab">图像</sys:String>
 </ResourceDictionary>

@@ -220,9 +220,17 @@ public sealed class ToupcamBackend : INativeCameraBackend
         if (width <= 0 || height <= 0)
             throw new ArgumentOutOfRangeException(nameof(width));
 
-        _native!.PutSize(_handle, width, height);
-        _native.PutRoi(_handle, (uint)offsetX, (uint)offsetY, (uint)width, (uint)height);
+        if (offsetX == 0 && offsetY == 0 && width >= _sensorW && height >= _sensorH)
+        {
+            _native!.PutESize(_handle, 0);
+            _native.GetSize(_handle, out _sensorW, out _sensorH);
+            _roiW = _sensorW;
+            _roiH = _sensorH;
+            return;
+        }
 
+        _native!.PutESize(_handle, 0);
+        _native.PutRoi(_handle, (uint)offsetX, (uint)offsetY, (uint)width, (uint)height);
         RefreshGeometry();
     }
 
@@ -430,10 +438,7 @@ public sealed class ToupcamBackend : INativeCameraBackend
 
     private unsafe void ReadStaticCameraInfo()
     {
-        _native!.GetSize(_handle, out _sensorW, out _sensorH);
-
-        _native.PutSize(_handle, _sensorW, _sensorH);
-        _native.PutRoi(_handle, 0, 0, (uint)_sensorW, (uint)_sensorH);
+        _native!.PutESize(_handle, 0);
         _native.GetSize(_handle, out _sensorW, out _sensorH);
 
         _roiW = _sensorW;
@@ -605,6 +610,7 @@ public sealed class ToupcamBackend : INativeCameraBackend
         private readonly Toupcam_put_ExpoAGain _putExpoAGain;
         private readonly Toupcam_put_Roi _putRoi;
         private readonly Toupcam_put_Size _putSize;
+        private readonly Toupcam_put_eSize _putESize;
         private readonly Toupcam_get_Size _getSize;
         private readonly Toupcam_get_RawFormat _getRawFormat;
         private readonly Toupcam_put_Option _putOption;
@@ -626,6 +632,7 @@ public sealed class ToupcamBackend : INativeCameraBackend
             Toupcam_put_ExpoAGain putExpoAGain,
             Toupcam_put_Roi putRoi,
             Toupcam_put_Size putSize,
+            Toupcam_put_eSize putESize,
             Toupcam_get_Size getSize,
             Toupcam_get_RawFormat getRawFormat,
             Toupcam_put_Option putOption,
@@ -646,6 +653,7 @@ public sealed class ToupcamBackend : INativeCameraBackend
             _putExpoAGain = putExpoAGain;
             _putRoi = putRoi;
             _putSize = putSize;
+            _putESize = putESize;
             _getSize = getSize;
             _getRawFormat = getRawFormat;
             _putOption = putOption;
@@ -687,6 +695,7 @@ public sealed class ToupcamBackend : INativeCameraBackend
                 G<Toupcam_put_ExpoAGain>(P("_put_ExpoAGain")),
                 G<Toupcam_put_Roi>(P("_put_Roi")),
                 G<Toupcam_put_Size>(P("_put_Size")),
+                G<Toupcam_put_eSize>(P("_put_eSize")),
                 G<Toupcam_get_Size>(P("_get_Size")),
                 G<Toupcam_get_RawFormat>(P("_get_RawFormat")),
                 G<Toupcam_put_Option>(P("_put_Option")),
@@ -719,6 +728,7 @@ public sealed class ToupcamBackend : INativeCameraBackend
         public int PutExpoAGain(nint h, ushort g) => _putExpoAGain(h, g);
         public int PutRoi(nint h, uint x, uint y, uint w, uint ht) => _putRoi(h, x, y, w, ht);
         public int PutSize(nint h, int w, int ht) => _putSize(h, w, ht);
+        public int PutESize(nint h, uint index) => _putESize(h, index);
         public int GetSize(nint h, out int w, out int ht) => _getSize(h, out w, out ht);
         public int GetRawFormat(nint h, out uint fourcc, out uint bpp) => _getRawFormat(h, out fourcc, out bpp);
         public int PutOption(nint h, uint opt, int val) => _putOption(h, opt, val);
@@ -771,6 +781,9 @@ public sealed class ToupcamBackend : INativeCameraBackend
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         private delegate int Toupcam_put_Size(nint h, int w, int ht);
+
+        [UnmanagedFunctionPointer(CallingConvention.StdCall)]
+        private delegate int Toupcam_put_eSize(nint h, uint index);
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
         private delegate int Toupcam_get_Size(nint h, out int w, out int ht);

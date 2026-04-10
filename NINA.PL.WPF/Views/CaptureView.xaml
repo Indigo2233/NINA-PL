@@ -3,290 +3,334 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:avalonDock="https://github.com/Dirkster99/AvalonDock"
+             xmlns:avTheme="clr-namespace:AvalonDock.Themes;assembly=AvalonDock.Themes.VS2013"
              mc:Ignorable="d"
              d:DesignHeight="820" d:DesignWidth="1200">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="7*"/>
-            <ColumnDefinition Width="3*"/>
-        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
-        <!-- Live view -->
-        <Border Grid.Row="0" Grid.Column="0"
-                Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="3"
-                Margin="0,0,16,0" ClipToBounds="True"
-                x:Name="ImageContainer"
-                MouseWheel="ImageContainer_MouseWheel"
-                MouseLeftButtonDown="ImageContainer_MouseLeftButtonDown"
-                MouseLeftButtonUp="ImageContainer_MouseLeftButtonUp"
-                MouseMove="ImageContainer_MouseMove">
-            <Grid>
-                <Grid x:Name="ImageCanvas" Background="Transparent">
-                    <Grid.RenderTransform>
-                        <TransformGroup>
-                            <ScaleTransform ScaleX="{Binding LiveImageZoom}" ScaleY="{Binding LiveImageZoom}" CenterX="0" CenterY="0"/>
-                            <TranslateTransform X="{Binding PanOffsetX}" Y="{Binding PanOffsetY}"/>
-                        </TransformGroup>
-                    </Grid.RenderTransform>
-                    <Image Source="{Binding LiveImage}" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality"/>
-                    <Canvas IsHitTestVisible="False" Visibility="{Binding ShowCrosshair, Converter={StaticResource BoolToVis}}"
-                            Width="{Binding LiveImage.PixelWidth}" Height="{Binding LiveImage.PixelHeight}">
-                        <Line X1="{Binding CrosshairX}" Y1="0" X2="{Binding CrosshairX}" Y2="{Binding LiveImage.PixelHeight}"
-                              Stroke="{StaticResource Brush.Primary}" StrokeThickness="1" Opacity="0.6"/>
-                        <Line X1="0" Y1="{Binding CrosshairY}" X2="{Binding LiveImage.PixelWidth}" Y2="{Binding CrosshairY}"
-                              Stroke="{StaticResource Brush.Primary}" StrokeThickness="1" Opacity="0.6"/>
-                    </Canvas>
-                </Grid>
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="8">
-                    <ToggleButton IsChecked="{Binding ShowCrosshair, Mode=TwoWay}" Content="{DynamicResource Cap.Crosshair}" Margin="0,0,8,0"/>
-                    <Button Content="Zoom-" Command="{Binding ZoomOutCommand}" Padding="8,4" Margin="0,0,4,0"/>
-                    <Button Content="Zoom+" Command="{Binding ZoomInCommand}" Padding="8,4" Margin="0,0,4,0"/>
-                    <Button Content="1:1" Command="{Binding ResetZoomCommand}" Padding="10,4"/>
-                    <Button Command="{Binding FitZoomCommand}" Padding="10,4" Margin="4,0,0,0" Content="Fit"/>
-                </StackPanel>
-                <TextBlock VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="8" Padding="6,2"
-                           FontSize="11" Foreground="{StaticResource Brush.TextSecondary}"
-                           Text="{Binding ZoomPercentText}" Background="#88000000"/>
-            </Grid>
-        </Border>
-
-        <!-- Right stack -->
-        <ScrollViewer Grid.Row="0" Grid.Column="1" VerticalScrollBarVisibility="Auto">
-            <StackPanel>
-                <GroupBox Header="{DynamicResource Cap.Camera}" Margin="0,0,0,16">
-                    <StackPanel>
-                        <TextBlock Text="{Binding ConnectedCameraDisplayName}" FontWeight="SemiBold" Margin="0,0,0,4"/>
-                        <TextBlock Text="{Binding CameraSensorLine}" Foreground="{StaticResource Brush.TextSecondary}" TextWrapping="Wrap" Margin="0,0,0,8"/>
-                        <Grid Margin="0,0,0,6">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="80"/>
-                                <ColumnDefinition Width="100"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="{DynamicResource Cap.ExposureMs}" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}"/>
-                            <TextBox Grid.Column="1" Text="{Binding ExposureMs, UpdateSourceTrigger=LostFocus}" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="2" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}" Margin="8,0" FontSize="11">
-                                <TextBlock.Text>
-                                    <MultiBinding StringFormat="({0:F1} – {1:F1} ms)">
-                                        <Binding Path="ExposureMinMs"/>
-                                        <Binding Path="ExposureMaxMs"/>
-                                    </MultiBinding>
-                                </TextBlock.Text>
-                            </TextBlock>
-                        </Grid>
-                        <Grid Margin="0,0,0,6">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="80"/>
-                                <ColumnDefinition Width="100"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="{DynamicResource Cam.Gain}" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}"/>
-                            <TextBox Grid.Column="1" Text="{Binding Gain, UpdateSourceTrigger=LostFocus}" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="2" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}" Margin="8,0" FontSize="11">
-                                <TextBlock.Text>
-                                    <MultiBinding StringFormat="({0:F0} – {1:F0})">
-                                        <Binding Path="GainMin"/>
-                                        <Binding Path="GainMax"/>
-                                    </MultiBinding>
-                                </TextBlock.Text>
-                            </TextBlock>
-                        </Grid>
-                        <TextBlock Text="{DynamicResource Cap.ROI}" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource Brush.Primary}" Margin="0,12,0,8"/>
-                        <UniformGrid Columns="2">
-                            <StackPanel Margin="0,0,8,8">
-                                <Label Content="X"/>
-                                <TextBox Text="{Binding RoiOffsetX, UpdateSourceTrigger=PropertyChanged}"/>
-                            </StackPanel>
-                            <StackPanel Margin="0,0,0,8">
-                                <Label Content="Y"/>
-                                <TextBox Text="{Binding RoiOffsetY, UpdateSourceTrigger=PropertyChanged}"/>
-                            </StackPanel>
-                            <StackPanel Margin="0,0,8,0">
-                                <Label Content="W"/>
-                                <TextBox Text="{Binding RoiWidth, UpdateSourceTrigger=PropertyChanged}"/>
-                            </StackPanel>
-                            <StackPanel>
-                                <Label Content="H"/>
-                                <TextBox Text="{Binding RoiHeight, UpdateSourceTrigger=PropertyChanged}"/>
-                            </StackPanel>
-                        </UniformGrid>
-                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                            <Button Content="{DynamicResource Cap.ApplyROI}" Command="{Binding ApplyRoiCommand}" Margin="0,0,8,0"/>
-                            <Button Content="{DynamicResource Cap.ResetROI}" Command="{Binding ResetRoiCommand}"/>
-                        </StackPanel>
-                    </StackPanel>
-                </GroupBox>
-
-                <GroupBox Header="{DynamicResource Cap.Histogram}" Margin="0,0,0,16">
-                    <StackPanel>
-                        <Border Height="120" Background="{StaticResource Brush.InputBg}" CornerRadius="3" ClipToBounds="True" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1">
-                            <Polyline Points="{Binding HistogramLinePoints}" Stroke="{StaticResource Brush.Primary}" StrokeThickness="1.25" Stretch="Fill"/>
-                        </Border>
-                        <UniformGrid Columns="3" Margin="0,8,0,0">
-                            <TextBlock Foreground="{StaticResource Brush.TextSecondary}" Text="{Binding HistogramMin, StringFormat=Min {0}}"/>
-                            <TextBlock Foreground="{StaticResource Brush.TextSecondary}" Text="{Binding HistogramMax, StringFormat=Max {0}}"/>
-                            <TextBlock Foreground="{StaticResource Brush.TextSecondary}" Text="{Binding HistogramMean, StringFormat=Mean {0:F1}}"/>
-                        </UniformGrid>
-                        <ToggleButton IsChecked="{Binding AutoStretch, Mode=TwoWay}" Content="{DynamicResource Cap.AutoStretch}" Margin="0,8,0,0" HorizontalAlignment="Left" Padding="12,4"/>
-                    </StackPanel>
-                </GroupBox>
-
-                <GroupBox Header="{DynamicResource Cap.Filter}">
-                    <StackPanel>
-                        <TextBlock Text="Current" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}"/>
-                        <TextBlock Text="{Binding CurrentFilterQuickName}" FontWeight="SemiBold" Margin="0,0,0,8"/>
-                        <ItemsControl ItemsSource="{Binding FilterQuickSlots}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <WrapPanel/>
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Button Content="{Binding Name}" Margin="0,0,8,8" Padding="10,6"
-                                            Command="{Binding DataContext.SelectFilterQuickCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                            CommandParameter="{Binding Index}">
-                                        <Button.Style>
-                                            <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding IsCurrent}" Value="True">
-                                                        <Setter Property="BorderBrush" Value="{StaticResource Brush.Primary}"/>
-                                                        <Setter Property="Foreground" Value="{StaticResource Brush.Primary}"/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Button.Style>
-                                    </Button>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </StackPanel>
-                </GroupBox>
+        <!-- Module toggles -->
+        <Border Grid.Row="0" Background="{StaticResource Brush.Sidebar}" Padding="8,4" BorderBrush="{StaticResource Brush.Border}" BorderThickness="0,0,0,1">
+            <StackPanel Orientation="Horizontal">
+                <ToggleButton x:Name="TogCamera" Content="{DynamicResource Cap.Camera}" IsChecked="True" Padding="12,4" Margin="0,0,4,0" Click="ModuleToggle_Click"/>
+                <ToggleButton x:Name="TogHistogram" Content="{DynamicResource Cap.Histogram}" IsChecked="True" Padding="12,4" Margin="0,0,4,0" Click="ModuleToggle_Click"/>
+                <ToggleButton x:Name="TogFilter" Content="{DynamicResource Cap.Filter}" IsChecked="True" Padding="12,4" Margin="0,0,4,0" Click="ModuleToggle_Click"/>
+                <ToggleButton x:Name="TogRecord" Content="{DynamicResource Cap.Record}" IsChecked="True" Padding="12,4" Margin="0,0,4,0" Click="ModuleToggle_Click"/>
             </StackPanel>
-        </ScrollViewer>
-
-        <!-- Recording bar -->
-        <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
-                Background="{StaticResource Brush.Surface}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1" CornerRadius="3" Padding="16" Margin="0,16,0,0">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,24,0">
-                    <!-- Live View toggle -->
-                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,0,16,0">
-                        <ToggleButton Width="56" Height="56" IsChecked="{Binding IsLiveViewActive, Mode=OneWay}" Command="{Binding ToggleLiveViewCommand}"
-                                      ToolTip="Live View" Padding="0">
-                            <TextBlock Text="▶" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </ToggleButton>
-                        <TextBlock Text="{DynamicResource Cap.LiveView}" FontSize="9" HorizontalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}" Margin="0,4,0,0"/>
-                    </StackPanel>
-
-                    <!-- Snap FITS -->
-                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,0,16,0">
-                        <Button Width="56" Height="56" Command="{Binding SnapFitsCommand}" ToolTip="Snap single FITS" Padding="0">
-                            <TextBlock Text="FITS" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Button>
-                        <TextBlock Text="Snap FITS" FontSize="9" HorizontalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}" Margin="0,4,0,0"/>
-                    </StackPanel>
-
-                    <!-- Record button -->
-                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                    <Button Width="80" Height="80" Command="{Binding StartCaptureCommand}" IsEnabled="{Binding IsCapturing, Converter={StaticResource InverseBool}}">
-                        <Button.Style>
-                            <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-                                <Setter Property="Content" Value="●"/>
-                                <Setter Property="FontSize" Value="40"/>
-                                <Setter Property="Foreground" Value="{StaticResource Brush.TextSecondary}"/>
-                                <Setter Property="Template">
-                                    <Setter.Value>
-                                        <ControlTemplate TargetType="Button">
-                                            <Border x:Name="Circle" Width="80" Height="80" CornerRadius="40" BorderThickness="2"
-                                                    BorderBrush="{StaticResource Brush.Border}" Background="{StaticResource Brush.Surface}">
-                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                            </Border>
-                                            <ControlTemplate.Triggers>
-                                                <DataTrigger Binding="{Binding IsCapturing}" Value="True">
-                                                    <Setter TargetName="Circle" Property="BorderBrush" Value="{StaticResource Brush.Accent}"/>
-                                                </DataTrigger>
-                                                <Trigger Property="IsMouseOver" Value="True">
-                                                    <Setter TargetName="Circle" Property="BorderBrush" Value="{StaticResource Brush.Primary}"/>
-                                                </Trigger>
-                                            </ControlTemplate.Triggers>
-                                        </ControlTemplate>
-                                    </Setter.Value>
-                                </Setter>
-                            </Style>
-                        </Button.Style>
-                    </Button>
-                    <Border Width="12" Height="12" CornerRadius="6" HorizontalAlignment="Center" Margin="0,8,0,0"
-                            Background="{StaticResource Brush.TextSecondary}">
-                        <Border.Style>
-                            <Style TargetType="Border">
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsCapturing}" Value="True">
-                                        <Setter Property="Background" Value="{StaticResource Brush.Accent}"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Border.Style>
-                    </Border>
-                    <TextBlock Text="{DynamicResource Cap.Record}" FontSize="9" HorizontalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}" Margin="0,2,0,0"/>
-                    <Button Content="{DynamicResource Cap.Stop}" Command="{Binding StopCaptureCommand}" Margin="0,8,0,0" HorizontalAlignment="Center" MinWidth="72"/>
-                    </StackPanel>
-                </StackPanel>
-                <Grid Grid.Column="1">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-                    <WrapPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
-                        <Label Content="{DynamicResource Cap.Format}" VerticalAlignment="Center"/>
-                        <ComboBox Width="120" Margin="8,0,16,0" ItemsSource="{Binding CaptureFormats}" SelectedItem="{Binding SelectedFormat, Mode=TwoWay}"/>
-                        <Label Content="{DynamicResource Cap.FrameLimit}" VerticalAlignment="Center"/>
-                        <TextBox Width="72" Margin="8,0,16,0" Text="{Binding FrameLimit, UpdateSourceTrigger=PropertyChanged}"/>
-                        <Label Content="{DynamicResource Cap.TimeLimit}" VerticalAlignment="Center"/>
-                        <TextBox Width="72" Margin="8,0,0,0" Text="{Binding TimeLimitSeconds, UpdateSourceTrigger=PropertyChanged}"/>
-                    </WrapPanel>
-                    <Grid Grid.Row="1" Margin="0,0,0,8">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}" Margin="0,0,8,0">
-                                <Run Text="{DynamicResource Cap.Folder}"/><Run Text=":"/>
-                            </TextBlock>
-                            <TextBlock Text="{Binding OutputDirectory}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" MaxWidth="400"/>
-                            <Button Content="{DynamicResource Cap.Browse}" Command="{Binding BrowseOutputCommand}" Margin="12,0,0,0"/>
-                            <Button Content="Open" Command="{Binding OpenOutputFolderCommand}" Margin="8,0,0,0"/>
-                        </StackPanel>
-                        <StackPanel Grid.Column="1" Orientation="Horizontal">
-                            <Label Content="{DynamicResource Cap.Prefix}" VerticalAlignment="Center"/>
-                            <TextBox Width="160" Margin="8,0,0,0" Text="{Binding FilePrefix, UpdateSourceTrigger=PropertyChanged}"/>
-                        </StackPanel>
-                    </Grid>
-                    <TextBlock Grid.Row="2" Foreground="{StaticResource Brush.TextSecondary}">
-                        <TextBlock.Text>
-                            <MultiBinding StringFormat="Frames: {0}  |  FPS: {1:F2}  |  Dropped: {2}  |  Est. size: {3:N0} B">
-                                <Binding Path="FramesCaptured"/>
-                                <Binding Path="CurrentFps"/>
-                                <Binding Path="FramesDropped"/>
-                                <Binding Path="EstimatedSessionBytes"/>
-                            </MultiBinding>
-                        </TextBlock.Text>
-                    </TextBlock>
-                    <TextBlock Grid.Row="3" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}" Margin="0,4,0,0"
-                               Text="{Binding LastSnapPath, StringFormat=Last snap: {0}}" TextTrimming="CharacterEllipsis"/>
-                </Grid>
-            </Grid>
         </Border>
+    <avalonDock:DockingManager Grid.Row="1" x:Name="DockManager" AllowMixedOrientation="True"
+                               Background="{StaticResource Brush.Background}">
+        <avalonDock:DockingManager.Theme>
+            <avTheme:Vs2013DarkTheme/>
+        </avalonDock:DockingManager.Theme>
+
+        <avalonDock:LayoutRoot>
+            <avalonDock:LayoutPanel Orientation="Vertical">
+                <avalonDock:LayoutPanel Orientation="Horizontal" DockHeight="*">
+                    <!-- Center: Live Preview -->
+                    <avalonDock:LayoutDocumentPane DockWidth="7*">
+                        <avalonDock:LayoutDocument Title="{DynamicResource Cap.ImageTab}" CanClose="False">
+                            <Border Background="{StaticResource Brush.Surface}" ClipToBounds="True"
+                                    x:Name="ImageContainer"
+                                    MouseWheel="ImageContainer_MouseWheel"
+                                    MouseLeftButtonDown="ImageContainer_MouseLeftButtonDown"
+                                    MouseLeftButtonUp="ImageContainer_MouseLeftButtonUp"
+                                    MouseMove="ImageContainer_MouseMove">
+                                <Grid>
+                                    <Viewbox Stretch="Uniform" StretchDirection="Both">
+                                        <Grid x:Name="ImageCanvas" Background="Transparent"
+                                              Width="{Binding LiveImage.PixelWidth, FallbackValue=800}"
+                                              Height="{Binding LiveImage.PixelHeight, FallbackValue=600}">
+                                            <Grid.RenderTransform>
+                                                <TransformGroup>
+                                                    <ScaleTransform ScaleX="{Binding LiveImageZoom}" ScaleY="{Binding LiveImageZoom}"
+                                                                    CenterX="{Binding CrosshairX}" CenterY="{Binding CrosshairY}"/>
+                                                    <TranslateTransform X="{Binding PanOffsetX}" Y="{Binding PanOffsetY}"/>
+                                                </TransformGroup>
+                                            </Grid.RenderTransform>
+                                            <Image Source="{Binding LiveImage}" Stretch="Fill" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                            <Canvas IsHitTestVisible="False" Visibility="{Binding ShowCrosshair, Converter={StaticResource BoolToVis}}">
+                                                <Line X1="{Binding CrosshairX}" Y1="0" X2="{Binding CrosshairX}" Y2="{Binding LiveImage.PixelHeight}"
+                                                      Stroke="{StaticResource Brush.Primary}" StrokeThickness="1" Opacity="0.6"/>
+                                                <Line X1="0" Y1="{Binding CrosshairY}" X2="{Binding LiveImage.PixelWidth}" Y2="{Binding CrosshairY}"
+                                                      Stroke="{StaticResource Brush.Primary}" StrokeThickness="1" Opacity="0.6"/>
+                                            </Canvas>
+                                            <!-- ROI selection rectangle - only visible when IsSelectingRoi -->
+                                            <Canvas IsHitTestVisible="False" Visibility="{Binding IsSelectingRoi, Converter={StaticResource BoolToVis}}">
+                                                <Rectangle x:Name="RoiRect" Stroke="Red" StrokeThickness="2" StrokeDashArray="4 2" Fill="#22FF0000"
+                                                           Canvas.Left="{Binding RoiOffsetX}" Canvas.Top="{Binding RoiOffsetY}"
+                                                           Width="{Binding RoiWidth}" Height="{Binding RoiHeight}"/>
+                                            </Canvas>
+                                        </Grid>
+                                    </Viewbox>
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="8">
+                                        <ToggleButton IsChecked="{Binding ShowCrosshair, Mode=TwoWay}" Content="{DynamicResource Cap.Crosshair}" Margin="0,0,8,0"/>
+                                        <Button Content="Zoom-" Command="{Binding ZoomOutCommand}" Padding="8,4" Margin="0,0,4,0"/>
+                                        <Button Content="Zoom+" Command="{Binding ZoomInCommand}" Padding="8,4" Margin="0,0,4,0"/>
+                                        <Button Content="1:1" Command="{Binding ResetZoomCommand}" Padding="10,4"/>
+                                        <Button Command="{Binding FitZoomCommand}" Padding="10,4" Margin="4,0,0,0" Content="Fit"/>
+                                    </StackPanel>
+                                    <TextBlock VerticalAlignment="Bottom" HorizontalAlignment="Left" Margin="8" Padding="6,2"
+                                               FontSize="11" Foreground="{StaticResource Brush.TextSecondary}"
+                                               Text="{Binding ZoomPercentText}" Background="#88000000"/>
+                                </Grid>
+                            </Border>
+                        </avalonDock:LayoutDocument>
+                    </avalonDock:LayoutDocumentPane>
+
+                    <!-- Right: Camera + Histogram + Filter -->
+                    <avalonDock:LayoutAnchorablePane DockWidth="320" DockMinWidth="200">
+                        <avalonDock:LayoutAnchorable x:Name="PaneCamera" Title="{DynamicResource Cap.Camera}" CanClose="False" CanAutoHide="False" CanHide="True">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                <StackPanel Margin="8">
+                                    <TextBlock Text="{Binding ConnectedCameraDisplayName}" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                                    <TextBlock Text="{Binding CameraSensorLine}" Foreground="{StaticResource Brush.TextSecondary}" TextWrapping="Wrap" Margin="0,0,0,8"/>
+                                    <Grid Margin="0,0,0,6">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="80"/>
+                                            <ColumnDefinition Width="100"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{DynamicResource Cap.ExposureMs}" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                        <TextBox Grid.Column="1" Text="{Binding ExposureMs, UpdateSourceTrigger=LostFocus}" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="2" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}" Margin="8,0" FontSize="11">
+                                            <TextBlock.Text>
+                                                <MultiBinding StringFormat="({0:F1} – {1:F1} ms)">
+                                                    <Binding Path="ExposureMinMs"/>
+                                                    <Binding Path="ExposureMaxMs"/>
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+                                    </Grid>
+                                    <Grid Margin="0,0,0,6">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="80"/>
+                                            <ColumnDefinition Width="100"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{DynamicResource Cam.Gain}" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                        <TextBox Grid.Column="1" Text="{Binding Gain, UpdateSourceTrigger=LostFocus}" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="2" VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}" Margin="8,0" FontSize="11">
+                                            <TextBlock.Text>
+                                                <MultiBinding StringFormat="({0:F0} – {1:F0})">
+                                                    <Binding Path="GainMin"/>
+                                                    <Binding Path="GainMax"/>
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+                                    </Grid>
+                                    <TextBlock Text="{DynamicResource Cap.ROI}" FontSize="10" FontWeight="SemiBold" Foreground="{StaticResource Brush.Primary}" Margin="0,12,0,4"/>
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                        <ToggleButton IsChecked="{Binding IsSelectingRoi, Mode=TwoWay}" Content="Select" Padding="8,3" Margin="0,0,4,0"
+                                                      Checked="TogSelectRoi_Changed" Unchecked="TogSelectRoi_Changed"/>
+                                        <Button Content="{DynamicResource Cap.ApplyROI}" Command="{Binding ApplyRoiCommand}" Padding="8,3" Margin="0,0,4,0"/>
+                                        <Button Content="{DynamicResource Cap.ResetROI}" Command="{Binding ResetRoiCommand}" Padding="8,3"/>
+                                    </StackPanel>
+                                    <!-- Sensor minimap with ROI rectangle -->
+                                    <Grid Margin="0,0,0,6">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Border Background="#FF3A3A4A" CornerRadius="2" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1"
+                                                Height="80" HorizontalAlignment="Stretch"
+                                                x:Name="RoiMinimap" MouseLeftButtonDown="RoiMinimap_MouseDown" MouseLeftButtonUp="RoiMinimap_MouseUp" MouseMove="RoiMinimap_MouseMove"
+                                                SizeChanged="RoiMinimap_SizeChanged">
+                                            <Grid x:Name="RoiMinimapCanvas" ClipToBounds="True">
+                                                <Rectangle x:Name="RoiMinimapRect" Stroke="Red" StrokeThickness="1.5" Fill="#33FF0000"
+                                                           HorizontalAlignment="Left" VerticalAlignment="Top"/>
+                                            </Grid>
+                                        </Border>
+                                        <StackPanel Grid.Column="1" Margin="8,0,0,0" VerticalAlignment="Center" Width="60">
+                                            <TextBlock Text="X" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                            <TextBox Text="{Binding RoiOffsetX, UpdateSourceTrigger=PropertyChanged}" FontSize="11" Margin="0,0,0,4"/>
+                                            <TextBlock Text="Y" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                            <TextBox Text="{Binding RoiOffsetY, UpdateSourceTrigger=PropertyChanged}" FontSize="11"/>
+                                        </StackPanel>
+                                    </Grid>
+                                    <UniformGrid Columns="2" Margin="0,0,0,0">
+                                        <StackPanel Margin="0,0,4,0">
+                                            <TextBlock Text="W" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                            <TextBox Text="{Binding RoiWidth, UpdateSourceTrigger=PropertyChanged}" FontSize="11"/>
+                                        </StackPanel>
+                                        <StackPanel>
+                                            <TextBlock Text="H" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                            <TextBox Text="{Binding RoiHeight, UpdateSourceTrigger=PropertyChanged}" FontSize="11"/>
+                                        </StackPanel>
+                                    </UniformGrid>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </avalonDock:LayoutAnchorable>
+
+                        <avalonDock:LayoutAnchorable x:Name="PaneHistogram" Title="{DynamicResource Cap.Histogram}" CanClose="False" CanAutoHide="False" CanHide="True">
+                            <StackPanel Margin="8">
+                                <Border Height="120" Background="{StaticResource Brush.InputBg}" CornerRadius="3" ClipToBounds="True" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1">
+                                    <Polyline Points="{Binding HistogramLinePoints}" Stroke="{StaticResource Brush.Primary}" StrokeThickness="1.25" Stretch="Fill"/>
+                                </Border>
+                                <UniformGrid Columns="3" Margin="0,8,0,0">
+                                    <TextBlock Foreground="{StaticResource Brush.TextSecondary}" Text="{Binding HistogramMin, StringFormat=Min {0}}"/>
+                                    <TextBlock Foreground="{StaticResource Brush.TextSecondary}" Text="{Binding HistogramMax, StringFormat=Max {0}}"/>
+                                    <TextBlock Foreground="{StaticResource Brush.TextSecondary}" Text="{Binding HistogramMean, StringFormat=Mean {0:F1}}"/>
+                                </UniformGrid>
+                                <ToggleButton IsChecked="{Binding AutoStretch, Mode=TwoWay}" Content="{DynamicResource Cap.AutoStretch}" Margin="0,8,0,0" HorizontalAlignment="Left" Padding="12,4"/>
+                            </StackPanel>
+                        </avalonDock:LayoutAnchorable>
+
+                        <avalonDock:LayoutAnchorable x:Name="PaneFilter" Title="{DynamicResource Cap.Filter}" CanClose="False" CanAutoHide="False" CanHide="True">
+                            <StackPanel Margin="8">
+                                <TextBlock Text="Current" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}"/>
+                                <TextBlock Text="{Binding CurrentFilterQuickName}" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                                <ItemsControl ItemsSource="{Binding FilterQuickSlots}">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Button Content="{Binding Name}" Margin="0,0,8,8" Padding="10,6"
+                                                    Command="{Binding DataContext.SelectFilterQuickCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding Index}">
+                                                <Button.Style>
+                                                    <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsCurrent}" Value="True">
+                                                                <Setter Property="BorderBrush" Value="{StaticResource Brush.Primary}"/>
+                                                                <Setter Property="Foreground" Value="{StaticResource Brush.Primary}"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Button.Style>
+                                            </Button>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </avalonDock:LayoutAnchorable>
+                    </avalonDock:LayoutAnchorablePane>
+                </avalonDock:LayoutPanel>
+
+                <!-- Bottom: Recording Controls -->
+                <avalonDock:LayoutAnchorablePane DockHeight="200" DockMinHeight="120">
+                    <avalonDock:LayoutAnchorable x:Name="PaneRecord" Title="{DynamicResource Cap.Record}" CanClose="False" CanAutoHide="False" CanHide="True">
+                        <Border Background="{StaticResource Brush.Surface}" Padding="16">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,24,0">
+                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,0,16,0">
+                                        <ToggleButton Width="56" Height="56" IsChecked="{Binding IsLiveViewActive, Mode=OneWay}" Command="{Binding ToggleLiveViewCommand}"
+                                                      ToolTip="Live View" Padding="0">
+                                            <TextBlock Text="▶" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </ToggleButton>
+                                        <TextBlock Text="{DynamicResource Cap.LiveView}" FontSize="9" HorizontalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}" Margin="0,4,0,0"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Margin="0,0,16,0">
+                                        <Button Width="56" Height="56" Command="{Binding SnapFitsCommand}" ToolTip="Snap single FITS" Padding="0">
+                                            <TextBlock Text="FITS" FontSize="14" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Button>
+                                        <TextBlock Text="Snap FITS" FontSize="9" HorizontalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}" Margin="0,4,0,0"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
+                                        <Button Width="80" Height="80" Command="{Binding StartCaptureCommand}" IsEnabled="{Binding IsCapturing, Converter={StaticResource InverseBool}}">
+                                            <Button.Style>
+                                                <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                                    <Setter Property="Content" Value="●"/>
+                                                    <Setter Property="FontSize" Value="40"/>
+                                                    <Setter Property="Foreground" Value="{StaticResource Brush.TextSecondary}"/>
+                                                    <Setter Property="Template">
+                                                        <Setter.Value>
+                                                            <ControlTemplate TargetType="Button">
+                                                                <Border x:Name="Circle" Width="80" Height="80" CornerRadius="40" BorderThickness="2"
+                                                                        BorderBrush="{StaticResource Brush.Border}" Background="{StaticResource Brush.Surface}">
+                                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                                </Border>
+                                                                <ControlTemplate.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsCapturing}" Value="True">
+                                                                        <Setter TargetName="Circle" Property="BorderBrush" Value="{StaticResource Brush.Accent}"/>
+                                                                    </DataTrigger>
+                                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                                        <Setter TargetName="Circle" Property="BorderBrush" Value="{StaticResource Brush.Primary}"/>
+                                                                    </Trigger>
+                                                                </ControlTemplate.Triggers>
+                                                            </ControlTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                        <Border Width="12" Height="12" CornerRadius="6" HorizontalAlignment="Center" Margin="0,4,0,0"
+                                                Background="{StaticResource Brush.TextSecondary}">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsCapturing}" Value="True">
+                                                            <Setter Property="Background" Value="{StaticResource Brush.Accent}"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                        </Border>
+                                        <Button Content="{DynamicResource Cap.Stop}" Command="{Binding StopCaptureCommand}" Margin="0,4,0,0" HorizontalAlignment="Center" MinWidth="72"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                <Grid Grid.Column="1">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+                                    <WrapPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+                                        <Label Content="{DynamicResource Cap.Format}" VerticalAlignment="Center"/>
+                                        <ComboBox Width="120" Margin="8,0,16,0" ItemsSource="{Binding CaptureFormats}" SelectedItem="{Binding SelectedFormat, Mode=TwoWay}"/>
+                                        <Label Content="{DynamicResource Cap.FrameLimit}" VerticalAlignment="Center"/>
+                                        <TextBox Width="72" Margin="8,0,16,0" Text="{Binding FrameLimit, UpdateSourceTrigger=PropertyChanged}"/>
+                                        <Label Content="{DynamicResource Cap.TimeLimit}" VerticalAlignment="Center"/>
+                                        <TextBox Width="72" Margin="8,0,0,0" Text="{Binding TimeLimitSeconds, UpdateSourceTrigger=PropertyChanged}"/>
+                                    </WrapPanel>
+                                    <Grid Grid.Row="1" Margin="0,0,0,8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock VerticalAlignment="Center" Foreground="{StaticResource Brush.TextSecondary}" Margin="0,0,8,0">
+                                                <Run Text="{DynamicResource Cap.Folder}"/><Run Text=":"/>
+                                            </TextBlock>
+                                            <TextBlock Text="{Binding OutputDirectory}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" MaxWidth="400"/>
+                                            <Button Content="{DynamicResource Cap.Browse}" Command="{Binding BrowseOutputCommand}" Margin="12,0,0,0"/>
+                                            <Button Content="Open" Command="{Binding OpenOutputFolderCommand}" Margin="8,0,0,0"/>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                            <Label Content="{DynamicResource Cap.Prefix}" VerticalAlignment="Center"/>
+                                            <TextBox Width="160" Margin="8,0,0,0" Text="{Binding FilePrefix, UpdateSourceTrigger=PropertyChanged}"/>
+                                        </StackPanel>
+                                    </Grid>
+                                    <TextBlock Grid.Row="2" Foreground="{StaticResource Brush.TextSecondary}">
+                                        <TextBlock.Text>
+                                            <MultiBinding StringFormat="Frames: {0}  |  FPS: {1:F2}  |  Dropped: {2}  |  Est. size: {3:N0} B">
+                                                <Binding Path="FramesCaptured"/>
+                                                <Binding Path="CurrentFps"/>
+                                                <Binding Path="FramesDropped"/>
+                                                <Binding Path="EstimatedSessionBytes"/>
+                                            </MultiBinding>
+                                        </TextBlock.Text>
+                                    </TextBlock>
+                                    <TextBlock Grid.Row="3" FontSize="10" Foreground="{StaticResource Brush.TextSecondary}" Margin="0,4,0,0"
+                                               Text="{Binding LastSnapPath, StringFormat=Last snap: {0}}" TextTrimming="CharacterEllipsis"/>
+                                </Grid>
+                            </Grid>
+                        </Border>
+                    </avalonDock:LayoutAnchorable>
+                </avalonDock:LayoutAnchorablePane>
+            </avalonDock:LayoutPanel>
+        </avalonDock:LayoutRoot>
+    </avalonDock:DockingManager>
     </Grid>
 </UserControl>

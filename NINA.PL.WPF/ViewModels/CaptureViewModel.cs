@@ -51,7 +51,12 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
         _statsTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(200) };
         _statsTimer.Tick += (_, _) => RefreshCaptureStats();
 
-        OutputDirectory = _capture.OutputDirectory;
+        var profile = ProfileManager.Instance.ActiveProfile;
+        string savedDir = profile.OutputDirectory;
+        if (string.IsNullOrWhiteSpace(savedDir))
+            savedDir = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\NINA-PL";
+        OutputDirectory = savedDir;
+        _capture.OutputDirectory = savedDir;
         FilePrefix = _capture.FilePrefix;
         FrameLimit = _capture.FrameLimit;
         TimeLimitSeconds = _capture.TimeLimitSeconds;
@@ -148,6 +153,15 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
 
     [ObservableProperty]
     private int roiHeight = 480;
+
+    [ObservableProperty]
+    private bool isSelectingRoi;
+
+    [ObservableProperty]
+    private int sensorFullWidth = 1920;
+
+    [ObservableProperty]
+    private int sensorFullHeight = 1200;
 
     [ObservableProperty]
     private string connectedCameraDisplayName = "—";
@@ -266,6 +280,9 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
         ExposureMax = cam.ExposureMax;
         GainMin = cam.GainMin;
         GainMax = cam.GainMax;
+
+        SensorFullWidth = cam.SensorWidth;
+        SensorFullHeight = cam.SensorHeight;
 
         if (RoiWidth == 0 || RoiHeight == 0 || (RoiWidth == 640 && RoiHeight == 480 && cam.SensorWidth > 640))
         {
@@ -704,6 +721,8 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
             OutputDirectory = dlg.FolderName;
     }
 
+    private static int Align8(int v) => (v + 7) & ~7;
+
     [RelayCommand]
     private void ApplyRoi()
     {
@@ -712,7 +731,13 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
             return;
         try
         {
-            cam.SetROI(RoiOffsetX, RoiOffsetY, RoiWidth, RoiHeight);
+            int x = Align8(RoiOffsetX);
+            int y = Align8(RoiOffsetY);
+            int w = Align8(Math.Max(8, RoiWidth));
+            int h = Align8(Math.Max(8, RoiHeight));
+            cam.SetROI(x, y, w, h);
+            RoiOffsetX = x; RoiOffsetY = y; RoiWidth = w; RoiHeight = h;
+            IsSelectingRoi = false;
         }
         catch (Exception ex)
         {
@@ -729,6 +754,11 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
         try
         {
             cam.ResetROI();
+            RoiOffsetX = 0;
+            RoiOffsetY = 0;
+            RoiWidth = cam.SensorWidth;
+            RoiHeight = cam.SensorHeight;
+            IsSelectingRoi = false;
         }
         catch (Exception ex)
         {

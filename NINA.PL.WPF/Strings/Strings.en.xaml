@@ -101,4 +101,5 @@
     <sys:String x:Key="Cap.AutoStretch">Auto Stretch</sys:String>
     <sys:String x:Key="Cap.Crosshair">Crosshair</sys:String>
     <sys:String x:Key="Cap.LiveView">Live View</sys:String>
+    <sys:String x:Key="Cap.ImageTab">Image</sys:String>
 </ResourceDictionary>
