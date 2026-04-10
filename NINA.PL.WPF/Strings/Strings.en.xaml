@@ -3,7 +3,7 @@
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
     <!-- Navigation -->
     <sys:String x:Key="Nav.Equipment">Equip</sys:String>
-    <sys:String x:Key="Nav.Capture">Capture</sys:String>
+    <sys:String x:Key="Nav.Capture">Imaging</sys:String>
     <sys:String x:Key="Nav.Focus">Focus</sys:String>
     <sys:String x:Key="Nav.Guider">Guider</sys:String>
     <sys:String x:Key="Nav.Stack">Stack</sys:String>
@@ -98,6 +98,7 @@
     <sys:String x:Key="Cap.ApplyROI">Apply ROI</sys:String>
     <sys:String x:Key="Cap.ResetROI">Reset ROI</sys:String>
     <sys:String x:Key="Cap.ExposureMs">Exposure (ms)</sys:String>
+    <sys:String x:Key="Cap.AutoStretch">Auto Stretch</sys:String>
     <sys:String x:Key="Cap.Crosshair">Crosshair</sys:String>
     <sys:String x:Key="Cap.LiveView">Live View</sys:String>
 </ResourceDictionary>

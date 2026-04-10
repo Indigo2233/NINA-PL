@@ -16,6 +16,15 @@ public static class MatBitmapHelper
         return MatToWriteableBitmap(mat);
     }
 
+    public static WriteableBitmap? FrameToWriteableBitmapStretched(FrameData frame)
+    {
+        using Mat mat = Debayer.ToMat(frame);
+        if (mat.Empty()) return null;
+        using Mat stretched = new();
+        Cv2.Normalize(mat, stretched, 0, 255, NormTypes.MinMax, dtype: -1);
+        return MatToWriteableBitmap(stretched);
+    }
+
     public static WriteableBitmap? MatToWriteableBitmap(Mat? mat)
     {
         if (mat is null || mat.Empty())

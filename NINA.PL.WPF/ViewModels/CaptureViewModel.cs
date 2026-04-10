@@ -167,7 +167,20 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
     private double liveImageZoom = 1.0;
 
     [ObservableProperty]
+    private double panOffsetX;
+
+    [ObservableProperty]
+    private double panOffsetY;
+
+    [ObservableProperty]
+    private bool autoStretch = true;
+
+    [ObservableProperty]
     private bool isLiveViewActive;
+
+    public double CrosshairX => LiveImage is not null ? LiveImage.PixelWidth / 2.0 : 0;
+    public double CrosshairY => LiveImage is not null ? LiveImage.PixelHeight / 2.0 : 0;
+    public string ZoomPercentText => $"{LiveImageZoom * 100:F0}%";
 
     [ObservableProperty]
     private double liveFps;
@@ -199,6 +212,8 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
     {
         _capture.Format = value;
     }
+
+    partial void OnLiveImageZoomChanged(double value) => OnPropertyChanged(nameof(ZoomPercentText));
 
     partial void OnExposureMicrosecondsChanged(double value)
     {
@@ -353,7 +368,11 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
         {
             try
             {
-                LiveImage = MatBitmapHelper.FrameToWriteableBitmap(frame);
+                LiveImage = AutoStretch
+                    ? MatBitmapHelper.FrameToWriteableBitmapStretched(frame)
+                    : MatBitmapHelper.FrameToWriteableBitmap(frame);
+                OnPropertyChanged(nameof(CrosshairX));
+                OnPropertyChanged(nameof(CrosshairY));
                 UpdateHistogram(frame);
             }
             finally
@@ -449,19 +468,29 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
     [RelayCommand]
     private void ZoomIn()
     {
-        LiveImageZoom = Math.Min(4, LiveImageZoom + 0.25);
+        LiveImageZoom = Math.Min(20, LiveImageZoom * 1.25);
     }
 
     [RelayCommand]
     private void ZoomOut()
     {
-        LiveImageZoom = Math.Max(1, LiveImageZoom - 0.25);
+        LiveImageZoom = Math.Max(0.05, LiveImageZoom / 1.25);
     }
 
     [RelayCommand]
     private void ResetZoom()
     {
         LiveImageZoom = 1;
+        PanOffsetX = 0;
+        PanOffsetY = 0;
+    }
+
+    [RelayCommand]
+    private void FitZoom()
+    {
+        LiveImageZoom = 1;
+        PanOffsetX = 0;
+        PanOffsetY = 0;
     }
 
     [RelayCommand]
