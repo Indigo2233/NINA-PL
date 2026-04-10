@@ -346,6 +346,9 @@ public sealed class AlpacaCameraProvider : ICameraProvider
         }
     }
 
+    public int MaxDeliverFps { get; set; } = 30;
+    public double ActualCameraFps { get; private set; }
+
     public async Task StartCaptureAsync()
     {
         Task? previous;

@@ -73,6 +73,12 @@ public interface INativeCameraBackend : IDisposable
 
     List<string> GetPixelFormatList();
 
+    /// <summary>Max frames/sec to deliver via FrameArrived. 0 = unlimited.</summary>
+    int MaxDeliverFps { get; set; }
+
+    /// <summary>Actual camera frame rate (signals per second).</summary>
+    double ActualCameraFps { get; }
+
     bool StartCapture(int timeoutMs = 5000);
 
     void StopCapture();

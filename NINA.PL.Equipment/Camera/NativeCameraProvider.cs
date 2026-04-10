@@ -169,6 +169,14 @@ public sealed class NativeCameraProvider : ICameraProvider
         WithActive(b => b.SetPixelFormat(format));
     }
 
+    public int MaxDeliverFps
+    {
+        get => ActiveOrDefault(b => b.MaxDeliverFps);
+        set => WithActive(b => b.MaxDeliverFps = value);
+    }
+
+    public double ActualCameraFps => ActiveOrDefault(b => b.ActualCameraFps);
+
     public Task StartCaptureAsync()
     {
         var ok = WithActive(b => b.StartCapture(5000), () => false);

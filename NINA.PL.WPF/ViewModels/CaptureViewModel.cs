@@ -330,13 +330,14 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
         long elapsed = now - Interlocked.Read(ref _liveFpsWindowStart);
         if (elapsed > TimeSpan.TicksPerSecond)
         {
-            double fps = count / (elapsed / (double)TimeSpan.TicksPerSecond);
             long total = Interlocked.Read(ref _liveTotalReceived);
             Interlocked.Exchange(ref _liveFrameCount, 0);
             Interlocked.Exchange(ref _liveFpsWindowStart, now);
+            ICameraProvider? cam = _camera.GetConnectedProvider();
+            double hwFps = cam?.ActualCameraFps ?? 0;
             _dispatcher.BeginInvoke(() =>
             {
-                LiveFps = fps;
+                LiveFps = hwFps;
                 LiveFramesTotal = (int)total;
             });
         }

@@ -59,6 +59,12 @@ public interface ICameraProvider : IDisposable
 
     void SetPixelFormat(string format);
 
+    /// <summary>Max frames/sec to deliver via FrameReceived. 0 = unlimited. Default 30.</summary>
+    int MaxDeliverFps { get; set; }
+
+    /// <summary>Actual frame rate from the camera hardware (signals per second).</summary>
+    double ActualCameraFps { get; }
+
     Task StartCaptureAsync();
 
     Task StopCaptureAsync();

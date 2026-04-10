@@ -260,6 +260,9 @@ public sealed class PlayerOneBackend : INativeCameraBackend
         return true;
     }
 
+    public int MaxDeliverFps { get; set; } = 30;
+    public double ActualCameraFps { get; private set; }
+
     public void StopCapture()
     {
         lock (_gate)

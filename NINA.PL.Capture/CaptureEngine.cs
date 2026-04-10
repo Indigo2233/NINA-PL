@@ -94,6 +94,10 @@ public sealed class CaptureEngine
         };
         _worker.Start(_cts.Token);
 
+        var provider = _camera.GetConnectedProvider();
+        if (provider is not null)
+            provider.MaxDeliverFps = 0; // unlimited for recording
+
         _camera.FrameReceived += OnFrameReceived;
         CaptureStarted?.Invoke(this, EventArgs.Empty);
     }
@@ -105,6 +109,10 @@ public sealed class CaptureEngine
 
         if (_camera is not null)
         {
+            var provider = _camera.GetConnectedProvider();
+            if (provider is not null)
+                provider.MaxDeliverFps = 30; // back to preview rate
+
             _camera.FrameReceived -= OnFrameReceived;
             _camera = null;
         }

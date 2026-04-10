@@ -255,6 +255,11 @@ public sealed class ToupcamBackend : INativeCameraBackend
     public List<string> GetPixelFormatList() =>
         new() { "RAW8", "RAW10", "RAW12", "RAW14", "RAW16", "RGB888", "MONO8", "MONO16" };
 
+    private volatile int _maxDeliverFps = 30;
+
+    /// <summary>Max frames/sec to deliver via FrameArrived. 0 = unlimited. Default 30 (preview).</summary>
+    public int MaxDeliverFps { get => _maxDeliverFps; set => _maxDeliverFps = Math.Max(0, value); }
+
     public bool StartCapture(int timeoutMs = 5000)
     {
         ThrowIfNotOpen();
@@ -320,6 +325,10 @@ public sealed class ToupcamBackend : INativeCameraBackend
             _frameSignal.Set();
     }
 
+    private long _actualCameraFpsTicks;
+    /// <summary>Actual frame rate reported by the camera SDK (frames signaled per second).</summary>
+    public double ActualCameraFps => BitConverter.Int64BitsToDouble(Interlocked.Read(ref _actualCameraFpsTicks));
+
     private unsafe void PullLoop()
     {
         var native = _native;
@@ -327,11 +336,33 @@ public sealed class ToupcamBackend : INativeCameraBackend
         if (native is null || handle == nint.Zero)
             return;
 
+        long lastDeliverMs = 0;
+        int signalCount = 0;
+        long fpsWindowStart = Environment.TickCount64;
         var buffer = Array.Empty<byte>();
         while (_captureRunning)
         {
             if (!_frameSignal.WaitOne(100))
                 continue;
+
+            signalCount++;
+            long nowMs = Environment.TickCount64;
+            long fpsElapsed = nowMs - fpsWindowStart;
+            if (fpsElapsed >= 1000)
+            {
+                Interlocked.Exchange(ref _actualCameraFpsTicks, BitConverter.DoubleToInt64Bits(signalCount * 1000.0 / fpsElapsed));
+                signalCount = 0;
+                fpsWindowStart = nowMs;
+            }
+
+            int limit = _maxDeliverFps;
+            if (limit > 0)
+            {
+                long minInterval = 1000 / limit;
+                if (nowMs - lastDeliverMs < minInterval)
+                    continue;
+            }
+            lastDeliverMs = nowMs;
 
             var localHandle = nint.Zero;
             int w, h, bpp, rowPitch;
