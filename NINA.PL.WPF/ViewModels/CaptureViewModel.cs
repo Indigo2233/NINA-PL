@@ -178,6 +178,9 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
     [ObservableProperty]
     private bool isLiveViewActive;
 
+    [ObservableProperty]
+    private string? lastSnapPath;
+
     public double CrosshairX => LiveImage is not null ? LiveImage.PixelWidth / 2.0 : 0;
     public double CrosshairY => LiveImage is not null ? LiveImage.PixelHeight / 2.0 : 0;
     public string ZoomPercentText => $"{LiveImageZoom * 100:F0}%";
@@ -580,13 +583,12 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
                 string filename = Path.Combine(dir, $"{FilePrefix}_{DateTime.Now:yyyyMMdd_HHmmss}.fits");
                 using Mat mat = Debayer.ToMat(frame);
                 SaveFits(mat, filename);
-                _dispatcher.BeginInvoke(() =>
-                    MessageBox.Show($"Saved: {filename}", "Snap FITS", MessageBoxButton.OK, MessageBoxImage.Information));
+                _dispatcher.BeginInvoke(() => LastSnapPath = filename);
             }
             catch (Exception ex)
             {
-                _dispatcher.BeginInvoke(() =>
-                    MessageBox.Show($"Failed to save FITS: {ex.Message}", "Snap", MessageBoxButton.OK, MessageBoxImage.Error));
+                Logger.Error(ex, "Failed to save FITS.");
+                _dispatcher.BeginInvoke(() => LastSnapPath = $"Error: {ex.Message}");
             }
         });
     }
@@ -637,6 +639,13 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
     {
         string card = $"{key,-8}= {value,20} / {comment}";
         return card.PadRight(80)[..80];
+    }
+
+    [RelayCommand]
+    private void OpenOutputFolder()
+    {
+        string dir = Directory.Exists(OutputDirectory) ? OutputDirectory : Path.GetTempPath();
+        try { System.Diagnostics.Process.Start("explorer.exe", dir); } catch { /* ignore */ }
     }
 
     [RelayCommand]
