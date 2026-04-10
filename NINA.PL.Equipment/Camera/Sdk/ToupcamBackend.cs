@@ -327,11 +327,18 @@ public sealed class ToupcamBackend : INativeCameraBackend
         if (native is null || handle == nint.Zero)
             return;
 
+        const long minIntervalMs = 33; // ~30 fps cap
+        long lastPullMs = 0;
         var buffer = Array.Empty<byte>();
         while (_captureRunning)
         {
             if (!_frameSignal.WaitOne(100))
                 continue;
+
+            long nowMs = Environment.TickCount64;
+            if (nowMs - lastPullMs < minIntervalMs)
+                continue;
+            lastPullMs = nowMs;
 
             var localHandle = nint.Zero;
             int w, h, bpp, rowPitch;
