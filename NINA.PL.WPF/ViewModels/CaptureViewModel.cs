@@ -53,9 +53,6 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
 
         RefreshCameraDisplayName();
         RebuildFilterQuickList();
-
-        if (_camera.IsConnected)
-            _ = StartLiveViewInternalAsync();
     }
 
     [ObservableProperty]
@@ -297,10 +294,8 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
                 RefreshCameraDisplayName();
                 RebuildFilterQuickList();
 
-                if (_camera.IsConnected && !IsLiveViewActive)
-                    _ = StartLiveViewInternalAsync();
-                else if (!_camera.IsConnected && IsLiveViewActive)
-                    _ = StopLiveViewInternalAsync();
+                if (!_camera.IsConnected && IsLiveViewActive)
+                    IsLiveViewActive = false;
             });
         }
     }
@@ -546,22 +541,24 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
         try
         {
             ApplyCameraExposureGain();
-            await cam.StartCaptureAsync().ConfigureAwait(true);
+            await Task.Run(() => cam.StartCaptureAsync()).ConfigureAwait(true);
             IsLiveViewActive = true;
         }
         catch (Exception ex)
         {
             Logger.Warn(ex, "Failed to start live view.");
+            MessageBox.Show($"Failed to start live view: {ex.Message}", "Live View",
+                MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
 
     private async Task StopLiveViewInternalAsync()
     {
         ICameraProvider? cam = _camera.GetConnectedProvider();
-        if (cam is null) return;
+        if (cam is null) { IsLiveViewActive = false; return; }
         try
         {
-            await cam.StopCaptureAsync().ConfigureAwait(true);
+            await Task.Run(() => cam.StopCaptureAsync()).ConfigureAwait(true);
         }
         catch (Exception ex)
         {
