@@ -601,41 +601,69 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
         using var fs = new FileStream(path, FileMode.Create, FileAccess.Write);
         using var bw = new BinaryWriter(fs);
 
-        int naxis = mat.Channels() == 1 ? 2 : 3;
-        int bitpix = mat.Depth() switch
-        {
-            MatType.CV_8U => 8,
-            MatType.CV_16U => 16,
-            MatType.CV_32F => -32,
-            _ => 8
-        };
+        int channels = mat.Channels();
+        int naxis = channels == 1 ? 2 : 3;
+        int depth = mat.Depth();
+        int bitpix = depth == MatType.CV_16U ? 16
+                   : depth == MatType.CV_32F ? -32
+                   : 8;
+        int bytesPerPixel = Math.Abs(bitpix) / 8;
 
         var headers = new List<string>
         {
-            FitsCard("SIMPLE", "T", "FITS standard"),
-            FitsCard("BITPIX", bitpix.ToString(), "bits per pixel"),
+            FitsCard("SIMPLE", "T", "conforms to FITS standard"),
+            FitsCard("BITPIX", bitpix.ToString(), "bits per data value"),
             FitsCard("NAXIS", naxis.ToString(), "number of axes"),
             FitsCard("NAXIS1", mat.Width.ToString(), "width"),
             FitsCard("NAXIS2", mat.Height.ToString(), "height"),
         };
         if (naxis == 3)
-            headers.Add(FitsCard("NAXIS3", mat.Channels().ToString(), "channels"));
+            headers.Add(FitsCard("NAXIS3", channels.ToString(), "number of planes"));
+        headers.Add(FitsCard("BZERO", "0", "physical = array * BSCALE + BZERO"));
+        headers.Add(FitsCard("BSCALE", "1", "default scaling factor"));
         headers.Add("END".PadRight(80));
 
         foreach (var h in headers)
             bw.Write(System.Text.Encoding.ASCII.GetBytes(h));
 
         int headerBytes = headers.Count * 80;
-        int pad = (2880 - headerBytes % 2880) % 2880;
-        if (pad > 0) bw.Write(new byte[pad]);
+        int padH = (2880 - headerBytes % 2880) % 2880;
+        if (padH > 0) bw.Write(new byte[padH]);
 
-        int total = mat.Rows * mat.Cols * mat.Channels() * mat.ElemSize() / mat.Channels();
-        byte[] data = new byte[total * mat.Channels()];
-        System.Runtime.InteropServices.Marshal.Copy(mat.Data, data, 0, data.Length);
-        bw.Write(data);
+        int imgW = mat.Width;
+        int imgH = mat.Height;
 
-        int dataPad = (2880 - data.Length % 2880) % 2880;
-        if (dataPad > 0) bw.Write(new byte[dataPad]);
+        if (channels == 1)
+        {
+            long step = mat.Step();
+            for (int y = imgH - 1; y >= 0; y--)
+            {
+                byte[] row = new byte[imgW * bytesPerPixel];
+                System.Runtime.InteropServices.Marshal.Copy(mat.Data + (nint)(y * step), row, 0, row.Length);
+                bw.Write(row);
+            }
+        }
+        else
+        {
+            Mat[] planes = Cv2.Split(mat);
+            int[] order = channels >= 3 ? [2, 1, 0] : Enumerable.Range(0, channels).ToArray();
+            foreach (int ch in order)
+            {
+                using var plane = planes[ch];
+                long step = plane.Step();
+                for (int y = imgH - 1; y >= 0; y--)
+                {
+                    byte[] row = new byte[imgW * bytesPerPixel];
+                    System.Runtime.InteropServices.Marshal.Copy(plane.Data + (nint)(y * step), row, 0, row.Length);
+                    bw.Write(row);
+                }
+            }
+            foreach (var p in planes) p.Dispose();
+        }
+
+        long dataBytes = (long)imgW * imgH * channels * bytesPerPixel;
+        int padD = (int)((2880 - dataBytes % 2880) % 2880);
+        if (padD > 0) bw.Write(new byte[padD]);
     }
 
     private static string FitsCard(string key, string value, string comment)
