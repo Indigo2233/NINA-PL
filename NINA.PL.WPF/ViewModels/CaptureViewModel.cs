@@ -28,6 +28,7 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
     private readonly DispatcherTimer _statsTimer;
     private int _lastFramePayloadBytes;
     private int _frameRenderBusy;
+    private long _lastFrameRenderTicks;
 
     public CaptureViewModel(CameraMediator camera, FilterWheelMediator filterWheel, CaptureEngine capture)
     {
@@ -210,15 +211,20 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
         ICameraProvider? cam = _camera.GetConnectedProvider();
         if (cam is null || !cam.IsConnected)
             return;
-        try
+        double exp = ExposureMicroseconds;
+        double g = Gain;
+        Task.Run(() =>
         {
-            cam.SetExposure(ExposureMicroseconds);
-            cam.SetGain(Gain);
-        }
-        catch (Exception ex)
-        {
-            Logger.Warn(ex, "CaptureViewModel: failed to set exposure/gain.");
-        }
+            try
+            {
+                cam.SetExposure(exp);
+                cam.SetGain(g);
+            }
+            catch (Exception ex)
+            {
+                Logger.Warn(ex, "CaptureViewModel: failed to set exposure/gain.");
+            }
+        });
     }
 
     private void RefreshCameraLimits()
@@ -298,12 +304,19 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
         FilterQuickSlots = new ObservableCollection<FilterSlotRow>(rows);
     }
 
+    private const long MinFrameIntervalTicks = TimeSpan.TicksPerSecond / 30; // 30 FPS cap
+
     private void OnCameraFrameReceived(object? sender, FrameData frame)
     {
         _lastFramePayloadBytes = frame.Data.Length;
 
+        long now = DateTime.UtcNow.Ticks;
+        long prev = Interlocked.Read(ref _lastFrameRenderTicks);
+        if (now - prev < MinFrameIntervalTicks)
+            return;
         if (Interlocked.CompareExchange(ref _frameRenderBusy, 1, 0) != 0)
             return;
+        Interlocked.Exchange(ref _lastFrameRenderTicks, now);
 
         _dispatcher.BeginInvoke(() =>
         {
@@ -311,8 +324,6 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
             {
                 LiveImage = MatBitmapHelper.FrameToWriteableBitmap(frame);
                 UpdateHistogram(frame);
-                RefreshCameraLimits();
-                RefreshCameraDisplayName();
             }
             finally
             {
