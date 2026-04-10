@@ -29,6 +29,8 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
     private int _lastFramePayloadBytes;
     private int _frameRenderBusy;
     private long _lastFrameRenderTicks;
+    private int _liveFrameCount;
+    private long _liveFpsWindowStart;
 
     public CaptureViewModel(CameraMediator camera, FilterWheelMediator filterWheel, CaptureEngine capture)
     {
@@ -165,6 +167,9 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
 
     [ObservableProperty]
     private bool isLiveViewActive;
+
+    [ObservableProperty]
+    private double liveFps;
 
     partial void OnFrameLimitChanged(int value)
     {
@@ -318,12 +323,25 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
             return;
         Interlocked.Exchange(ref _lastFrameRenderTicks, now);
 
+        int count = Interlocked.Increment(ref _liveFrameCount);
+        long windowStart = Interlocked.Read(ref _liveFpsWindowStart);
+        if (windowStart == 0)
+            Interlocked.CompareExchange(ref _liveFpsWindowStart, now, 0);
+
         _dispatcher.BeginInvoke(() =>
         {
             try
             {
                 LiveImage = MatBitmapHelper.FrameToWriteableBitmap(frame);
                 UpdateHistogram(frame);
+
+                long elapsed = DateTime.UtcNow.Ticks - Interlocked.Read(ref _liveFpsWindowStart);
+                if (elapsed > TimeSpan.TicksPerSecond)
+                {
+                    LiveFps = count / (elapsed / (double)TimeSpan.TicksPerSecond);
+                    Interlocked.Exchange(ref _liveFrameCount, 0);
+                    Interlocked.Exchange(ref _liveFpsWindowStart, DateTime.UtcNow.Ticks);
+                }
             }
             finally
             {

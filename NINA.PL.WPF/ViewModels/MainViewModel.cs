@@ -138,9 +138,9 @@ public sealed partial class MainViewModel : ObservableObject
         string mnt = _mountMediator.IsConnected
             ? (_mountMediator.ConnectedDeviceName ?? "Mount")
             : "—";
-        double fps = Capture.CurrentFps;
+        double fps = _captureEngine.IsCapturing ? Capture.CurrentFps : Capture.LiveFps;
         string fpsPart = $"{fps:F1} FPS";
-        string rec = _captureEngine.IsCapturing ? "● REC" : "Idle";
+        string rec = _captureEngine.IsCapturing ? "● REC" : Capture.IsLiveViewActive ? "▶ Live" : "Idle";
         StatusBarText =
             $"{cam}  |  {fpsPart}  |  Frames: {Capture.FramesCaptured}  |  Dropped: {Capture.FramesDropped}  |  {rec}  |  Mount: {mnt}";
     }
