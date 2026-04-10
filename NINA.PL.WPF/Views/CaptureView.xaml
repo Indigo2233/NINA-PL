@@ -25,14 +25,14 @@
                 MouseLeftButtonUp="ImageContainer_MouseLeftButtonUp"
                 MouseMove="ImageContainer_MouseMove">
             <Grid>
-                <Grid x:Name="ImageCanvas" RenderTransformOrigin="0.5,0.5" Background="Transparent">
+                <Grid x:Name="ImageCanvas" Background="Transparent">
                     <Grid.RenderTransform>
                         <TransformGroup>
-                            <ScaleTransform ScaleX="{Binding LiveImageZoom}" ScaleY="{Binding LiveImageZoom}"/>
+                            <ScaleTransform ScaleX="{Binding LiveImageZoom}" ScaleY="{Binding LiveImageZoom}" CenterX="0" CenterY="0"/>
                             <TranslateTransform X="{Binding PanOffsetX}" Y="{Binding PanOffsetY}"/>
                         </TransformGroup>
                     </Grid.RenderTransform>
-                    <Image Source="{Binding LiveImage}" Stretch="None" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
+                    <Image Source="{Binding LiveImage}" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality"/>
                     <Canvas IsHitTestVisible="False" Visibility="{Binding ShowCrosshair, Converter={StaticResource BoolToVis}}"
                             Width="{Binding LiveImage.PixelWidth}" Height="{Binding LiveImage.PixelHeight}">
                         <Line X1="{Binding CrosshairX}" Y1="0" X2="{Binding CrosshairX}" Y2="{Binding LiveImage.PixelHeight}"
