@@ -25,30 +25,30 @@
                 MouseLeftButtonUp="ImageContainer_MouseLeftButtonUp"
                 MouseMove="ImageContainer_MouseMove">
             <Grid>
-                <ScrollViewer x:Name="ImageScroller"
-                              HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"
-                              PanningMode="None" IsManipulationEnabled="False">
-                    <Grid x:Name="ImageCanvas" RenderTransformOrigin="0,0">
-                        <Grid.RenderTransform>
-                            <TransformGroup>
-                                <ScaleTransform x:Name="ImageScale" ScaleX="{Binding LiveImageZoom}" ScaleY="{Binding LiveImageZoom}"/>
-                                <TranslateTransform x:Name="ImageTranslate" X="{Binding PanOffsetX}" Y="{Binding PanOffsetY}"/>
-                            </TransformGroup>
-                        </Grid.RenderTransform>
-                        <Image Source="{Binding LiveImage}" Stretch="None" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
-                        <Canvas IsHitTestVisible="False" Visibility="{Binding ShowCrosshair, Converter={StaticResource BoolToVis}}"
-                                Width="{Binding LiveImage.PixelWidth}" Height="{Binding LiveImage.PixelHeight}">
-                            <Line X1="{Binding CrosshairX}" Y1="0" X2="{Binding CrosshairX}" Y2="{Binding LiveImage.PixelHeight}"
-                                  Stroke="{StaticResource Brush.Primary}" StrokeThickness="1" Opacity="0.6"/>
-                            <Line X1="0" Y1="{Binding CrosshairY}" X2="{Binding LiveImage.PixelWidth}" Y2="{Binding CrosshairY}"
-                                  Stroke="{StaticResource Brush.Primary}" StrokeThickness="1" Opacity="0.6"/>
-                        </Canvas>
-                    </Grid>
-                </ScrollViewer>
+                <Grid x:Name="ImageCanvas" RenderTransformOrigin="0.5,0.5" Background="Transparent">
+                    <Grid.RenderTransform>
+                        <TransformGroup>
+                            <ScaleTransform ScaleX="{Binding LiveImageZoom}" ScaleY="{Binding LiveImageZoom}"/>
+                            <TranslateTransform X="{Binding PanOffsetX}" Y="{Binding PanOffsetY}"/>
+                        </TransformGroup>
+                    </Grid.RenderTransform>
+                    <Image Source="{Binding LiveImage}" Stretch="None" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
+                    <Canvas IsHitTestVisible="False" Visibility="{Binding ShowCrosshair, Converter={StaticResource BoolToVis}}"
+                            Width="{Binding LiveImage.PixelWidth}" Height="{Binding LiveImage.PixelHeight}">
+                        <Line X1="{Binding CrosshairX}" Y1="0" X2="{Binding CrosshairX}" Y2="{Binding LiveImage.PixelHeight}"
+                              Stroke="{StaticResource Brush.Primary}" StrokeThickness="1" Opacity="0.6"/>
+                        <Line X1="0" Y1="{Binding CrosshairY}" X2="{Binding LiveImage.PixelWidth}" Y2="{Binding CrosshairY}"
+                              Stroke="{StaticResource Brush.Primary}" StrokeThickness="1" Opacity="0.6"/>
+                    </Canvas>
+                </Grid>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="8">
                     <ToggleButton IsChecked="{Binding ShowCrosshair, Mode=TwoWay}" Content="{DynamicResource Cap.Crosshair}" Margin="0,0,8,0"/>
-                    <Button Command="{Binding ZoomOutCommand}" Width="32" Height="32" FontSize="18" FontWeight="Bold" Margin="0,0,4,0">&#x2212;</Button>
-                    <Button Command="{Binding ZoomInCommand}" Width="32" Height="32" FontSize="18" FontWeight="Bold" Margin="0,0,4,0">+</Button>
+                    <Button Command="{Binding ZoomOutCommand}" Width="32" Height="32" Margin="0,0,4,0">
+                        <TextBlock Text="-" FontSize="18" FontWeight="Bold" FontFamily="Consolas" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Button>
+                    <Button Command="{Binding ZoomInCommand}" Width="32" Height="32" Margin="0,0,4,0">
+                        <TextBlock Text="+" FontSize="18" FontWeight="Bold" FontFamily="Consolas" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Button>
                     <Button Content="1:1" Command="{Binding ResetZoomCommand}" Padding="10,4"/>
                     <Button Command="{Binding FitZoomCommand}" Padding="10,4" Margin="4,0,0,0" Content="Fit"/>
                 </StackPanel>
@@ -125,13 +125,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <GroupBox Margin="0,0,0,16">
-                    <GroupBox.Header>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{DynamicResource Cap.Histogram}" VerticalAlignment="Center"/>
-                            <ToggleButton IsChecked="{Binding AutoStretch, Mode=TwoWay}" Content="{DynamicResource Cap.AutoStretch}" Margin="12,0,0,0" Padding="8,2"/>
-                        </StackPanel>
-                    </GroupBox.Header>
+                <GroupBox Header="{DynamicResource Cap.Histogram}" Margin="0,0,0,16">
                     <StackPanel>
                         <Border Height="120" Background="{StaticResource Brush.InputBg}" CornerRadius="3" ClipToBounds="True" BorderBrush="{StaticResource Brush.Border}" BorderThickness="1">
                             <Polyline Points="{Binding HistogramLinePoints}" Stroke="{StaticResource Brush.Primary}" StrokeThickness="1.25" Stretch="Fill"/>
@@ -141,6 +135,7 @@
                             <TextBlock Foreground="{StaticResource Brush.TextSecondary}" Text="{Binding HistogramMax, StringFormat=Max {0}}"/>
                             <TextBlock Foreground="{StaticResource Brush.TextSecondary}" Text="{Binding HistogramMean, StringFormat=Mean {0:F1}}"/>
                         </UniformGrid>
+                        <ToggleButton IsChecked="{Binding AutoStretch, Mode=TwoWay}" Content="{DynamicResource Cap.AutoStretch}" Margin="0,8,0,0" HorizontalAlignment="Left" Padding="12,4"/>
                     </StackPanel>
                 </GroupBox>
 
