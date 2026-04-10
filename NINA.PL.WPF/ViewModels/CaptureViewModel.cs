@@ -12,6 +12,7 @@ using Microsoft.Win32;
 using NINA.PL.Capture;
 using NINA.PL.Core;
 using NINA.PL.Image;
+using NINA.PL.Profile;
 using NINA.PL.WPF.Helpers;
 using OpenCvSharp;
 
@@ -82,7 +83,7 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
     private double timeLimitSeconds;
 
     [ObservableProperty]
-    private string outputDirectory = string.Empty;
+    private string outputDirectory = ProfileManager.Instance.ActiveProfile.OutputDirectory;
 
     [ObservableProperty]
     private string filePrefix = "capture";
@@ -204,6 +205,8 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
     partial void OnOutputDirectoryChanged(string value)
     {
         _capture.OutputDirectory = string.IsNullOrWhiteSpace(value) ? Path.GetTempPath() : value;
+        ProfileManager.Instance.ActiveProfile.OutputDirectory = _capture.OutputDirectory;
+        try { ProfileManager.Instance.Save(); } catch { /* ignore */ }
     }
 
     partial void OnFilePrefixChanged(string value)
