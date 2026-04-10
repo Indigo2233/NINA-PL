@@ -657,7 +657,7 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
         if (channels == 1)
         {
             long step = work.Step();
-            for (int y = imgH - 1; y >= 0; y--)
+            for (int y = 0; y < imgH; y++)
                 WriteRowBigEndian(work.Data + (nint)(y * step), imgW);
         }
         else
@@ -668,7 +668,7 @@ public sealed partial class CaptureViewModel : ObservableObject, IDisposable
             {
                 using var plane = planes[ch];
                 long step = plane.Step();
-                for (int y = imgH - 1; y >= 0; y--)
+                for (int y = 0; y < imgH; y++)
                     WriteRowBigEndian(plane.Data + (nint)(y * step), imgW);
             }
             foreach (var p in planes) p.Dispose();
